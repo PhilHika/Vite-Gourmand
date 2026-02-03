@@ -1,0 +1,14 @@
+.git
+.gitignore
+docker/
+.env.local
+.env.*.local
+vendor/
+var/
+public/build/
+node_modules/
+tests/
+phpunit.xml
+.php-cs-fixer.dist.php
+composer.lock
+symfony.lock

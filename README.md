@@ -24,6 +24,12 @@ PostgreSQL :
  - Correspond à des projets complexes avec gestion des droits
  - Gere en natif les uuid (+ de securité)
  
+Docker :
+ - Premiere occasion d'utiliser Docker "grandeur nature"
+ - Pour la portabilité totale
+ - reset DB instantanément
+ - recréer un environnement clean
+ 
 ---
 
 ## Installation
@@ -36,4 +42,7 @@ composer install
 
 ## Lancer le serveur
 symfony serve
+puis
+url : http://localhost:8080
+
 

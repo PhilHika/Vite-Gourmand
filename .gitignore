@@ -18,3 +18,9 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> Docker ###
+docker/volumes
+docker/db_data/
+###< Docker ###
+
