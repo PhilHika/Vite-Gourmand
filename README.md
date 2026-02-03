@@ -13,56 +13,91 @@ Un projet Symfony 7.4 pour la gestion des commande de menus, avec l'appui d'une 
 
 ---
 
-## 🛠️ Installation avec Docker
+## 🏗️ Architecture & Modèle de Données
 
-### 1. Cloner le projet
+Le projet suit une architecture MVC classique avec Symfony, en mettant l'accent sur un domaine métier robuste.
+
+### Schéma des Entités (Aperçu)
+
+```mermaid
+classDiagram
+    class Utilisateur {
+        +int id
+        +string email
+        +string password
+        +array roles
+        +string prenom
+        +string telephone
+    }
+    class Commande {
+        +string numero_commande (UUID)
+        +datetime date_commande
+        +datetime date_prestation
+        +int nombre_personne
+        +float prix_livraison
+        +string statut
+    }
+    class Menu {
+        +int id
+        +string titre
+        +float prix_par_personne
+        +int nombre_personne_minimum
+    }
+    class Plat {
+        +int id
+        +string titre_plat
+        +blob photo
+    }
+    class Avis {
+        +int id
+        +string commentaire
+        +int note
+    }
+
+```
+
+---
+
+## 💡 Philosophie de Développement
+
+### 🛡️ Fail-Fast & Validation
+Nous utilisons une approche "Fail-Fast" pour garantir l'intégrité des données dès le niveau des entités :
+- **Validation Doctrine/Symfony** : Utilisation intensive des attributs `#[Assert]` pour la validation automatique (ex: email, longueurs, types).
+- **Validation Métier** : Les setters des entités incluent des vérifications manuelles (ex: date de prestation > date de commande) et lèvent des `\InvalidArgumentException` immédiatement en cas d'erreur.
+
+### Commande 🆔 Identifiants Uniques
+- Utilisation de **UUID v4** + Date Reference : 
+  Pour les numéros de commande (`Commande::numero_commande`), offrant une sécurité accrue et une meilleure portabilité des données.
+
+---
+
+## 🛠️ Installation & Workflow
+
+### 1. Installation Rapide
 ```bash
 git clone git@github.com:PhilHika/Vite-Gourmand.git
 cd Vite-et-Gourmand
-```
-
-### 2. Configuration de l'environnement
-Créez votre fichier local de secrets (non versionné) :
-```bash
-cp .env .env.local
-```
-> [!IMPORTANT]
-> Modifiez le fichier `.env.local` pour y définir vos identifiants personnalisés (Database, App Secret, etc.).
-
-### 3. Lancer la Stack
-```bash
+cp .env .env.local # Configurez vos variables
 docker compose up -d --build
-```
-
-### 4. Installer les dépendances
-```bash
 docker compose exec php composer install
 ```
 
----
-
-## 💡 Pourquoi ce choix technique ?
-
-- **PostgreSQL** : Pour sa gestion native des UUID, son intégration parfaite avec Doctrine ORM et sa robustesse sur des projets complexes.
-- **Docker** :
-  - **Portabilité** : Environnement identique pour tous les développeurs.
-  - **Performance** : PHP optimisé avec Opcache et Nginx configuré pour Symfony.
-  - **Flexibilité** : Reset de la base de données et des services en une commande.
-
----
-
-## 📖 Commandes Utiles
+### 2. Commandes Utiles
 
 | Action | Commande |
 | :--- | :--- |
-| Voir les logs | `docker compose logs -f` |
+| **Bases de données** | |
 | Créer une migration | `docker compose exec php php bin/console make:migration` |
 | Appliquer les migrations | `docker compose exec php php bin/console doctrine:migrations:migrate` |
+| **Qualité & Debug** | |
+| Vider le cache | `docker compose exec php php bin/console cache:clear` |
+| Voir les routes | `docker compose exec php php bin/console debug:router` |
 | Accéder au conteneur PHP | `docker compose exec php bash` |
+| **Logs** | `docker compose logs -f` |
 
 ---
 
-## 🌐 Accès
+## 🌐 Accès aux Services
 - **Application** : [http://localhost:8080](http://localhost:8080)
 - **Mailpit (Emails)** : [http://localhost:8025](http://localhost:8025)
 
