@@ -30,11 +30,28 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
+    // Renforcer le controle des mots de passe / fail-fast :
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le mot de passe est obligatoire')]
     #[Assert\Length(
-        min: 8,
+        min: 10,
         minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
+    )]
+    #[Assert\Regex(
+        pattern: '/[A-Z]/',
+        message: 'Le mot de passe doit contenir au moins une majuscule'
+    )]
+    #[Assert\Regex(
+        pattern: '/[a-z]/',
+        message: 'Le mot de passe doit contenir au moins une minuscule'
+    )]
+    #[Assert\Regex(
+        pattern: '/[0-9]/',
+        message: 'Le mot de passe doit contenir au moins un chiffre'
+    )]
+    #[Assert\Regex(
+        pattern: '/[^A-Za-z0-9]/',
+        message: 'Le mot de passe doit contenir au moins un caractère spécial'
     )]
     private ?string $password = null;
 
@@ -47,8 +64,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 50, maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères')]
     private ?string $prenom = null;
 
+    // Renforcer le controle des numero de telephone / fail-fast :
+    // juste des chiffres (& des - / . / espace)! 
     #[ORM\Column(length: 50)]
     #[Assert\Length(max: 50, maxMessage: 'Le téléphone ne peut pas dépasser {{ limit }} caractères')]
+    #[Assert\Regex(
+        pattern: '/^\d+$/',
+        message: 'Le téléphone ne peut contenir que des chiffres'
+    )]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 50)]
@@ -110,6 +133,23 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): static
     {
+        // Fail-fast validation
+        if (mb_strlen($password) < 10) {
+            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins 10 caractères.');
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins une majuscule.');
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins une minuscule.');
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins un chiffre.');
+        }
+        if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins un caractère spécial.');
+        }
+
         $this->password = $password;
 
         return $this;
@@ -166,10 +206,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setTelephone(string $telephone): static
     {
-        if (mb_strlen($telephone) > 50) {
-            throw new \InvalidArgumentException('Le téléphone ne peut pas dépasser 50 caractères.');
+        // Nettoyage : on ne garde que les chiffres (enlève les espaces, points, tirets...)
+        $cleanTelephone = preg_replace('/\D/', '', $telephone);
+
+        if (empty($cleanTelephone)) {
+            throw new \InvalidArgumentException('Le numéro de téléphone doit contenir au moins quelques chiffres.');
         }
-        $this->telephone = $telephone;
+
+        if (mb_strlen($cleanTelephone) > 50) {
+            throw new \InvalidArgumentException('Le numéro de téléphone ne peut pas dépasser 50 chiffres.');
+        }
+
+        $this->telephone = $cleanTelephone;
 
         return $this;
     }
