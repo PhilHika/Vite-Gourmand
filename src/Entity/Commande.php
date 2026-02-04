@@ -29,6 +29,10 @@ class Commande
     private ?string $heure_livraison = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero(message: 'Le prix de menu ne peut pas être négatif')]
+    private ?float $prix_menu = null;
+
+    #[ORM\Column]
     #[Assert\Positive(message: 'Le nombre de personnes doit être supérieur à zéro')]
     private ?int $nombre_personne = null;
 
@@ -138,6 +142,21 @@ class Commande
             throw new \InvalidArgumentException('Le prix de livraison ne peut pas être négatif.');
         }
         $this->prix_livraison = $prix_livraison;
+
+        return $this;
+    }
+
+    public function getPrix_menu(): ?float
+    {
+        return $this->prix_menu;
+    }
+
+    public function setPrix_menu(float $prix_menu): static
+    {
+        if ($prix_menu < 0) {
+            throw new \InvalidArgumentException('Le prix de menu ne peut pas être négatif.');
+        }
+        $this->prix_menu = $prix_menu;
 
         return $this;
     }

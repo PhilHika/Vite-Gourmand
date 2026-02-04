@@ -35,6 +35,7 @@ classDiagram
         +datetime date_prestation
         +int nombre_personne
         +float prix_livraison
+        +float prix_menu
         +string statut
     }
     class Menu {
