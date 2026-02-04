@@ -51,7 +51,7 @@ class Commande
     private ?bool $restitution_materiel = null;
 
     #[ORM\PrePersist]
-    public function generateNumero_commande(): void
+    public function generateNumeroCommande(): void
     {
         // eviter un crash si la date n'est pas set 
         // au moment de la creation de la commande
@@ -69,7 +69,7 @@ class Commande
         }
     }
 
-    public function getNumero_commande(): ?string
+    public function getNumeroCommande(): ?string
     {
         return $this->numero_commande;
     }

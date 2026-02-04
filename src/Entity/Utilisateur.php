@@ -254,12 +254,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     
-    public function getAdresse_postale(): ?string
+    public function getAdressePostale(): ?string
     {
         return $this->adresse_postale;
     }
 
-    public function setAdresse_postale(string $adresse_postale): static
+    public function setAdressePostale(string $adresse_postale): static
     {
         if (mb_strlen($adresse_postale) > 50) {
             throw new \InvalidArgumentException('L\'adresse ne peut pas dépasser 50 caractères.');
