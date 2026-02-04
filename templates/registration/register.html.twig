@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - Vite-et-Gourmand{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">Rejoignez-nous</h2>
+                </div>
+                <div class="card-body p-4">
+                    {{ form_start(registrationForm) }}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.password.first) }}
+                                {{ form_widget(registrationForm.password.first, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.password.first) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.password.second) }}
+                                {{ form_widget(registrationForm.password.second, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.password.second) }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.prenom) }}
+                                {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.prenom) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.telephone) }}
+                                {{ form_widget(registrationForm.telephone, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.telephone) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.adresse_postale) }}
+                            {{ form_widget(registrationForm.adresse_postale, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(registrationForm.adresse_postale) }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.ville) }}
+                                {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.ville) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_label(registrationForm.pays) }}
+                                {{ form_widget(registrationForm.pays, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.pays) }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Créer mon compte</button>
+                        </div>
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
