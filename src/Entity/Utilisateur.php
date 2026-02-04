@@ -31,7 +31,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     // Renforcer le controle des mots de passe / fail-fast :
-    #[ORM\Column]
+    #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le mot de passe est obligatoire')]
     #[Assert\Length(
         min: 10,

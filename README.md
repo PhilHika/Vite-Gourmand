@@ -68,6 +68,11 @@ Nous utilisons une approche "Fail-Fast" pour garantir l'intégrité des données
 ### Commande 🆔 Identifiants Uniques
 - Utilisation de **UUID v4** + Date Reference : 
   Pour les numéros de commande (`Commande::numero_commande`), offrant une sécurité accrue et une meilleure portabilité des données.
+  
+### 🔑 Gestion des mots de passe (Entité Utilisateur)
+- **Contrainte du cahier des charges** : Le schéma impose un `VARCHAR(50)` pour le mot de passe.
+- **Problématique** : Les algorithmes de hachage par défaut de Symfony (BCrypt/Argon2) génèrent des empreintes de 60 caractères ou plus, ce qui provoquerait une troncature et rendrait l'authentification impossible.
+- **Solution retenue** : Utilisation de l'algorithme `PBKDF2` avec `SHA-256` (encodage Base64). Cette configuration génère des empreintes de **44 caractères**, permettant de respecter strictement la contrainte de 50 caractères tout en conservant un système d'authentification fonctionnel et sécurisé.
 
 ---
 
