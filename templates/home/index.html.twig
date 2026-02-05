@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Vite et Gourmand
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+			<div class="container-fluid py-5">
+				<h1 class="display-5 fw-bold">Bienvenue chez Vite et Gourmand !</h1>
+				<p class="col-md-8 fs-4">Le meilleur de la gastronomie rapide, directement chez vous.</p>
+				{% if app.user %}
+					<div class="alert alert-success mt-3">
+						<h4 class="alert-heading">Bonjour
+							{{ app.user.prenom }}
+							!</h4>
+						<p>Vous êtes connecté avec l'email :
+							<strong>{{ app.user.email }}</strong>
+						</p>
+						<hr>
+						<a class="btn btn-outline-danger" href="{{ path('app_logout') }}">Se déconnecter</a>
+					</div>
+				{% else %}
+					<div class="mt-4">
+						<a class="btn btn-primary btn-lg" href="{{ path('app_login') }}" role="button">Se connecter</a>
+						<a class="btn btn-outline-secondary btn-lg" href="{{ path('app_register') }}" role="button">S'inscrire</a>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

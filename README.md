@@ -61,23 +61,29 @@ classDiagram
 
 ## 💡 Philosophie de Développement
 
-### 🛡️ Fail-Fast & Validation
-Nous utilisons une approche "Fail-Fast" pour garantir l'intégrité des données dès le niveau des entités :
-- **Validation Doctrine/Symfony** : Utilisation intensive des attributs `#[Assert]` pour la validation automatique (ex: email, longueurs, types).
-- **Validation Métier** : Les setters des entités incluent des vérifications manuelles (ex: date de prestation > date de commande) et lèvent des `\InvalidArgumentException` immédiatement en cas d'erreur.
+### 🛡️ Validation
+Nous utilisons la validation standard de Symfony pour garantir l'intégrité des données :
+- **Validation Doctrine/Symfony** : Utilisation des attributs `#[Assert]` pour la validation automatique (ex: email, longueurs, types).
 
 ### Commande 🆔 Identifiants Uniques
 - Utilisation de **UUID v4** + Date Reference : 
   Pour les numéros de commande (`Commande::numero_commande`), offrant une sécurité accrue et une meilleure portabilité des données.
   
-### 🔑 Gestion des mots de passe (Entité Utilisateur)
-- **Contrainte du cahier des charges** : Le schéma impose un `VARCHAR(50)` pour le mot de passe.
-- **Problématique** : Les algorithmes de hachage par défaut de Symfony (BCrypt/Argon2) génèrent des empreintes de 60 caractères ou plus, ce qui provoquerait une troncature et rendrait l'authentification impossible.
-- **Solution retenue** : Utilisation de l'algorithme `PBKDF2` avec `SHA-256` (encodage Base64). Cette configuration génère des empreintes de **44 caractères**, permettant de respecter strictement la contrainte de 50 caractères tout en conservant un système d'authentification fonctionnel et sécurisé.
+### 🔑 Gestion des mots de passe
+- Utilisation du standard Symfony `UserPasswordHasherInterface` avec l'algorithme par défaut (auto) pour une sécurité optimale.
+- Stockage en base de données sur 255 caractères (`VARCHAR(255)`). Contrairement a montrer dans le Schema annexe de la base de données.
 
 ---
 
 ## 🛠️ Installation & Workflow
+
+## Développement
+### Mode rapide (DB Docker + PHP local)
+docker compose up -d db
+symfony serve --port=8080
+### Mode Docker complet
+docker compose up -d
+
 
 ### 1. Installation Rapide
 ```bash

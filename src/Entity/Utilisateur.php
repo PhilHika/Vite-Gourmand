@@ -30,30 +30,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
-    // Renforcer le controle des mots de passe / fail-fast :
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire')]
-    #[Assert\Length(
-        min: 10,
-        minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
-    )]
-    #[Assert\Regex(
-        pattern: '/[A-Z]/',
-        message: 'Le mot de passe doit contenir au moins une majuscule'
-    )]
-    #[Assert\Regex(
-        pattern: '/[a-z]/',
-        message: 'Le mot de passe doit contenir au moins une minuscule'
-    )]
-    #[Assert\Regex(
-        pattern: '/[0-9]/',
-        message: 'Le mot de passe doit contenir au moins un chiffre'
-    )]
-    #[Assert\Regex(
-        pattern: '/[^A-Za-z0-9]/',
-        message: 'Le mot de passe doit contenir au moins un caractère spécial'
-    )]
+    #[ORM\Column(length: 255)]
     private ?string $password = null;
+
+    private ?string $plainPassword = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'L\'email est obligatoire')]
@@ -64,9 +44,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 50, maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères')]
     private ?string $prenom = null;
 
-    // Renforcer le controle des numero de telephone / fail-fast :
-    // juste des chiffres (& des - / . / espace)! 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le téléphone est obligatoire')]
     #[Assert\Length(max: 50, maxMessage: 'Le téléphone ne peut pas dépasser {{ limit }} caractères')]
     #[Assert\Regex(
         pattern: '/^\d+$/',
@@ -133,24 +112,19 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): static
     {
-        // Fail-fast validation
-        if (mb_strlen($password) < 10) {
-            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins 10 caractères.');
-        }
-        if (!preg_match('/[A-Z]/', $password)) {
-            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins une majuscule.');
-        }
-        if (!preg_match('/[a-z]/', $password)) {
-            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins une minuscule.');
-        }
-        if (!preg_match('/[0-9]/', $password)) {
-            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins un chiffre.');
-        }
-        if (!preg_match('/[^A-Za-z0-9]/', $password)) {
-            throw new \InvalidArgumentException('Le mot de passe doit contenir au moins un caractère spécial.');
-        }
-
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }
@@ -173,9 +147,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPrenom(string $prenom): static
     {
-        if (mb_strlen($prenom) > 50) {
-            throw new \InvalidArgumentException('Le prénom ne peut pas dépasser 50 caractères.');
-        }
         $this->prenom = $prenom;
 
         return $this;
@@ -188,11 +159,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        // Validation email (fail-fast)
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException(sprintf('L\'adresse email "%s" n\'est pas valide.', $email));
-        }
-
         $this->email = $email;
 
         return $this;
@@ -206,18 +172,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setTelephone(string $telephone): static
     {
-        // Nettoyage : on ne garde que les chiffres (enlève les espaces, points, tirets...)
-        $cleanTelephone = preg_replace('/\D/', '', $telephone);
-
-        if (empty($cleanTelephone)) {
-            throw new \InvalidArgumentException('Le numéro de téléphone doit contenir au moins quelques chiffres.');
-        }
-
-        if (mb_strlen($cleanTelephone) > 50) {
-            throw new \InvalidArgumentException('Le numéro de téléphone ne peut pas dépasser 50 chiffres.');
-        }
-
-        $this->telephone = $cleanTelephone;
+        // Nettoyage : on ne garde que les chiffres
+        $this->telephone = preg_replace('/\D/', '', $telephone);
 
         return $this;
     }
@@ -229,9 +185,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setVille(string $ville): static
     {
-        if (mb_strlen($ville) > 50) {
-            throw new \InvalidArgumentException('La ville ne peut pas dépasser 50 caractères.');
-        }
         $this->ville = $ville;
 
         return $this;
@@ -245,9 +198,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPays(string $pays): static
     {
-        if (mb_strlen($pays) > 50) {
-            throw new \InvalidArgumentException('Le pays ne peut pas dépasser 50 caractères.');
-        }
         $this->pays = $pays;
 
         return $this;
@@ -261,9 +211,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setAdressePostale(string $adresse_postale): static
     {
-        if (mb_strlen($adresse_postale) > 50) {
-            throw new \InvalidArgumentException('L\'adresse ne peut pas dépasser 50 caractères.');
-        }
         $this->adresse_postale = $adresse_postale;
 
         return $this;
