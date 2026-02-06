@@ -33,16 +33,20 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    private ?string $plainPassword = null;
-
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'L\'email est obligatoire')]
     #[Assert\Email(message: 'L\'email est invalide')]
     private ?string $email = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
     #[Assert\Length(max: 50, maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères')]
     private ?string $prenom = null;
+
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le nom est obligatoire')]
+    #[Assert\Length(max: 50, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères')]
+    private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le téléphone est obligatoire')]
@@ -54,14 +58,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $telephone = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'La ville est obligatoire')]
     #[Assert\Length(max: 50, maxMessage: 'La ville ne peut pas dépasser {{ limit }} caractères')]
     private ?string $ville = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le pays est obligatoire')]
     #[Assert\Length(max: 50, maxMessage: 'Le pays ne peut pas dépasser {{ limit }} caractères')]
     private ?string $pays = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'L\'adresse est obligatoire')]
     #[Assert\Length(max: 50, maxMessage: 'L\'adresse ne peut pas dépasser {{ limit }} caractères')]
     private ?string $adresse_postale = null;
 
@@ -93,7 +100,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * ##@ param list<string> $roles
+     * @param list<string> $roles
      */
     public function setRoles(array $roles): static
     {
@@ -117,25 +124,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPlainPassword(): ?string
-    {
-        return $this->plainPassword;
-    }
-
-    public function setPlainPassword(?string $plainPassword): static
-    {
-        $this->plainPassword = $plainPassword;
-
-        return $this;
-    }
-
     /**
      * @see UserInterface
      */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        $this->plainPassword = null;
     }
 
     public function getPrenom(): ?string
@@ -146,6 +140,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
 
         return $this;
     }
