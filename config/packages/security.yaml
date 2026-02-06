@@ -23,7 +23,10 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-                default_target_path: app_profile
+                csrf_token_id: authenticate
+                username_parameter: email # permet de se connecter avec l'email et non le nom d'utilisateur 
+                password_parameter: password # le formulaire envoie "password" et non "_password" 
+                default_target_path: app_home
                 always_use_default_target_path: true
             logout:
                 path: app_logout
