@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-8 col-lg-6">
+				<div class="card shadow border-0">
+					<div class="card-header bg-primary text-white text-center py-3">
+						<h2 class="mb-0 fs-4">Contactez-nous</h2>
+					</div>
+					<div class="card-body p-4">
+						{{ form_start(contactForm) }}
+
+						<div class="row">
+							<div class="col-md-6">
+								{{ form_row(contactForm.nom) }}
+							</div>
+							<div class="col-md-6">
+								{{ form_row(contactForm.email) }}
+							</div>
+						</div>
+
+						{{ form_row(contactForm.code_postal) }}
+						{{ form_row(contactForm.sujet) }}
+						{{ form_row(contactForm.message) }}
+
+						<div class="d-grid gap-2 mt-4">
+							<button type="submit" class="btn btn-primary btn-lg">Envoyer</button>
+						</div>
+
+						{{ form_end(contactForm) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
