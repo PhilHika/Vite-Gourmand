@@ -1,61 +1,163 @@
 body {
     background: #fff;
-    margin: 0 auto; 
+    margin: 0 auto;
     font-family: Arial, sans-serif;
     color: #333;
 }
-.intro-wrapper-content, 
+
+/* Footer */
+footer.py-5.bg-dark.flex-shrink-0 {
+    margin-top: 25px;
+}
+
+.intro-wrapper-content,
 .main-wrapper-content {
     margin: 15px 20%;
 }
 
 /* Menu */
-.menu-right {  display: flex; gap: 20px; }
-.menu-wrapper a { text-decoration-line: none; color: #e8e7e7; margin: 10px; }
-.menu-wrapper a:hover { color: #3175fd; }
-.menu-wrapper { display: flex; justify-content: space-between; align-items: center;  background: #232222; }
-
-/* Intro section */
-.intro-wrapper { 
-    background: #3175fd; 
-    padding: 15px 0; 
-    color: #fff;
-    text-align: center; 
-    margin-bottom: 50px; 
+.menu-right {
+    display: flex;
+    gap: 20px;
 }
 
-.intro-wrapper h1 { font-size: 3rem; margin-bottom: 15px; }
-.intro-wrapper p { font-size: 1.2rem; }
-.intro-wrapper .btn { padding: 10px 25px; font-size: 1rem; }
+.menu-wrapper a,
+.menu-wrapper span {
+    text-decoration-line: none;
+    color: #e8e7e7;
+    margin: 10px;
+    display: inline-block;
+}
+
+.menu-wrapper a:hover {
+    color: #3175fd;
+}
+
+.menu-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #232222;
+}
+
+/* Dropdown Compte (hover) */
+.menu-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-dropdown-toggle {
+    cursor: pointer;
+}
+
+.menu-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #fff;
+    min-width: 170px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    z-index: 1000;
+    padding: 6px 0;
+}
+
+/* Override .menu-wrapper a styles for dropdown items */
+.menu-wrapper .menu-dropdown-content a {
+    display: block;
+    padding: 10px 16px;
+    margin: 0;
+    color: #333;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.menu-wrapper .menu-dropdown-content a:hover {
+    background-color: #f0f0f0;
+    color: #3175fd;
+}
+
+.menu-dropdown:hover .menu-dropdown-content {
+    display: block;
+}
+
+/* Intro section */
+.intro-wrapper {
+    background: #3175fd;
+    padding: 15px 0;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.intro-wrapper h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.intro-wrapper p {
+    font-size: 1.2rem;
+}
+
+.intro-wrapper .btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+}
 
 /* Main content */
-.main-wrapper { padding: 30px 0; }
-.main-wrapper h3 {  margin-bottom: 20px; font-size: 1.8rem; font-weight: bold; }
-.main-wrapper p { margin-bottom: 15px; line-height: 1.6; }
-.main-wrapper ul { padding-left: 20px; }
-.main-wrapper li { margin-bottom: 8px; }
-.main-wrapper h3 { margin-bottom: 20px; font-size: 1.8rem; }
-.main-wrapper p { margin-bottom: 15px; }
-.main-wrapper ul { padding-left: 20px; }
-.main-wrapper li { margin-bottom: 8px; }
+.main-wrapper {
+    padding: 30px 0;
+}
+
+.main-wrapper h3 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.main-wrapper p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.main-wrapper ul {
+    padding-left: 20px;
+}
+
+.main-wrapper li {
+    margin-bottom: 8px;
+}
 
 /* 
  * custom boot strp 
  */
 /* Book listing */
-.listing-container img.card-img-top { max-height: 260px; }
-.show-book .col-md-6.d-flex.align-items-stretch { padding: 5px 45px; }
+.listing-container img.card-img-top {
+    max-height: 260px;
+}
+
+.show-book .col-md-6.d-flex.align-items-stretch {
+    padding: 5px 45px;
+}
 
 a.stretched-link.link-dark,
 .intro-wrapper-content button a,
-button.btn.btn-outline-secondary a { text-decoration: none; }
+button.btn.btn-outline-secondary a {
+    text-decoration: none;
+}
 
 
-button.btn.btn-outline-secondary a { color: #54595e; }
-button.btn.btn-outline-secondary:hover a { color: #fff; }
+button.btn.btn-outline-secondary a {
+    color: #54595e;
+}
+
+button.btn.btn-outline-secondary:hover a {
+    color: #fff;
+}
 
 /* Register form */
-.register-login-form .main-wrapper-content{
+.register-login-form .main-wrapper-content {
     padding: 25px;
     margin: 15px 35%;
 }
