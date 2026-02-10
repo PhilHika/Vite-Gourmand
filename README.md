@@ -73,6 +73,38 @@ Nous utilisons la validation standard de Symfony pour garantir l'intégrité des
 - Utilisation du standard Symfony `UserPasswordHasherInterface` avec l'algorithme par défaut (auto) pour une sécurité optimale.
 - Stockage en base de données sur 255 caractères (`VARCHAR(255)`). Contrairement a montrer dans le Schema annexe de la base de données.
 
+### 📧 Configuration de l'envoi d'emails (Symfony Mailer)
+
+**Choix technique : Mode synchrone (`sync`) pour l'envoi d'emails**
+
+Par défaut, Symfony 7 utilise **Messenger** pour envoyer les emails en mode **asynchrone** via une file d'attente. Cela nécessite de lancer un worker en continu pour consommer les messages :
+```bash
+php bin/console messenger:consume async
+```
+
+#### Pourquoi le mode synchrone ?
+
+Pour ce projet, nous avons configuré `Symfony\Component\Mailer\Messenger\SendEmailMessage: sync` dans `config/packages/messenger.yaml`.
+
+**Avantages pour notre contexte :**
+- ✅ **Simplicité opérationnelle** : Pas besoin de gérer un worker Messenger en production
+- ✅ **Volume faible** : Application à petit/moyen trafic (formulaire de contact & commande a priori...)
+- ✅ **Feedback immédiat** : L'utilisateur peut le vérifier immédiatement
+- ✅ **Déploiement** : Configuration identique en dev et prod
+
+**Mode asynchrone SI :**
+Volume d'emails ++ (> 100/jour)
+si les temps de réponse deviennent trop longs
+Et alors :
+1. Repasser en mode `async`
+2. Déployer un worker Messenger
+3. Transport plus robuste que Doctrine
+
+**Configuration :**
+- **Transport SMTP** : Configuré via `MAILER_DSN` dans `.env.local`
+- **Mode développement** : MailHog sur `smtp://localhost:1025`
+- **Mode production** : SMTP réel (Gmail, SendGrid, Brevo, etc.)
+
 ---
 
 ## 🛠️ Installation & Workflow
