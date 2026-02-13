@@ -2,42 +2,69 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\HasCommandesMenuTrait; // collection commandes
+use App\Entity\Traits\HasPlatsTrait; // collection plats
 use App\Repository\MenuRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu
 {
+    use HasPlatsTrait;
+    use HasCommandesMenuTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $menu_id = null;
+    #[ORM\Column(name: 'menu_id')]
+    private ?int $id = null;
 
     #[ORM\Column(length: 50)]
     private ?string $titre = null;
 
     #[ORM\Column]
     #[Assert\PositiveOrZero(message: 'Le nombre de personnes doit être positif')]
-    private ?int $nombre_personne_minimum = null;
+    private ?int $nombrePersonneMinimum = null;
 
     #[ORM\Column]
     #[Assert\Positive(message: 'Le prix doit être supérieur à zéro')]
-    private ?float $prix_par_personne = null;
+    private ?float $prixParPersonne = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $regime = null;
+    #[ORM\ManyToOne(inversedBy: 'menus')]
+    #[ORM\JoinColumn(name: 'regime_id')]
+    private ?Regime $regime = null;
+
+    #[ORM\ManyToOne(inversedBy: 'menus')]
+    #[ORM\JoinColumn(name: 'theme_id', nullable: false)] // ← nullable: false car 1,1
+    private ?Theme $theme = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageUrl = null;
+
+    #[ORM\ManyToMany(targetEntity: Plat::class, inversedBy: 'menus')]
+    private Collection $plats;
 
     #[ORM\Column(length: 50)]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Assert\PositiveOrZero(message: 'La quantité doit être positive')]
-    private ?int $quantite_restante = null;
+    private ?int $quantiteRestante = null;
+
+    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: Commande::class)]
+    private Collection $commandes;
+
+    public function __construct()
+    {
+        $this->plats = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
-        return $this->menu_id;
+        return $this->id;
     }
 
     public function getTitre(): ?string
@@ -52,38 +79,62 @@ class Menu
         return $this;
     }
 
-    public function getNombre_personne_minimum(): ?int
+    public function getNombrePersonneMinimum(): ?int
     {
-        return $this->nombre_personne_minimum;
+        return $this->nombrePersonneMinimum;
     }
 
-    public function setNombre_personne_minimum(int $nombre_personne_minimum): static
+    public function setNombrePersonneMinimum(int $nombrePersonneMinimum): static
     {
-        $this->nombre_personne_minimum = $nombre_personne_minimum;
+        $this->nombrePersonneMinimum = $nombrePersonneMinimum;
 
         return $this;
     }
 
-    public function getPrix_par_personne(): ?float
+    public function getPrixParPersonne(): ?float
     {
-        return $this->prix_par_personne;
+        return $this->prixParPersonne;
     }
 
-    public function setPrix_par_personne(float $prix_par_personne): static
+    public function setPrixParPersonne(float $prixParPersonne): static
     {
-        $this->prix_par_personne = $prix_par_personne;
+        $this->prixParPersonne = $prixParPersonne;
 
         return $this;
     }
 
-    public function getRegime(): ?string
+    public function getRegime(): ?Regime
     {
         return $this->regime;
     }
 
-    public function setRegime(string $regime): static
+    public function setRegime(?Regime $regime): static
     {
         $this->regime = $regime;
+
+        return $this;
+    }
+
+    public function getTheme(): ?Theme
+    {
+        return $this->theme;
+    }
+
+    public function setTheme(?Theme $theme): static
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    public function setImageUrl(?string $imageUrl): static
+    {
+        $this->imageUrl = $imageUrl;
 
         return $this;
     }
@@ -100,14 +151,14 @@ class Menu
         return $this;
     }
 
-    public function getQuantite_restante(): ?int
+    public function getQuantiteRestante(): ?int
     {
-        return $this->quantite_restante;
+        return $this->quantiteRestante;
     }
 
-    public function setQuantite_restante(int $quantite_restante): static
+    public function setQuantiteRestante(int $quantiteRestante): static
     {
-        $this->quantite_restante = $quantite_restante;
+        $this->quantiteRestante = $quantiteRestante;
 
         return $this;
     }
