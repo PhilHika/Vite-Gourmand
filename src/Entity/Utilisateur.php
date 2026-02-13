@@ -32,7 +32,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
-    #[ORM\JoinColumn(name: 'role_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'role_id', nullable: false)]
     private ?Role $role = null;
 
     #[ORM\Column(name: 'password', length: 255)]

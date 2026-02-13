@@ -54,11 +54,11 @@ class Commande
     private ?bool $restitutionMateriel = null;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[ORM\JoinColumn(name: 'utilisateur_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'utilisateur_id', referencedColumnName: 'utilisateur_id', nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[ORM\JoinColumn(name: 'menu_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'menu_id', referencedColumnName: 'menu_id', nullable: false)]
     private ?Menu $menu = null;
 
     public function getUtilisateur(): ?Utilisateur

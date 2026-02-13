@@ -33,17 +33,20 @@ class Menu
     private ?float $prixParPersonne = null;
 
     #[ORM\ManyToOne(inversedBy: 'menus')]
-    #[ORM\JoinColumn(name: 'regime_id')]
+    #[ORM\JoinColumn(name: 'regime_id', referencedColumnName: 'regime_id')]
     private ?Regime $regime = null;
 
     #[ORM\ManyToOne(inversedBy: 'menus')]
-    #[ORM\JoinColumn(name: 'theme_id', nullable: false)] // ← nullable: false car 1,1
+    #[ORM\JoinColumn(name: 'theme_id', referencedColumnName: 'theme_id', nullable: false)]
     private ?Theme $theme = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageUrl = null;
 
     #[ORM\ManyToMany(targetEntity: Plat::class, inversedBy: 'menus')]
+    #[ORM\JoinTable(name: 'menu_plat')]
+    #[ORM\JoinColumn(name: 'menu_id', referencedColumnName: 'menu_id')]
+    #[ORM\InverseJoinColumn(name: 'plat_id', referencedColumnName: 'plat_id')]
     private Collection $plats;
 
     #[ORM\Column(length: 50)]

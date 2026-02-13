@@ -22,6 +22,9 @@ class Plat
     private ?string $titrePlat = null;
 
     #[ORM\ManyToMany(targetEntity: Allergene::class, inversedBy: 'plats')]
+    #[ORM\JoinTable(name: 'plat_allergene')]
+    #[ORM\JoinColumn(name: 'plat_id', referencedColumnName: 'plat_id')]
+    #[ORM\InverseJoinColumn(name: 'allergene_id', referencedColumnName: 'allergene_id')]
     private Collection $allergenes;
 
     #[ORM\Column(name: 'photo', type: 'blob')]

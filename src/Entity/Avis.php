@@ -30,7 +30,7 @@ class Avis
     private ?string $statut = null;
 
     #[ORM\ManyToOne(inversedBy: 'avis')]
-    #[ORM\JoinColumn(name: 'utilisateur_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'utilisateur_id', referencedColumnName: 'utilisateur_id', nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
     public function getId(): ?int
