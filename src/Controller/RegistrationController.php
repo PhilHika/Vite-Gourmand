@@ -34,8 +34,12 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            // Set default role
-            $user->setRoles(['ROLE_USER']);
+            // Assigner le rôle par défaut
+            $defaultRole = $entityManager->getRepository(\App\Entity\Role::class)
+                ->findOneBy(['libelle' => 'ROLE_USER']);
+            if ($defaultRole) {
+                $user->setRole($defaultRole);
+            }
 
             $entityManager->persist($user);
             $entityManager->flush();
