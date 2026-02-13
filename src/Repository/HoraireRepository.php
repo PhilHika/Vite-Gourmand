@@ -2,42 +2,31 @@
 
 namespace App\Repository;
 
-use App\Entity\Horaire;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Document\Horaire;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
 
 /**
- * @extends ServiceEntityRepository<Horaire>
+ * @extends ServiceDocumentRepository<Horaire>
  */
-class HoraireRepository extends ServiceEntityRepository
+class HoraireRepository extends ServiceDocumentRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Horaire::class);
     }
 
-    //    /**
-    //     * @return Horaire[] Returns an array of Horaire objects
-    //     */
-    //    public function findByExampleField($value): array
+    // Les méthodes de base (find, findAll, findBy, findOneBy) sont
+    // déjà fournies par ServiceDocumentRepository.
+    //
+    // Exemple de requête personnalisée :
+    //
+    //    public function findByJour(string $jour): array
     //    {
-    //        return $this->createQueryBuilder('h')
-    //            ->andWhere('h.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('h.id', 'ASC')
-    //            ->setMaxResults(10)
+    //        return $this->createQueryBuilder()
+    //            ->field('jour')->equals($jour)
     //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Horaire
-    //    {
-    //        return $this->createQueryBuilder('h')
-    //            ->andWhere('h.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
+    //            ->execute()
+    //            ->toArray();
     //    }
 }

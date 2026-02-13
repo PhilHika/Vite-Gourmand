@@ -8,14 +8,21 @@ Un projet Symfony 7.4 pour la gestion des commande de menus, avec l'appui d'une 
 
 - **Framework** : Symfony 7.4 LTS (PHP 8.4)
 - **Serveur Web** : Nginx (Alpine)
-- **Base de données** : PostgreSQL 18
-- **Outils** : Mailpit (Capture d'emails), Composer 2.8
+- **Base de données relationnelle** : PostgreSQL 18 (Doctrine ORM)
+- **Base de données NoSQL** : MongoDB 7 (Doctrine ODM)
+- **Outils** : Mailpit (Capture d'emails), Mongo Express (Admin MongoDB), Composer 2.8
 
 ---
 
 ## 🏗️ Architecture & Modèle de Données
 
 Le projet suit une architecture MVC classique avec Symfony, en mettant l'accent sur un domaine métier robuste.
+
+### Double base de données
+
+Le projet utilise **deux systèmes de bases de données** complémentaires :
+- **PostgreSQL** (Doctrine ORM) : Données relationnelles (Utilisateurs, Commandes, Menus, Plats, Avis, etc.) dans `src/Entity/`
+- **MongoDB** (Doctrine ODM) : Données documentaires (Horaires) dans `src/Document/`
 
 ### Schéma des Entités (Aperçu)
 
@@ -130,9 +137,11 @@ docker compose exec php composer install
 
 | Action | Commande |
 | :--- | :--- |
-| **Bases de données** | |
+| **PostgreSQL (ORM)** | |
 | Créer une migration | `docker compose exec php php bin/console make:migration` |
 | Appliquer les migrations | `docker compose exec php php bin/console doctrine:migrations:migrate` |
+| **MongoDB (ODM)** | |
+| Créer le schéma MongoDB | `docker compose exec php php bin/console doctrine:mongodb:schema:create` |
 | **Qualité & Debug** | |
 | Vider le cache | `docker compose exec php php bin/console cache:clear` |
 | Voir les routes | `docker compose exec php php bin/console debug:router` |
@@ -143,6 +152,7 @@ docker compose exec php composer install
 
 ## 🌐 Accès aux Services
 - **Application** : [http://localhost:8080](http://localhost:8080)
+- **Mongo Express (Admin MongoDB)** : [http://localhost:8081](http://localhost:8081)
 - **Mailpit (Emails)** : [http://localhost:8025](http://localhost:8025)
 
 ---
