@@ -25,4 +25,5 @@
 docker/volumes
 docker/db_data/
 /docker/db/data
+/docker/mongodb/data
 ###< Docker ###
