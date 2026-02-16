@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des menus
+{% endblock %}
+
+{% block body %}
+
+	<!-- Section -->
+	<section class="py-5">
+		<div class="listing-container container px-4 px-lg-5 mt-5">
+			<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+				{% for menu in menus %}
+					<div class="col mb-5">
+						<div
+							class="card h-100">
+
+							<!-- Image du menu -->
+							<img
+							class="card-img-top" src="{{ menu.imageUrl is not empty ? menu.imageUrl : asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}"/>
+
+							<!-- Détails du menu -->
+							<div class="card-body p-4">
+								<div
+									class="text-center">
+
+									<!-- Régime (many-to-one) -->
+									{% if menu.regime is not null %}
+										<span class="badge bg-secondary mb-2">{{ menu.regime.libelle }}</span>
+									{% endif %}
+
+									<!-- Nom du menu -->
+									<a href="{{ path('app_menu_show', {id: menu.id}) }}" class="stretched-link link-dark">
+										<h5 class="fw-bolder">{{ menu.titre }}</h5>
+									</a>
+
+									<!-- Description courte -->
+									{% if menu.description is not empty %}
+										<p class="text-muted small">{{ menu.description }}</p>
+									{% endif %}
+
+									<!-- Plats + leurs allergènes -->
+									{% if menu.plats|length > 0 %}
+										<ul class="list-unstyled mt-2">
+											{% for plat in menu.plats %}
+												<li class="mb-1">
+													<span class="small">{{ plat.titrePlat }}</span>
+													{% if plat.allergenes|length > 0 %}
+														<div class="mt-1">
+															{% for allergene in plat.allergenes %}
+																<span class="badge bg-warning text-dark me-1">{{ allergene.libelle }}</span>
+															{% endfor %}
+														</div>
+													{% endif %}
+												</li>
+											{% endfor %}
+										</ul>
+									{% else %}
+										<p class="text-muted fst-italic small">Aucun plat renseigné</p>
+									{% endif %}
+
+								</div>
+							</div>
+
+							<!-- Prix + actions -->
+							<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+								<div
+									class="text-center">
+
+									<!-- Prix -->
+									{% if menu.getPrixParPersonne is not null %}
+										<p class="fw-bold mb-2">{{ menu.getPrixParPersonne | number_format(2, ',', ' ') }}
+											€</p>
+									{% endif %}
+
+									<!-- Stock / Disponibilité -->
+									{% if menu.getQuantiteRestante > 0 %}
+										<a class="btn btn-outline-dark mt-auto" href="{{ path('app_menu_show', {id: menu.id}) }}">
+											Voir le menu
+										</a>
+									{% else %}
+										<button class="btn btn-outline-secondary mt-auto" disabled>
+											Indisponible
+										</button>
+									{% endif %}
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+				{% else %}
+					<p>Aucun menu disponible.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</section>
+
+{% endblock %}

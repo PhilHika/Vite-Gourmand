@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{% if menu.id %}
+		Éditer le menu :
+		{{ menu.titre }}
+	{% else %}
+		Créer un nouveau menu
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<h1 class="mb-4">
+			{% if menu.id %}
+				Éditer le menu
+			{% else %}
+				Créer un menu
+			{% endif %}
+		</h1>
+
+		{{ form_start(form) }}
+		<div class="row">
+			<div class="col-md-6">
+				{{ form_row(form.titre) }}
+				{{ form_row(form.description) }}
+				{{ form_row(form.prixParPersonne) }}
+			</div>
+			<div class="col-md-6">
+				{{ form_row(form.nombrePersonneMinimum) }}
+				{{ form_row(form.quantiteRestante) }}
+				{{ form_row(form.imageUrl) }}
+			</div>
+		</div>
+
+		<div class="row mt-3">
+			<div class="col-md-6">
+				{{ form_row(form.regime) }}
+				{{ form_row(form.theme) }}
+			</div>
+			<div class="col-md-6">
+				{{ form_row(form.plats) }}
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-primary mt-4">
+			{% if menu.id %}
+				Mettre à jour
+			{% else %}
+				Créer
+			{% endif %}
+		</button>
+		<a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site (TODO: Vers liste menu admin si existe)</a>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}
