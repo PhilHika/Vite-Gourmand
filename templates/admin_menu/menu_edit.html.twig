@@ -35,7 +35,14 @@
 
 		<div class="row mt-3">
 			<div class="col-md-6">
-				{{ form_row(form.regime) }}
+				<label class="form-label">Régime alimentaire</label>
+				<div class="input-group mb-3">
+					{{ form_widget(form.regime) }}
+					<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#regimeModal">
+						<i class="bi bi-gear"></i>
+						Gérer
+					</button>
+				</div>
 				{{ form_row(form.theme) }}
 			</div>
 			<div class="col-md-6">
@@ -50,7 +57,38 @@
 				Créer
 			{% endif %}
 		</button>
-		<a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site (TODO: Vers liste menu admin si existe)</a>
+		<a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site</a>
 		{{ form_end(form) }}
+	</div>
+
+	<!-- Modal Regime Controlled by Stimulus -->
+	<div class="modal fade" id="regimeModal" tabindex="-1" aria-hidden="true" data-controller="referentiel" data-referentiel-list-url-value="{{ path('app_admin_referentiel_regime_list') }}" data-referentiel-add-url-value="{{ path('app_admin_referentiel_regime_new') }}" data-referentiel-delete-url-template-value="{{ path('app_admin_referentiel_regime_delete', {id: 'PLACEHOLDER'}) }}" data-referentiel-select-id-value="{{ form.regime.vars.id }}" data-referentiel-form-name-value="regime_form">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Gérer les Régimes</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label class="form-label">Nouveau Régime</label>
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Nom du régime" data-referentiel-target="input">
+							<button class="btn btn-success" data-referentiel-target="addButton" data-action="click->referentiel#add">Ajouter</button>
+						</div>
+					</div>
+					<hr>
+					<h6>Liste des Régimes existants</h6>
+					<ul class="list-group" data-referentiel-target="list">
+						<li class="list-group-item text-center">
+							<span class="spinner-border spinner-border-sm"></span>
+							Chargement...</li>
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}

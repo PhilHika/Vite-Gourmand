@@ -22,7 +22,7 @@ trait HasPlatsTrait
     {
         if (!$this->plats->contains($plat)) {
             $this->plats->add($plat);
-            $plat->referenceMenu($this);
+            $plat->addMenu($this);
         }
         return $this;
     }
@@ -30,7 +30,7 @@ trait HasPlatsTrait
     public function removePlat(Plat $plat): static
     {
         if ($this->plats->removeElement($plat)) {
-            $plat->unreferenceMenu($this);
+            $plat->removeMenu($this);
         }
         return $this;
     }

@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{% if plat.id %}
+		Éditer le plat :
+		{{ plat.titrePlat }}
+	{% else %}
+		Créer un nouveau plat
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+	<h1 class="mb-4">
+		{% if plat.id %}
+			Éditer le plat
+		{% else %}
+			Créer un plat
+		{% endif %}
+	</h1>
+
+	{{ form_start(form) }}
+	<div class="row">
+		<div class="col-md-6">
+			{{ form_row(form.titrePlat) }}
+
+			{# Image Management #}
+			<div class="card mb-3 p-3 bg-light">
+				<label class="form-label fw-bold">Image du plat</label>
+
+				{% if plat.photo %}
+					<div class="mb-3 text-center">
+						<img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="Image du plat" class="img-thumbnail mb-2" style="max-height: 200px;">
+						<div class="form-check form-switch mt-2 d-flex justify-content-center">
+							{{ form_widget(form.deletePhoto) }}
+							{{ form_label(form.deletePhoto) }}
+						</div>
+					</div>
+				{% else %}
+					<div class="alert alert-secondary py-1 text-center">Aucune image enregistrée.</div>
+				{% endif %}
+
+				{{ form_row(form.photoFile, {'label': 'Télécharger une nouvelle image (remplacera l\'actuelle)'}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Allergènes</label>
+                    <div class="input-group mb-3">
+                         {{ form_widget(form.allergenes) }}
+                         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#allergeneModal">
+                             <i class="bi bi-gear"></i> Gérer
+                         </button>
+                    </div>
+                    {{ form_row(form.menus) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">
+                {% if plat.id %}
+                    Mettre à jour
+                {% else %}
+                    Créer
+                {% endif %}
+            </button>
+            <a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site</a>
+        {{ form_end(form) }}
+    </div>
+
+    <!-- Modal Allergene Controlled by Stimulus -->
+    <div class="modal fade" id="allergeneModal" tabindex="-1" aria-hidden="true"
+         data-controller="referentiel"
+         data-referentiel-list-url-value="{{ path('app_admin_referentiel_allergene_list') }}"
+         data-referentiel-add-url-value="{{ path('app_admin_referentiel_allergene_new') }}"
+         data-referentiel-delete-url-template-value="{{ path('app_admin_referentiel_allergene_delete', {id: 'PLACEHOLDER'}) }}"
+         data-referentiel-select-id-value="{{ form.allergenes.vars.id }}"
+         data-referentiel-form-name-value="allergene_form">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gérer les Allergènes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                         <label class="form-label">Nouvel Allergène</label>
+                         <div class="input-group">
+                             <input type="text" class="form-control" placeholder="Nom de l'allergène"
+                                    data-referentiel-target="input">
+                             <button class="btn btn-success" 
+                                     data-referentiel-target="addButton"
+                                     data-action="click->referentiel#add">Ajouter</button>
+                         </div>
+                    </div>
+                    <hr>
+                    <h6>Liste des Allergènes existants</h6>
+                    <ul class="list-group" data-referentiel-target="list">
+                        <!-- Loaded via JS -->
+                        <li class="list-group-item text-center"><span class="spinner-border spinner-border-sm"></span> Chargement...</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

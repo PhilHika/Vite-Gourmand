@@ -92,17 +92,20 @@ class Plat
         return $this->menus;
     }
 
-    public function referenceMenu(Menu $menu): static
+    public function addMenu(Menu $menu): static
     {
         if (!$this->menus->contains($menu)) {
             $this->menus->add($menu);
+            $menu->addPlat($this);
         }
         return $this;
     }
 
-    public function unreferenceMenu(Menu $menu): static
+    public function removeMenu(Menu $menu): static
     {
-        $this->menus->removeElement($menu);
+        if ($this->menus->removeElement($menu)) {
+            $menu->removePlat($this);
+        }
         return $this;
     }
 
