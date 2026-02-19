@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Utilisateurs
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<h1 class="mb-4">Gestion des Utilisateurs</h1>
+
+		<div class="table-responsive shadow-sm rounded">
+			<table class="table table-striped table-hover align-middle mb-0">
+				<thead class="table-dark">
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Nom complet</th>
+						<th scope="col">Email</th>
+						<th scope="col">Rôle actuel</th>
+						<th scope="col" class="text-end">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for utilisateur in utilisateurs %}
+						<tr>
+							<td>{{ utilisateur.id }}</td>
+							<td>{{ utilisateur.prenom }}
+								{{ utilisateur.nom|upper }}</td>
+							<td>{{ utilisateur.email }}</td>
+							<td>
+								{% if utilisateur.role %}
+									<span class="badge bg-primary">{{ utilisateur.role.libelle }}</span>
+								{% else %}
+									<span class="badge bg-secondary">ROLE_USER</span>
+								{% endif %}
+							</td>
+							<td class="text-end">
+								<a href="{{ path('app_admin_user_edit', {'id': utilisateur.id}) }}" class="btn btn-sm btn-outline-primary">
+									<i class="bi bi-pencil-square"></i>
+									Modifier Rôle
+								</a>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5" class="text-center py-4">Aucun utilisateur trouvé</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="mt-4">
+			<a href="{{ path('app_home') }}" class="btn btn-secondary">
+				<i class="bi bi-arrow-left"></i>
+				Retour à l'accueil
+			</a>
+		</div>
+	</div>
+{% endblock %}
