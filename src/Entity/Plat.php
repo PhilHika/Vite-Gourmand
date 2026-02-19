@@ -27,7 +27,7 @@ class Plat
     #[ORM\InverseJoinColumn(name: 'allergene_id', referencedColumnName: 'allergene_id')]
     private Collection $allergenes;
 
-    #[ORM\Column(name: 'photo', type: 'blob')]
+    #[ORM\Column(name: 'photo', type: 'blob', nullable: true)]
     private $photo = null;
 
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'plats')]

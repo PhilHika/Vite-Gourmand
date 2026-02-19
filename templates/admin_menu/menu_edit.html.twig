@@ -45,8 +45,57 @@
 				</div>
 				{{ form_row(form.theme) }}
 			</div>
-			<div class="col-md-6">
-				{{ form_row(form.plats) }}
+			<div
+				class="col-md-6" data-controller="menu-plats">
+
+				{# ===== PLATS SECTION ===== #}
+				<label class="form-label">Plats inclus</label>
+
+				<div data-menu-plats-target="originalSelect">
+					{{ form_widget(form.plats) }}
+				</div>
+
+				<div class="card mb-2">
+					<ul class="list-group list-group-flush" data-menu-plats-target="list"></ul>
+				</div>
+
+				<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#platsModal" data-action="click->menu-plats#openModal">
+					<i class="bi bi-plus-circle"></i>
+					Ajouter un plat
+				</button>
+
+				<div class="alert alert-warning py-2 small d-none" data-menu-plats-target="reminder">
+					<i class="bi bi-exclamation-triangle"></i>
+					Pensez à mettre à jour le menu pour sauvegarder les changements.
+				</div>
+
+				{# Modal Plats - Selection #}
+				<div class="modal fade" id="platsModal" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Ajouter un plat</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div class="mb-3">
+									<label class="form-label fw-bold" for="modalPlatSelect">Choisir un plat</label>
+									<select id="modalPlatSelect" class="form-select" data-menu-plats-target="modalSelect">
+										<option value="">-- Sélectionner un plat --</option>
+										{% for choice in form.plats.vars.choices %}
+											<option value="{{ choice.value }}">{{ choice.label }}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+								<button type="button" class="btn btn-primary" data-action="click->menu-plats#add">Ajouter la sélection</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 
@@ -57,7 +106,7 @@
 				Créer
 			{% endif %}
 		</button>
-		<a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site</a>
+		<a href="{{ path('app_menu_index') }}" class="btn btn-secondary mt-4 ms-2">Retour au Menus</a>
 		{{ form_end(form) }}
 	</div>
 
