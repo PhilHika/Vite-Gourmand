@@ -11,8 +11,15 @@
 
 			{# Header image + titre #}
 			<div class="row gx-4 gx-lg-5 align-items-center mb-5">
-				<div class="col-md-5">
-					<img class="img-fluid rounded shadow" src="{{ menu.imageUrl is not empty ? menu.imageUrl : asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}">
+				<div
+					class="col-md-5">
+					{# Image du menu (via le premier plat) #}
+					{% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
+						{% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+					{% else %}
+						{% set menuImage = asset('images/menus/default.jpg') %}
+					{% endif %}
+					<img class="img-fluid rounded shadow" src="{{ menuImage }}" alt="{{ menu.titre }}">
 				</div>
 				<div class="col-md-7">
 					<h1 class="fw-bolder mb-3">{{ menu.titre }}</h1>

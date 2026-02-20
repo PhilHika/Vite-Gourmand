@@ -40,8 +40,7 @@ class Menu
     #[ORM\JoinColumn(name: 'theme_id', referencedColumnName: 'theme_id', nullable: false)]
     private ?Theme $theme = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $imageUrl = null;
+
 
     #[ORM\ManyToMany(targetEntity: Plat::class, inversedBy: 'menus')]
     #[ORM\JoinTable(name: 'menu_plat')]
@@ -130,17 +129,6 @@ class Menu
         return $this;
     }
 
-    public function getImageUrl(): ?string
-    {
-        return $this->imageUrl;
-    }
-
-    public function setImageUrl(?string $imageUrl): static
-    {
-        $this->imageUrl = $imageUrl;
-
-        return $this;
-    }
 
     public function getDescription(): ?string
     {

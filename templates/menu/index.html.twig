@@ -14,9 +14,14 @@
 						<div
 							class="card h-100">
 
-							<!-- Image du menu -->
+							<!-- Image du menu (via le premier plat) -->
+							{% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
+								{% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+							{% else %}
+								{% set menuImage = asset('images/menus/default.jpg') %}
+							{% endif %}
 							<img
-							class="card-img-top" src="{{ menu.imageUrl is not empty ? menu.imageUrl : asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}"/>
+							class="card-img-top" src="{{ menuImage }}" alt="{{ menu.titre }}"/>
 
 							<!-- Détails du menu -->
 							<div class="card-body p-4">
@@ -95,7 +100,7 @@
 
 									<!-- Bouton Modifier (salarié / admin uniquement) -->
 									{% if is_granted('ROLE_SALARIE') %}
-										<a class="btn btn-outline-primary btn-sm mt-2" href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" style="position: relative; z-index: 2;">
+										<a class="btn btn-primary mt-2" href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" style="position: relative; z-index: 2;">
 											<i class="bi bi-pencil"></i>
 											Modifier
 										</a>

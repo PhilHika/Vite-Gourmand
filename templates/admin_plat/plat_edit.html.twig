@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block body %}
-	<div data-controller="plat-allergenes" data-plat-allergenes-create-url-value="{{ path('app_admin_referentiel_allergene_new') }}">
+	<div>
 		<div class="container mt-5">
 			<h1 class="mb-4">
 				{% if plat.id %}
@@ -37,7 +37,12 @@
 							<div class="alert alert-secondary py-1 text-center">Aucune image enregistrée.</div>
 						{% endif %}
 
-						{{ form_row(form.photoFile, {'label': 'Télécharger une image', 'attr': {'onchange': "document.getElementById('btnUploadPhoto').classList.remove('d-none');"}}) }}
+						{{ form_row(form.photoFile, {
+							'label': 'Télécharger une image',
+							'attr': {
+								'onchange': "document.getElementById('btnUploadPhoto').classList.remove('d-none');"
+							}
+						}) }}
 
 						{# Upload button: hidden by default, shown when a file is selected #}
 						<button type="submit" id="btnUploadPhoto" class="btn btn-outline-success w-100 mt-2 d-none">
@@ -46,7 +51,12 @@
 						</button>
 
 						{% if plat.photo %}
-							<button type="button" class="btn btn-outline-danger w-100 mt-2" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) { var fd = new FormData(); fd.append('_token', '{{ csrf_token('delete-photo-' ~ plat.id) }}'); fetch('{{ path('app_admin_plat_delete_photo', {id: plat.id}) }}', { method: 'POST', body: fd }).then(function() { window.location.reload(); }); }">
+							<button type="button" class="btn btn-outline-danger w-100 mt-2" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) {
+																		var fd = new FormData();
+																		fd.append('_token', '{{ csrf_token('delete-photo-' ~ plat.id) }}');
+																		fetch('{{ path('app_admin_plat_delete_photo', {id: plat.id}) }}', { method: 'POST', body: fd })
+																			.then(function() { window.location.reload(); });
+																	}">
 								<i class="bi bi-trash"></i>
 								Supprimer la photo
 							</button>
@@ -60,44 +70,89 @@
 					class="col-md-6">
 
 					{# ===== ALLERGENES SECTION ===== #}
-					<label class="form-label" for="plat_allergenes_label">Allergènes</label>
+					<div data-controller="entity-picker" data-entity-picker-mode-value="multiple" data-entity-picker-modal-id-value="allergeneModal" data-entity-picker-empty-message-value="Aucun allergène associé" data-entity-picker-create-url-value="{{ path('app_admin_referentiel_allergene_new') }}" data-entity-picker-form-field-name-value="allergene_form[libelle]">
 
-					<div data-plat-allergenes-target="originalSelect">
-						{{ form_widget(form.allergenes) }}
+						<label class="form-label">Allergènes</label>
+
+						<div data-entity-picker-target="originalSelect">
+							{{ form_widget(form.allergenes) }}
+						</div>
+
+						<div class="card mb-2">
+							<ul class="list-group list-group-flush" data-entity-picker-target="list"></ul>
+						</div>
+
+						<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#allergeneModal" data-action="click->entity-picker#openModal">
+							<i class="bi bi-plus-circle"></i>
+							Ajouter un allergène
+						</button>
+
+						<div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
+							<i class="bi bi-exclamation-triangle"></i>
+							Pensez à mettre à jour le plat pour sauvegarder les changements.
+						</div>
+
+						{# Modal Allergene - Selection & Creation #}
+						<div class="modal fade" id="allergeneModal" tabindex="-1" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Gérer les Allergènes</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div class="mb-4 p-3 bg-light rounded">
+											<label class="form-label small fw-bold" for="newAllergeneInput">Créer un nouvel allergène</label>
+											<div class="input-group">
+												<input type="text" id="newAllergeneInput" class="form-control" placeholder="Nom du nouvel allergène" data-entity-picker-target="newInput">
+												<button class="btn btn-success" data-entity-picker-target="createButton" data-action="click->entity-picker#create">
+													<i class="bi bi-plus-lg"></i>
+													Créer & Ajouter
+												</button>
+											</div>
+											<div class="form-text">Cela l'ajoutera à la liste globale et à ce plat.</div>
+										</div>
+
+										<hr>
+
+										<div class="mb-3">
+											<label class="form-label fw-bold" for="modalAllergeneSelect">Ou choisir un existant</label>
+											<select id="modalAllergeneSelect" class="form-select" data-entity-picker-target="modalSelect">
+												<option value="">-- Sélectionner un allergène --</option>
+												{% for choice in form.allergenes.vars.choices %}
+													<option value="{{ choice.value }}">{{ choice.label }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+										<button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Ajouter la sélection</button>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="card mb-2">
-						<ul class="list-group list-group-flush" data-plat-allergenes-target="list"></ul>
-					</div>
+					{# ===== MENUS SECTION ===== #}
+					<div data-controller="entity-picker" data-entity-picker-mode-value="multiple" data-entity-picker-modal-id-value="menusModal" data-entity-picker-empty-message-value="Aucun menu associé">
 
-					<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#allergeneModal" data-action="click->plat-allergenes#openModal">
-						<i class="bi bi-plus-circle"></i>
-						Ajouter un allergène
-					</button>
+						<label class="form-label">Menus associés</label>
 
-					<div class="alert alert-warning py-2 small d-none" data-plat-allergenes-target="reminder">
-						<i class="bi bi-exclamation-triangle"></i>
-						Pensez à mettre à jour le plat pour sauvegarder les changements.
-					</div>
-
-					{# ===== MENUS SECTION (controlled by plat-menus) ===== #}
-					<div data-controller="plat-menus">
-						<label class="form-label" for="plat_menus_label">Menus associés</label>
-
-						<div data-plat-menus-target="originalSelect">
+						<div data-entity-picker-target="originalSelect">
 							{{ form_widget(form.menus) }}
 						</div>
 
 						<div class="card mb-2">
-							<ul class="list-group list-group-flush" data-plat-menus-target="list"></ul>
+							<ul class="list-group list-group-flush" data-entity-picker-target="list"></ul>
 						</div>
 
-						<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#menusModal" data-action="click->plat-menus#openModal">
+						<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#menusModal" data-action="click->entity-picker#openModal">
 							<i class="bi bi-plus-circle"></i>
 							Associer à un menu
 						</button>
 
-						<div class="alert alert-warning py-2 small d-none" data-plat-menus-target="reminder">
+						<div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
 							<i class="bi bi-exclamation-triangle"></i>
 							Pensez à mettre à jour le plat pour sauvegarder les changements.
 						</div>
@@ -113,7 +168,7 @@
 									<div class="modal-body">
 										<div class="mb-3">
 											<label class="form-label fw-bold" for="modalMenuSelect">Choisir un menu</label>
-											<select id="modalMenuSelect" class="form-select" data-plat-menus-target="modalSelect">
+											<select id="modalMenuSelect" class="form-select" data-entity-picker-target="modalSelect">
 												<option value="">-- Sélectionner un menu --</option>
 												{% for choice in form.menus.vars.choices %}
 													<option value="{{ choice.value }}">{{ choice.label }}</option>
@@ -123,7 +178,7 @@
 									</div>
 									<div class="modal-footer">
 										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-										<button type="button" class="btn btn-primary" data-action="click->plat-menus#add">Ajouter la sélection</button>
+										<button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Ajouter la sélection</button>
 									</div>
 								</div>
 							</div>
@@ -141,48 +196,14 @@
 				{% endif %}
 			</button>
 			<a href="{{ path('app_menu_index') }}" class="btn btn-secondary mt-4 ms-2">Retour au menus</a>
+			{% if app.request.query.get('back') %}
+				<a href="{{ app.request.query.get('back') }}" class="btn btn-outline-dark mt-4 ms-2">
+					<i class="bi bi-arrow-left"></i>
+					Retour à l'édition du menu
+				</a>
+			{% endif %}
 			{{ form_end(form) }}
 		</div>
 
-		{# Modal Allergene - Selection & Creation #}
-		<div class="modal fade" id="allergeneModal" tabindex="-1" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Gérer les Allergènes</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div class="mb-4 p-3 bg-light rounded">
-							<label class="form-label small fw-bold" for="newAllergeneInput">Créer un nouvel allergène</label>
-							<div class="input-group">
-								<input type="text" id="newAllergeneInput" class="form-control" placeholder="Nom du nouvel allergène" data-plat-allergenes-target="newInput">
-								<button class="btn btn-success" data-plat-allergenes-target="createButton" data-action="click->plat-allergenes#create">
-									<i class="bi bi-plus-lg"></i>
-									Créer & Ajouter
-								</button>
-							</div>
-							<div class="form-text">Cela l'ajoutera à la liste globale et à ce plat.</div>
-						</div>
-
-						<hr>
-
-						<div class="mb-3">
-							<label class="form-label fw-bold" for="modalAllergeneSelect">Ou choisir un existant</label>
-							<select id="modalAllergeneSelect" class="form-select" data-plat-allergenes-target="modalSelect">
-								<option value="">-- Sélectionner un allergène --</option>
-								{% for choice in form.allergenes.vars.choices %}
-									<option value="{{ choice.value }}">{{ choice.label }}</option>
-								{% endfor %}
-							</select>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-						<button type="button" class="btn btn-primary" data-action="click->plat-allergenes#add">Ajouter la sélection</button>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 {% endblock %}
