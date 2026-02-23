@@ -100,7 +100,71 @@
 					</div>
 				</div>
 
-				{{ form_row(form.theme) }}
+				{# ===== THEME SECTION ===== #}
+				<div data-controller="entity-picker" data-entity-picker-mode-value="single" data-entity-picker-modal-id-value="themeModal" data-entity-picker-empty-message-value="Aucun thème sélectionné" data-entity-picker-create-url-value="{{ path('app_admin_referentiel_theme_new') }}" data-entity-picker-form-field-name-value="theme_form[libelle]">
+
+					<label class="form-label">Thème du menu</label>
+
+					<div data-entity-picker-target="originalSelect">
+						{{ form_widget(form.theme) }}
+					</div>
+					{{ form_errors(form.theme) }}
+
+					<div class="card mb-2">
+						<div class="list-group list-group-flush" data-entity-picker-target="list"></div>
+					</div>
+
+					<button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#themeModal" data-action="click->entity-picker#openModal">
+						<i class="bi bi-plus-circle"></i>
+						Choisir un thème
+					</button>
+
+					<div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
+						<i class="bi bi-exclamation-triangle"></i>
+						Pensez à mettre à jour le menu pour sauvegarder les changements.
+					</div>
+
+					{# Modal Theme - Selection & Creation #}
+					<div class="modal fade" id="themeModal" tabindex="-1" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Gérer le Thème du menu</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<div class="mb-4 p-3 bg-light rounded">
+										<label class="form-label small fw-bold" for="newThemeInput">Créer un nouveau thème</label>
+										<div class="input-group">
+											<input type="text" id="newThemeInput" class="form-control" placeholder="Nom du nouveau thème" data-entity-picker-target="newInput">
+											<button class="btn btn-success" data-entity-picker-target="createButton" data-action="click->entity-picker#create">
+												<i class="bi bi-plus-lg"></i>
+												Créer & Sélectionner
+											</button>
+										</div>
+										<div class="form-text">Cela l'ajoutera à la liste globale et le sélectionnera pour ce menu.</div>
+									</div>
+
+									<hr>
+
+									<div class="mb-3">
+										<label class="form-label fw-bold" for="modalThemeSelect">Ou choisir un existant</label>
+										<select id="modalThemeSelect" class="form-select" data-entity-picker-target="modalSelect">
+											<option value="">-- Sélectionner un thème --</option>
+											{% for choice in form.theme.vars.choices %}
+												<option value="{{ choice.value }}">{{ choice.label }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+									<button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Sélectionner</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div
 				class="col-md-6" data-controller="entity-picker" data-entity-picker-mode-value="multiple" data-entity-picker-modal-id-value="platsModal" data-entity-picker-empty-message-value="Aucun plat associé" data-entity-picker-edit-url-template-value="{{ path('app_admin_plat_edit', {id: '__ID__'})|replace({'__ID__': '__ID__'}) }}">
