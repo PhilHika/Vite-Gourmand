@@ -53,8 +53,8 @@
 
 						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
 							{% if is_granted('ROLE_SALARIE') %}
-								<a href="{{ path('app_admin_menu_new') }}" class="btn btn-success me-md-2">Créer Menu</a>
-								<a href="{{ path('app_admin_plat_new') }}" class="btn btn-success me-md-2">Créer Plat</a>
+								<a href="{{ path('app_admin_menu_index') }}" class="btn btn-success me-md-2">Gestion Menus</a>
+								<a href="{{ path('app_admin_plat_index') }}" class="btn btn-success me-md-2">Gestion Plats</a>
 							{% endif %}
 							{% if is_granted('ROLE_ADMIN') %}
 								<a href="{{ path('app_admin_user_index') }}" class="btn btn-primary me-md-2">Gérer les roles</a>

@@ -47,6 +47,10 @@
 					<div class="menu-dropdown">
 						<span class="menu-dropdown-toggle">Compte</span>
 						<div class="menu-dropdown-content">
+							{% if is_granted('ROLE_SALARIE') %}
+								<a href="{{ path('app_admin_menu_index') }}">Gestion Menus</a>
+								<a href="{{ path('app_admin_plat_index') }}">Gestion Plats</a>
+							{% endif %}
 							<a href="{{ path('app_profile') }}">Mon Profil</a>
 							<a href="{{ path('app_logout') }}">Se déconnecter</a>
 						</div>

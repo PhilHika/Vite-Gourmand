@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des plats
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h1>Gestion des plats</h1>
+			<a href="{{ path('app_admin_plat_new') }}" class="btn btn-success">
+				<i class="bi bi-plus-circle"></i>
+				Nouveau plat
+			</a>
+		</div>
+
+		{% if plats|length > 0 %}
+			<div class="table-responsive">
+				<table class="table table-striped table-hover align-middle">
+					<thead class="table-dark">
+						<tr>
+							<th>Photo</th>
+							<th>Titre</th>
+							<th>Allergènes</th>
+							<th>Menus associés</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for plat in plats %}
+							<tr>
+								<td>
+									{% if plat.photo is not empty %}
+										<img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+									{% else %}
+										<span class="text-muted">
+											<i class="bi bi-image" style="font-size: 1.5rem;"></i>
+										</span>
+									{% endif %}
+								</td>
+								<td class="fw-bold">{{ plat.titrePlat }}</td>
+								<td>
+									{% if plat.allergenes|length > 0 %}
+										{% for allergene in plat.allergenes %}
+											<span class="badge bg-warning text-dark">{{ allergene.libelle }}</span>
+										{% endfor %}
+									{% else %}
+										<span class="text-muted small">Aucun</span>
+									{% endif %}
+								</td>
+								<td>
+									{% if plat.menus|length > 0 %}
+										<span class="badge bg-info">{{ plat.menus|length }}</span>
+									{% else %}
+										<span class="text-muted small">Aucun</span>
+									{% endif %}
+								</td>
+								<td class="text-end">
+									<a href="{{ path('app_admin_plat_edit', {id: plat.id}) }}" class="btn btn-sm btn-primary" title="Éditer">
+										<i class="bi bi-pencil"></i>
+									</a>
+									<button type="button" class="btn btn-sm btn-danger" title="Supprimer" data-bs-toggle="modal" data-bs-target="#deleteModal{{ plat.id }}">
+										<i class="bi bi-trash"></i>
+									</button>
+
+									{# Modal de confirmation de suppression #}
+									<div class="modal fade" id="deleteModal{{ plat.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ plat.id }}" aria-hidden="true">
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="deleteModalLabel{{ plat.id }}">Confirmer la suppression</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+												</div>
+												<div class="modal-body">
+													<p>Êtes-vous sûr de vouloir supprimer le plat
+														<strong>«
+															{{ plat.titrePlat }}
+															»</strong>
+														?</p>
+													{% if plat.menus|length > 0 %}
+														<p class="text-warning mb-0">
+															<i class="bi bi-exclamation-triangle"></i>
+															Ce plat est associé à
+															{{ plat.menus|length }}
+															menu(s). Il en sera retiré.</p>
+													{% endif %}
+													<p class="text-danger mb-0">
+														<i class="bi bi-exclamation-triangle"></i>
+														Cette action est irréversible.</p>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+													<form action="{{ path('app_admin_plat_delete', {id: plat.id}) }}" method="post" class="d-inline">
+														<input type="hidden" name="_token" value="{{ csrf_token('delete-plat-' ~ plat.id) }}">
+														<button type="submit" class="btn btn-danger">
+															<i class="bi bi-trash"></i>
+															Supprimer
+														</button>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<div class="alert alert-info">
+				<i class="bi bi-info-circle"></i>
+				Aucun plat n'a été créé pour le moment.
+				<a href="{{ path('app_admin_plat_new') }}">Créer un premier plat</a>.
+			</div>
+		{% endif %}
+
+		<a href="{{ path('app_admin_menu_index') }}" class="btn btn-outline-secondary mt-3">
+			<i class="bi bi-arrow-left"></i>
+			Retour à la gestion des menus
+		</a>
+	</div>
+{% endblock %}

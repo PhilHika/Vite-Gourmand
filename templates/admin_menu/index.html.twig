@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des menus
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h1>Gestion des menus</h1>
+			<a href="{{ path('app_admin_menu_new') }}" class="btn btn-success">
+				<i class="bi bi-plus-circle"></i>
+				Nouveau menu
+			</a>
+		</div>
+
+		{% if menus|length > 0 %}
+			<div class="table-responsive">
+				<table class="table table-striped table-hover align-middle">
+					<thead class="table-dark">
+						<tr>
+							<th>Titre</th>
+							<th>Description</th>
+							<th>Prix / pers.</th>
+							<th>Stock</th>
+							<th>Disponible</th>
+							<th>Nb plats</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for menu in menus %}
+							<tr>
+								<td class="fw-bold">{{ menu.titre }}</td>
+								<td>{{ menu.description }}</td>
+								<td>{{ menu.prixParPersonne|number_format(2, ',', ' ') }}
+									€</td>
+								<td>
+									{% if menu.quantiteRestante > 0 %}
+										<span class="badge bg-success">{{ menu.quantiteRestante }}</span>
+									{% else %}
+										<span class="badge bg-danger">Indisponible</span>
+									{% endif %}
+								</td>
+								<td>
+									{% if menu.quantiteRestante > 0 %}
+										<span class="badge bg-success">Oui</span>
+									{% else %}
+										<span class="badge bg-danger">Non</span>
+									{% endif %}
+								</td>
+								<td>{{ menu.plats|length }}</td>
+								<td class="text-end">
+									<a href="{{ path('app_menu_show', {id: menu.id}) }}" class="btn btn-sm btn-outline-secondary" title="Voir">
+										<i class="bi bi-eye"></i>
+									</a>
+									<a href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" class="btn btn-sm btn-primary" title="Éditer">
+										<i class="bi bi-pencil"></i>
+									</a>
+									<form action="{{ path('app_admin_menu_toggle_availability', {id: menu.id}) }}" method="post" class="d-inline">
+										<input type="hidden" name="_token" value="{{ csrf_token('toggle-menu-' ~ menu.id) }}">
+										{% if menu.quantiteRestante > 0 %}
+											<button type="submit" class="btn btn-sm btn-warning" title="Rendre indisponible">
+												<i class="bi bi-pause-circle"></i>
+											</button>
+										{% else %}
+											<button type="submit" class="btn btn-sm btn-success" title="Rendre disponible">
+												<i class="bi bi-play-circle"></i>
+											</button>
+										{% endif %}
+									</form>
+									<button type="button" class="btn btn-sm btn-danger" title="Supprimer" data-bs-toggle="modal" data-bs-target="#deleteModal{{ menu.id }}">
+										<i class="bi bi-trash"></i>
+									</button>
+
+									{# Modal de confirmation de suppression #}
+									<div class="modal fade" id="deleteModal{{ menu.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ menu.id }}" aria-hidden="true">
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="deleteModalLabel{{ menu.id }}">Confirmer la suppression</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+												</div>
+												<div class="modal-body">
+													<p>Êtes-vous sûr de vouloir supprimer le menu
+														<strong>«
+															{{ menu.titre }}
+															»</strong>
+														?</p>
+													<p class="text-danger mb-0">
+														<i class="bi bi-exclamation-triangle"></i>
+														Cette action est irréversible.</p>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+													<form action="{{ path('app_admin_menu_delete', {id: menu.id}) }}" method="post" class="d-inline">
+														<input type="hidden" name="_token" value="{{ csrf_token('delete-menu-' ~ menu.id) }}">
+														<button type="submit" class="btn btn-danger">
+															<i class="bi bi-trash"></i>
+															Supprimer
+														</button>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<div class="alert alert-info">
+				<i class="bi bi-info-circle"></i>
+				Aucun menu n'a été créé pour le moment.
+				<a href="{{ path('app_admin_menu_new') }}">Créer un premier menu</a>.
+			</div>
+		{% endif %}
+
+		<a href="{{ path('app_menu_index') }}" class="btn btn-outline-secondary mt-3">
+			<i class="bi bi-arrow-left"></i>
+			Retour au listing public
+		</a>
+	</div>
+{% endblock %}
