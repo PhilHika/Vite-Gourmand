@@ -32,7 +32,7 @@ class AdminMenuController extends AbstractController
 
             $this->addFlash('success', 'Le menu a bien été créé.');
 
-            return $this->redirectToRoute('app_home'); // TODO: Redirect to index/list if available
+            return $this->redirectToRoute('app_admin_menu_edit', ['id' => $menu->getId()]);
         }
 
         return $this->render('admin_menu/menu_edit.html.twig', [
@@ -58,7 +58,7 @@ class AdminMenuController extends AbstractController
 
             $this->addFlash('success', 'Le menu a bien été modifié.');
 
-            return $this->redirectToRoute('app_home'); // TODO: Redirect to index/list if available
+            return $this->redirectToRoute('app_admin_menu_edit', ['id' => $menu->getId()]);
         }
 
         return $this->render('admin_menu/menu_edit.html.twig', [

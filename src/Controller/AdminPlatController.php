@@ -38,7 +38,7 @@ class AdminPlatController extends AbstractController
 
             $this->addFlash('success', 'Le plat a bien été créé.');
 
-            return $this->redirectToRoute('app_home'); // TODO: Redirect to list
+            return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
         }
 
         return $this->render('admin_plat/plat_edit.html.twig', [
@@ -75,7 +75,7 @@ class AdminPlatController extends AbstractController
 
             $this->addFlash('success', 'Le plat a bien été modifié.');
 
-            return $this->redirectToRoute('app_home'); // TODO: Redirect to list
+            return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
         }
 
         return $this->render('admin_plat/plat_edit.html.twig', [
@@ -112,5 +112,27 @@ class AdminPlatController extends AbstractController
         $response->setEtag(md5($photoContent)); // Simple ETag based on content usage
 
         return $response;
+    }
+
+    #[Route('/{id}/delete-photo', name: 'app_admin_plat_delete_photo', methods: ['POST'])]
+    public function deletePhoto(Request $request, Plat $plat, PlatRepository $platRepository): Response
+    {
+        if (!$this->isGranted('ROLE_SALARIE')) {
+            $this->addFlash('danger', 'Accès refusé.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('delete-photo-' . $plat->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
+        }
+
+        $plat->setPhoto(null);
+        $platRepository->save($plat, true);
+
+        $this->addFlash('success', 'La photo a bien été supprimée.');
+
+        return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
     }
 }

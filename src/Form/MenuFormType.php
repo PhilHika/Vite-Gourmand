@@ -11,7 +11,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,16 +41,12 @@ class MenuFormType extends AbstractType
                 'label' => 'Quantité journalière disponible',
                 'attr' => ['class' => 'form-control', 'min' => 0]
             ])
-            ->add('imageUrl', UrlType::class, [
-                'label' => 'URL de l\'image (optionnel)',
-                'required' => false,
-                'attr' => ['class' => 'form-control', 'placeholder' => 'https://...'],
-                'default_protocol' => 'https'
-            ])
             ->add('regime', EntityType::class, [
                 'class' => Regime::class,
                 'choice_label' => 'libelle',
                 'label' => 'Régime alimentaire',
+                'required' => false,
+                'placeholder' => 'Choisir...',
                 'attr' => ['class' => 'form-select']
             ])
             ->add('theme', EntityType::class, [

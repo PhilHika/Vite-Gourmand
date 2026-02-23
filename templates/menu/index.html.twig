@@ -14,9 +14,14 @@
 						<div
 							class="card h-100">
 
-							<!-- Image du menu -->
+							<!-- Image du menu (via le premier plat) -->
+							{% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
+								{% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+							{% else %}
+								{% set menuImage = asset('images/menus/default.jpg') %}
+							{% endif %}
 							<img
-							class="card-img-top" src="{{ menu.imageUrl is not empty ? menu.imageUrl : asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}"/>
+							class="card-img-top" src="{{ menuImage }}" alt="{{ menu.titre }}"/>
 
 							<!-- Détails du menu -->
 							<div class="card-body p-4">
@@ -38,24 +43,34 @@
 										<p class="text-muted small">{{ menu.description }}</p>
 									{% endif %}
 
-									<!-- Plats + leurs allergènes -->
+									<!-- Plats -->
 									{% if menu.plats|length > 0 %}
 										<ul class="list-unstyled mt-2">
 											{% for plat in menu.plats %}
 												<li class="mb-1">
 													<span class="small">{{ plat.titrePlat }}</span>
-													{% if plat.allergenes|length > 0 %}
-														<div class="mt-1">
-															{% for allergene in plat.allergenes %}
-																<span class="badge bg-warning text-dark me-1">{{ allergene.libelle }}</span>
-															{% endfor %}
-														</div>
-													{% endif %}
 												</li>
 											{% endfor %}
 										</ul>
 									{% else %}
 										<p class="text-muted fst-italic small">Aucun plat renseigné</p>
+									{% endif %}
+
+									<!-- Allergènes (dédupliqués par libelle) -->
+									{% set seenAllergenes = [] %}
+									{% for plat in menu.plats %}
+										{% for allergene in plat.allergenes %}
+											{% if allergene.libelle not in seenAllergenes %}
+												{% set seenAllergenes = seenAllergenes|merge([allergene.libelle]) %}
+											{% endif %}
+										{% endfor %}
+									{% endfor %}
+									{% if seenAllergenes|length > 0 %}
+										<div class="mt-2">
+											{% for libelle in seenAllergenes %}
+												<span class="badge bg-warning text-dark me-1">{{ libelle }}</span>
+											{% endfor %}
+										</div>
 									{% endif %}
 
 								</div>
@@ -81,6 +96,14 @@
 										<button class="btn btn-outline-secondary mt-auto" disabled>
 											Indisponible
 										</button>
+									{% endif %}
+
+									<!-- Bouton Modifier (salarié / admin uniquement) -->
+									{% if is_granted('ROLE_SALARIE') %}
+										<a class="btn btn-primary mt-2" href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" style="position: relative; z-index: 2;">
+											<i class="bi bi-pencil"></i>
+											Modifier
+										</a>
 									{% endif %}
 
 								</div>
