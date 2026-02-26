@@ -14,6 +14,13 @@ class Commande
 {
     use HasPrixCommandeTrait;
 
+    // Constantes de statut
+    public const STATUT_EN_ATTENTE = 'en_attente';
+    public const STATUT_CONFIRMEE = 'confirmee';
+    public const STATUT_EN_PREPARATION = 'en_preparation';
+    public const STATUT_LIVREE = 'livree';
+    public const STATUT_ANNULEE = 'annulee';
+
     #[ORM\Id]
     #[ORM\Column(length: 50, unique: true)]
     private ?string $numeroCommande = null;
@@ -45,7 +52,7 @@ class Commande
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire')]
-    private ?string $statut = null;
+    private ?string $statut = self::STATUT_EN_ATTENTE;
 
     #[ORM\Column]
     private ?bool $pretMateriel = null;
@@ -206,5 +213,24 @@ class Commande
         $this->restitutionMateriel = $restitutionMateriel;
 
         return $this;
+    }
+
+    /**
+     * Calcule le prixMenu à partir du menu et du nombrePersonne.
+     * Applique une réduction de 10% si nombrePersonne >= menu.nombrePersonneMinimum + 5.
+     */
+    public function calculerPrixMenu(): void
+    {
+        if ($this->menu === null || $this->nombrePersonne === null) {
+            return;
+        }
+
+        $prixBase = $this->menu->getPrixParPersonne() * $this->nombrePersonne;
+
+        if ($this->nombrePersonne >= $this->menu->getNombrePersonneMinimum() + 5) {
+            $prixBase *= 0.90; // réduction de 10%
+        }
+
+        $this->prixMenu = round($prixBase, 2);
     }
 }

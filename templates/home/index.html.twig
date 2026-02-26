@@ -4,28 +4,28 @@
 {% endblock %}
 
 {% block body %}
-	<header class="bg-primary bg-gradient text-white">
-		<div class="container px-4 py-5 text-center">
-			{% if app.user %}
-				<h1 class="fw-bolder">
-					Bienvenue chez Vite et Gourmand
-					{{ app.user.prenom }}
-					!
-				</h1>
-				<p class="lead">Le meilleur de la gastronomie pour vos grandes occasions.</p>
-				<a class="btn btn-lg btn-light" href="{{ path('app_profile') }}" role="button">Vos commandes</a>
-			{% else %}
-				<h1 class="fw-bolder">Bienvenue chez Vite et Gourmand !</h1>
-				<p class="lead">Le meilleur de la gastronomie pour vos grandes occasions.</p>
-				<a class="btn btn-lg btn-light" href="{{ path('app_register') }}" role="button">S'inscrire</a>
-				<a class="btn btn-primary btn-lg" href="{{ path('app_login') }}" role="button">Se connecter</a>
-			{% endif %}
-		</div>
-	</header>
+    <header class="bg-primary bg-gradient text-white">
+        <div class="container px-4 py-5 text-center">
+            {% if app.user %}
+                <h1 class="fw-bolder">
+                    Bienvenue chez Vite et Gourmand
+                    {{ app.user.prenom }}
+                    !
+                </h1>
+                <p class="lead">Le meilleur de la gastronomie pour vos grandes occasions.</p>
+                <a class="btn btn-lg btn-light" href="{{ path('app_profile') }}" role="button">Vos commandes</a>
+            {% else %}
+                <h1 class="fw-bolder">Bienvenue chez Vite et Gourmand !</h1>
+                <p class="lead">Le meilleur de la gastronomie pour vos grandes occasions.</p>
+                <a class="btn btn-lg btn-light" href="{{ path('app_register') }}" role="button">S'inscrire</a>
+                <a class="btn btn-primary btn-lg" href="{{ path('app_login') }}" role="button">Se connecter</a>
+            {% endif %}
+        </div>
+    </header>
 
-	<div class="container mt-5">
-		<div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
-			<div class="container-fluid py-5"></div>
-		</div>
-	</div>
+    <div class="container mt-5">
+        <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+            <div class="container-fluid py-5"></div>
+        </div>
+    </div>
 {% endblock %}
