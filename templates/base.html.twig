@@ -50,6 +50,7 @@
                             {% if is_granted('ROLE_SALARIE') %}
                                 <a href="{{ path('app_admin_menu_index') }}">Gestion Menus</a>
                                 <a href="{{ path('app_admin_plat_index') }}">Gestion Plats</a>
+                                <a href="{{ path('app_admin_commande_index') }}">Gestion Commandes</a>
                             {% endif %}
                             <a href="{{ path('app_profile') }}">Mon Profil</a>
                             <a href="{{ path('app_logout') }}">Se déconnecter</a>

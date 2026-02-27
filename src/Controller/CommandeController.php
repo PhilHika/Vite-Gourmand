@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Commande;
-use App\Entity\Menu;
 use App\Form\CommandeFormType;
 use App\Repository\MenuRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -19,7 +20,7 @@ class CommandeController extends AbstractController
 {
     #[Route('/new', name: 'app_commande_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request, MenuRepository $menuRepository, EntityManagerInterface $em): Response
+    public function new(Request $request, MenuRepository $menuRepository, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         $menuId = $request->query->get('menu');
         $menu = null;
@@ -97,6 +98,36 @@ class CommandeController extends AbstractController
 
                 $em->persist($commande);
                 $em->flush();
+
+                // Envoi email de confirmation au client
+                $user = $this->getUser();
+                $emailMessage = (new Email())
+                    ->from('noreply@vite-et-gourmand.fr')
+                    ->to($user->getEmail())
+                    ->subject('Confirmation de votre commande ' . $commande->getNumeroCommande())
+                    ->html(sprintf(
+                        '<h2>Merci pour votre commande !</h2>
+                        <p>Bonjour <strong>%s</strong>,</p>
+                        <p>Votre commande <strong>%s</strong> a bien été enregistrée.</p>
+                        <h3>Récapitulatif</h3>
+                        <ul>
+                            <li><strong>Menu :</strong> %s</li>
+                            <li><strong>Date de prestation :</strong> %s</li>
+                            <li><strong>Heure de livraison :</strong> %s</li>
+                            <li><strong>Nombre de personnes :</strong> %d</li>
+                            <li><strong>Prix menu :</strong> %s €</li>
+                        </ul>
+                        <p>Notre équipe vous contactera pour confirmer les détails de livraison.</p>
+                        <p>Cordialement,<br>L\'équipe Vite &amp; Gourmand</p>',
+                        htmlspecialchars($user->getPrenom()),
+                        htmlspecialchars($commande->getNumeroCommande()),
+                        htmlspecialchars($menu->getTitre()),
+                        $commande->getDatePrestation()->format('d/m/Y'),
+                        htmlspecialchars($commande->getHeureLivraison()),
+                        $commande->getNombrePersonne(),
+                        number_format($commande->getPrixMenu(), 2, ',', ' ')
+                    ));
+                $mailer->send($emailMessage);
 
                 $this->addFlash('success', 'Votre commande a bien été enregistrée !');
                 return $this->redirectToRoute('app_commande_show', [
