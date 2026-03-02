@@ -112,6 +112,26 @@ Et alors :
 - **Mode développement** : MailHog sur `smtp://localhost:1025`
 - **Mode production** : SMTP réel (Gmail, SendGrid, Brevo, etc.)
 
+### 🛒 Système de Commande
+
+#### Parcours utilisateur
+
+1. **Utilisateur connecté** : Clic sur "Commander" (d'un container Menu) → Formulaire pré-rempli → Récapitulatif
+2. **Utilisateur non connecté** : Clic sur "Commander" (d'un container Menu) → Modale d'invitation à se connecter/s'inscrire → Redirection automatique vers la commande après login
+3. **Accès direct** (`/commande/new`) : Clic sur Commander (generique : menu inconnu) → Listing des menus intégré pour sélection → Formulaire
+
+#### Réduction tarifaire
+
+> 10% est automatiquement appliquée sur le prix total du menu lorsque le nombre de personnes commandé dépasse de 5 ou plus le minimum requis par le menu.
+>
+> `prixMenu = prixParPersonne × nombrePersonne × 0.90` (si `nombrePersonne >= min + 5`)
+
+#### Gestion du stock
+- Le bouton "Commander" est remplacé par **"Épuisé"** si `quantiteRestante <= 0`
+- Une **vérification serveur** est effectuée au moment de la soumission (protection contre les commandes concurrentes) + stock est **décrémenté automatiquement** à chaque commande validée
+
+> Le changement de statut est réservé aux rôles `ROLE_SALARIE` et `ROLE_ADMIN` tout comme le calcul du prix de la livraison a partir de l'adresse renseignée par le client.
+
 ---
 
 ## 🛠️ Installation & Workflow

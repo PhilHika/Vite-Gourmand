@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accès refusé — Vite & Gourmand{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-1 fw-bold text-danger">403</h1>
+                <h2 class="mb-3">Accès refusé</h2>
+                <p class="lead text-muted mb-4">
+                    Vous ne disposez pas des droits nécessaires pour accéder à cette ressource.
+                </p>
+                <a href="{{ path('app_home') }}" class="btn btn-primary">
+                    <i class="bi bi-house-door"></i> Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

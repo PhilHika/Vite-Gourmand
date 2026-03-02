@@ -32,7 +32,7 @@ security:
                 username_parameter: email # permet de se connecter avec l'email et non le nom d'utilisateur 
                 password_parameter: password # le formulaire envoie "password" et non "_password" 
                 default_target_path: app_home
-                always_use_default_target_path: true
+                always_use_default_target_path: false
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -46,8 +46,8 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_SALARIE }
+        - { path: ^/profil, roles: ROLE_USER }
 
 when@test:
     security:
