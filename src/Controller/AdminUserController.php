@@ -14,23 +14,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/utilisateurs')]
+#[IsGranted('ROLE_ADMIN')]
 class AdminUserController extends AbstractController
 {
-    private function checkAdminAccess(): ?Response
-    {
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('danger', 'Vous n\'avez pas les droits nécessaire pour acceder.');
-            return $this->redirectToRoute('app_home');
-        }
-        return null;
-    }
-
     #[Route('/', name: 'app_admin_user_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
-        if ($redirect = $this->checkAdminAccess()) {
-            return $redirect;
-        }
 
         // Récupérer tous les utilisateurs sauf celui actuellement connecté
         $currentUser = $this->getUser();
@@ -47,10 +36,6 @@ class AdminUserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_admin_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Utilisateur $utilisateur, EntityManagerInterface $entityManager): Response
     {
-        if ($redirect = $this->checkAdminAccess()) {
-            return $redirect;
-        }
-
         // Empêcher l'édition de ses propres droits
         if ($utilisateur === $this->getUser()) {
             $this->addFlash('warning', 'Vous ne pouvez pas modifier vos propres droits.');
