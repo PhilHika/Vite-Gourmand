@@ -16,6 +16,21 @@ class UtilisateurRepository extends ServiceEntityRepository
         parent::__construct($registry, Utilisateur::class);
     }
 
+    /**
+     * Retourne tous les utilisateurs ayant le rôle ROLE_SALARIE ou ROLE_ADMIN.
+     *
+     * @return Utilisateur[]
+     */
+    public function findGestionnaires(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.role', 'r')
+            ->where('r.libelle IN (:roles)')
+            ->setParameter('roles', ['ROLE_SALARIE', 'ROLE_ADMIN'])
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */
