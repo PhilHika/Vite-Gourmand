@@ -85,7 +85,7 @@ Nous utilisons la validation standard de Symfony pour garantir l'intégrité des
 #### Architecture Service
 
 Les emails sont gérés par des **services dédiés** (Pattern Service / SRP)
-rc/Service/
+src/Service/
 ├── CommandeMailerService.php          ← Emails liés aux commandes
 ├── ContactMailerService.php           ← Emails liés au formulaire de contact
 └── PasswordResetMailerService.php     ← Emails liés au reset de mot de passe
@@ -109,6 +109,19 @@ Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml`.
 #### Configuration SMTP
 - **Dev** : MailHog sur `smtp://localhost:1025` (interface : http://localhost:8025)
 - **Prod** : SMTP réel (Gmail, SendGrid, Brevo, etc.) via `MAILER_DSN` dans `.env.local`
+
+### 🔐 Réinitialisation de mot de passe
+
+Implémentation manuelle (sans bundle externe) avec une **table dédiée** `reset_password_request` :
+- Le schéma de la table `utilisateur` n'est **pas modifié**
+- Tokens UUID v4, expiration 1 heure
+- Message identique que l'email existe ou non (sécurité : pas de divulgation d'emails)
+- Après reset : session invalidée, l'utilisateur doit se reconnecter
+
+| Route | Description |
+| :--- | :--- |
+| `/reset-password` | Formulaire de demande (saisie email) |
+| `/reset-password/{token}` | Formulaire de saisie du nouveau mot de passe |
 
 ### 🛒 Système de Commande
 

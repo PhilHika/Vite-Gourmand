@@ -8,6 +8,27 @@
     <!-- Section -->
     <section class="py-5">
         <div class="listing-container container px-4 px-lg-5 mt-5">
+
+            <!-- Bouton Commander sans menu -->
+            <div class="text-center mb-4">
+                {% if app.user %}
+                    <a class="btn btn-success btn-lg" href="{{ path('app_commande_new') }}">
+                        <i class="bi bi-cart-plus"></i>
+                        Commander sans menu
+                    </a>
+                {% else %}
+                    <button type="button"
+                        class="btn btn-success btn-lg btn-commander-login"
+                        data-bs-toggle="modal"
+                        data-bs-target="#loginModal"
+                        data-menu-id=""
+                        data-menu-titre="personnalisée">
+                        <i class="bi bi-cart-plus"></i>
+                        Commander sans menu
+                    </button>
+                {% endif %}
+            </div>
+
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 {% for menu in menus %}
                     <div class="col mb-5">
@@ -152,8 +173,7 @@
                     </div>
                     <div class="modal-body text-center py-4">
                         <i class="bi bi-person-circle display-1 text-primary mb-3"></i>
-                        <p class="lead">Pour commander le menu
-                            <strong id="modalMenuTitre"></strong>, veuillez vous connecter ou créer un compte.</p>
+                        <p class="lead" id="modalMessage">Pour passer une commande, veuillez vous connecter ou créer un compte.</p>
                     </div>
                     <div class="modal-footer justify-content-center">
                         <a id="modalLoginLink" href="#" class="btn btn-primary btn-lg">
@@ -176,10 +196,16 @@
                     const button = event.relatedTarget;
                     const menuId = button.getAttribute('data-menu-id');
                     const menuTitre = button.getAttribute('data-menu-titre');
+                    const messageEl = document.getElementById('modalMessage');
 
-                    document.getElementById('modalMenuTitre').textContent = menuTitre;
+                    if (menuId) {
+                        messageEl.innerHTML = 'Pour commander le menu <strong>' + menuTitre + '</strong>, veuillez vous connecter ou créer un compte.';
+                        var targetPath = '/commande/new?menu=' + menuId;
+                    } else {
+                        messageEl.textContent = 'Pour passer une commande personnalisée, veuillez vous connecter ou créer un compte.';
+                        var targetPath = '/commande/new';
+                    }
 
-                    const targetPath = '/commande/new?menu=' + menuId;
                     document.getElementById('modalLoginLink').href = '{{ path('app_login') }}?_target_path=' + encodeURIComponent(targetPath);
                 });
             });
