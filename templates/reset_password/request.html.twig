@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h2 class="mb-0 fs-4">Mot de passe oublié</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">
+                            Saisissez votre adresse email. Si un compte existe, vous recevrez un lien pour réinitialiser votre mot de passe.
+                        </p>
+
+                        {{ form_start(requestForm) }}
+
+                        {{ form_row(requestForm.email) }}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Envoyer le lien</button>
+                        </div>
+
+                        {{ form_end(requestForm) }}
+
+                        <div class="text-center mt-3">
+                            <small>
+                                <a href="{{ path('app_login') }}">Retour à la connexion</a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

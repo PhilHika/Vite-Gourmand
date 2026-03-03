@@ -84,19 +84,12 @@ Nous utilisons la validation standard de Symfony pour garantir l'intégrité des
 
 #### Architecture Service
 
-Les emails sont gérés par des **services dédiés** (Pattern Service / SRP) et non directement dans les contrôleurs :
-
+Les emails sont gérés par des **services dédiés** (Pattern Service / SRP)
+rc/Service/
+├── CommandeMailerService.php          ← Emails liés aux commandes
+├── ContactMailerService.php           ← Emails liés au formulaire de contact
+└── PasswordResetMailerService.php     ← Emails liés au reset de mot de passe
 ```
-src/Service/
-├── CommandeMailerService.php   ← Emails liés aux commandes
-└── ContactMailerService.php    ← Emails liés au formulaire de contact
-```
-
-**Pourquoi ?** Les contrôleurs restent **fins** (*thin controllers*) et délèguent la logique métier :
-- ✅ **Réutilisabilité** : Un seul endroit pour modifier le contenu des emails
-- ✅ **Testabilité** : Chaque service est testable isolément
-- ✅ **SRP** : Un service = une responsabilité (commandes ≠ contact)
-- ✅ **DRY** : Les builders HTML utilisent un flag `isStaff` pour les variantes client/staff
 
 #### Emails automatiques
 
@@ -105,12 +98,13 @@ src/Service/
 | Nouvelle commande confirmée | Client + tous gestionnaires `[STAFF]` | `CommandeMailerService` |
 | Changement de statut (admin) | Client + tous gestionnaires `[STAFF]` | `CommandeMailerService` |
 | Formulaire de contact | Équipe admin | `ContactMailerService` |
+| Réinitialisation mot de passe | Utilisateur demandeur | `PasswordResetMailerService` |
 
 Les gestionnaires (ROLE_SALARIE + ROLE_ADMIN) sont récupérés dynamiquement via `UtilisateurRepository::findGestionnaires()`.
 
 #### Mode synchrone
 
-Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml`. Adapté au volume faible de l'application. Passage en mode async recommandé si > 100 emails/jour.
+Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml`. 
 
 #### Configuration SMTP
 - **Dev** : MailHog sur `smtp://localhost:1025` (interface : http://localhost:8025)
