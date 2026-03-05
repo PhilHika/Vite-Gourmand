@@ -14,7 +14,7 @@
                 {% if app.user %}
                     <a class="btn btn-success btn-lg" href="{{ path('app_commande_new') }}">
                         <i class="bi bi-cart-plus"></i>
-                        Commander sans menu
+                        Passer commande
                     </a>
                 {% else %}
                     <button type="button"
@@ -24,7 +24,7 @@
                         data-menu-id=""
                         data-menu-titre="personnalisée">
                         <i class="bi bi-cart-plus"></i>
-                        Commander sans menu
+                        Passer commande
                     </button>
                 {% endif %}
             </div>
@@ -176,7 +176,7 @@
                         <p class="lead" id="modalMessage">Pour passer une commande, veuillez vous connecter ou créer un compte.</p>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <a id="modalLoginLink" href="#" class="btn btn-primary btn-lg">
+                        <a id="modalLoginLink" href="{{ path('app_login', {'_target_path': path('app_commande_new')}) }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-box-arrow-in-right"></i>
                             Se connecter
                         </a>
@@ -190,24 +190,21 @@
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const loginModal = document.getElementById('loginModal');
-                loginModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const menuId = button.getAttribute('data-menu-id');
-                    const menuTitre = button.getAttribute('data-menu-titre');
-                    const messageEl = document.getElementById('modalMessage');
+            document.getElementById('loginModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                if (!button) {
+                    return;
+                }
 
-                    if (menuId) {
-                        messageEl.innerHTML = 'Pour commander le menu <strong>' + menuTitre + '</strong>, veuillez vous connecter ou créer un compte.';
-                        var targetPath = '/commande/new?menu=' + menuId;
-                    } else {
-                        messageEl.textContent = 'Pour passer une commande personnalisée, veuillez vous connecter ou créer un compte.';
-                        var targetPath = '/commande/new';
-                    }
+                const menuId = button.getAttribute('data-menu-id');
+                const menuTitre = button.getAttribute('data-menu-titre');
+                const targetPath = menuId ? '/commande/new?menu=' + menuId : '/commande/new';
 
-                    document.getElementById('modalLoginLink').href = '{{ path('app_login') }}?_target_path=' + encodeURIComponent(targetPath);
-                });
+                document.getElementById('modalMessage').innerHTML = menuId
+                    ? 'Pour commander le menu <strong>' + menuTitre + '</strong>, veuillez vous connecter ou créer un compte.'
+                    : 'Pour passer une commande personnalisée, veuillez vous connecter ou créer un compte.';
+
+                document.getElementById('modalLoginLink').href = '{{ path('app_login') }}?_target_path=' + encodeURIComponent(targetPath);
             });
         </script>
     {% endif %}
