@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des commandes{% endblock %}
+
+{% block body %}
+    <section class="py-5">
+        <div class="container px-4 px-lg-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bolder mb-0">
+                    <i class="bi bi-clipboard-data"></i>
+                    Gestion des commandes
+                </h2>
+                <span class="badge bg-primary fs-6">{{ commandes|length }} commande{{ commandes|length > 1 ? 's' : '' }}</span>
+            </div>
+
+            {% if commandes|length > 0 %}
+                <div class="card shadow border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>N° Commande</th>
+                                        <th>Client</th>
+                                        <th>Menu</th>
+                                        <th>Date prestation</th>
+                                        <th>Heure</th>
+                                        <th class="text-end">Prix menu</th>
+                                        <th class="text-end">Livraison</th>
+                                        <th class="text-end">Total</th>
+                                        <th class="text-center">Statut</th>
+                                        <th class="text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for commande in commandes %}
+                                        <tr>
+                                            <td><code>{{ commande.numeroCommande }}</code></td>
+                                            <td>{{ commande.utilisateur.prenom }}</td>
+                                            <td>{{ commande.menu.titre }}</td>
+                                            <td>{{ commande.datePrestation|date('d/m/Y') }}</td>
+                                            <td>{{ commande.heureLivraison }}</td>
+                                            <td class="text-end">{{ commande.prixMenu|number_format(2, ',', ' ') }} €</td>
+                                            <td class="text-end">
+                                                {% if commande.prixLivraison > 0 %}
+                                                    {{ commande.prixLivraison|number_format(2, ',', ' ') }} €
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end fw-bold">
+                                                {{ (commande.prixMenu + commande.prixLivraison)|number_format(2, ',', ' ') }} €
+                                            </td>
+                                            <td class="text-center">
+                                                {% if commande.statut == 'en_attente' %}
+                                                    <span class="badge bg-warning text-dark">En attente</span>
+                                                {% elseif commande.statut == 'confirmee' %}
+                                                    <span class="badge bg-success">Confirmée</span>
+                                                {% elseif commande.statut == 'en_preparation' %}
+                                                    <span class="badge bg-info">En préparation</span>
+                                                {% elseif commande.statut == 'livree' %}
+                                                    <span class="badge bg-primary">Livrée</span>
+                                                {% elseif commande.statut == 'annulee' %}
+                                                    <span class="badge bg-danger">Annulée</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="{{ path('app_admin_commande_edit', {numeroCommande: commande.numeroCommande}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                    Gérer
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-clipboard display-1 text-muted"></i>
+                    <p class="text-muted mt-3">Aucune commande enregistrée.</p>
+                </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Retour au profil
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

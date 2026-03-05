@@ -1,0 +1,31 @@
+{# Variables attendues :
+    - commande     : App\Entity\Commande
+    - labelStatut  : string (ex: "Confirmée", "En préparation"...)
+    - isStaff      : bool (true = email interne staff, false = email client)
+#}
+{% extends 'emails/_layout.html.twig' %}
+
+{% block content %}
+    {% if isStaff %}
+        <h2>Changement de statut</h2>
+        <p>
+            <strong>Client :</strong> {{ commande.utilisateur.prenom }} {{ commande.utilisateur.nom }}<br>
+            <strong>Email :</strong> {{ commande.utilisateur.email }}<br>
+            <strong>N° de commande :</strong> {{ commande.numeroCommande }}
+        </p>
+    {% else %}
+        <h2>Mise à jour de votre commande</h2>
+        <p>Bonjour <strong>{{ commande.utilisateur.prenom }}</strong>,</p>
+        <p>Le statut de votre commande <strong>{{ commande.numeroCommande }}</strong> a été mis à jour :</p>
+    {% endif %}
+
+    <p>Nouveau statut : <span class="badge">{{ labelStatut }}</span></p>
+
+    <hr class="divider">
+
+    <ul>
+        <li><strong>Menu :</strong> {{ commande.menu.titre }}</li>
+        <li><strong>Date de prestation :</strong> {{ commande.datePrestation|date('d/m/Y') }}</li>
+        <li><strong>Heure :</strong> {{ commande.heureLivraison }}</li>
+    </ul>
+{% endblock %}

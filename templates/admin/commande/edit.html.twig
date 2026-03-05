@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gérer commande {{ commande.numeroCommande }}{% endblock %}
+
+{% block body %}
+    <section class="py-5">
+        <div class="container px-4 px-lg-5">
+            <h2 class="fw-bolder mb-4">
+                <i class="bi bi-pencil-square"></i>
+                Commande {{ commande.numeroCommande }}
+            </h2>
+
+            <div class="row gx-4 gx-lg-5">
+
+                {# Colonne gauche : infos lecture seule #}
+                <div class="col-lg-5 mb-4">
+                    {# Infos client #}
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person"></i>
+                                Client
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>{{ commande.utilisateur.prenom }}</strong></p>
+                            <p class="mb-1 text-muted">{{ commande.utilisateur.email }}</p>
+                            {% if commande.utilisateur.telephone %}
+                                <p class="mb-1">
+                                    <i class="bi bi-telephone"></i>
+                                    {{ commande.utilisateur.telephone }}
+                                </p>
+                            {% endif %}
+                            {% if commande.utilisateur.adressePostale %}
+                                <p class="mb-0">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ commande.utilisateur.adressePostale }}, {{ commande.utilisateur.ville }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Menu commandé #}
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-journal-text"></i>
+                                Menu : {{ commande.menu.titre }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1">
+                                <strong>Prix/pers. :</strong>
+                                {{ commande.menu.prixParPersonne|number_format(2, ',', ' ') }} €
+                            </p>
+                            <p class="mb-1">
+                                <strong>Min. personnes :</strong>
+                                {{ commande.menu.nombrePersonneMinimum }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Seuil réduction (10%) :</strong>
+                                {{ commande.menu.nombrePersonneMinimum + 5 }} personnes
+                            </p>
+
+                            {% if commande.menu.plats|length > 0 %}
+                                <h6 class="fw-bold mt-3">Plats inclus :</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for plat in commande.menu.plats %}
+                                        <li class="list-group-item px-0">
+                                            <i class="bi bi-check-circle text-success"></i>
+                                            {{ plat.titrePlat }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Récap prix #}
+                    <div class="card shadow-sm border-success">
+                        <div class="card-body">
+                            <h6 class="fw-bold">
+                                <i class="bi bi-calculator"></i>
+                                Décomposition du prix
+                            </h6>
+                            <table class="table table-sm table-borderless mb-0">
+                                <thead class="visually-hidden">
+                                    <tr>
+                                        <th>Libellé</th>
+                                        <th>Montant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Prix menu</td>
+                                        <td class="text-end">{{ commande.prixMenu|number_format(2, ',', ' ') }} €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Prix livraison</td>
+                                        <td class="text-end">
+                                            {% if commande.prixLivraison > 0 %}
+                                                {{ commande.prixLivraison|number_format(2, ',', ' ') }} €
+                                            {% else %}
+                                                <span class="text-muted">Non renseigné</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top fw-bold fs-5">
+                                        <td>Total</td>
+                                        <td class="text-end text-success">{{ total|number_format(2, ',', ' ') }} €</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {# Colonne droite : formulaire d'édition #}
+                <div class="col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-sliders"></i>
+                                Modifier la commande
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            {# data-turbo="false" : on re-rend la page lors du recalcul prix (pas de redirect) #}
+                            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
+
+                            <h6 class="text-primary fw-bold mb-3">Prestation</h6>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_label(form.datePrestation) }}
+                                    {{ form_widget(form.datePrestation) }}
+                                    {{ form_errors(form.datePrestation) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.heureLivraison) }}
+                                    {{ form_widget(form.heureLivraison) }}
+                                    {{ form_errors(form.heureLivraison) }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.nombrePersonne) }}
+                                {{ form_widget(form.nombrePersonne) }}
+                                {{ form_errors(form.nombrePersonne) }}
+                            </div>
+
+                            <hr>
+                            <h6 class="text-primary fw-bold mb-3">Matériel</h6>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ form_widget(form.pretMateriel) }}
+                                        {{ form_label(form.pretMateriel) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ form_widget(form.restitutionMateriel) }}
+                                        {{ form_label(form.restitutionMateriel) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h6 class="text-primary fw-bold mb-3">Tarification</h6>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_label(form.prixMenu) }}
+                                    {{ form_widget(form.prixMenu) }}
+                                    {{ form_errors(form.prixMenu) }}
+                                    <div class="form-text">Modifiable manuellement ou via recalcul</div>
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.prixLivraison) }}
+                                    {{ form_widget(form.prixLivraison) }}
+                                    {{ form_errors(form.prixLivraison) }}
+                                    <div class="form-text">Bordeaux : 5€ | Hors : +0,59€/km</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="submit" name="_recalculer" class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                    Recalculer le prix menu ({{ commande.menu.prixParPersonne|number_format(2, ',', ' ') }} € × nb pers.)
+                                </button>
+                            </div>
+
+                            <hr>
+                            <h6 class="text-primary fw-bold mb-3">Statut</h6>
+
+                            <div class="mb-3">
+                                {{ form_widget(form.statut) }}
+                                {{ form_errors(form.statut) }}
+                            </div>
+
+                            <hr>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-lg"></i>
+                                    Sauvegarder les modifications
+                                </button>
+                                <a href="{{ path('app_admin_commande_index') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i>
+                                    Retour au listing
+                                </a>
+                            </div>
+
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

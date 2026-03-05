@@ -37,10 +37,20 @@
 
 							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
+							{% if app.request.query.get('_target_path') %}
+								<input type="hidden" name="_target_path" value="{{ app.request.query.get('_target_path') }}">
+							{% endif %}
+
 							<div class="d-grid gap-2 mt-4">
 								<button type="submit" class="btn btn-primary btn-lg">
 									Connexion
 								</button>
+							</div>
+
+							<div class="text-center mt-3">
+								<small>
+									<a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a>
+								</small>
 							</div>
 
 							<div class="text-center mt-3">

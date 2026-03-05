@@ -4,67 +4,67 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container mt-5">
-		<div class="row justify-content-center">
-			<div class="col-md-8 col-lg-6">
-				<div class="card shadow border-0">
-					<div class="card-header bg-primary text-white text-center py-3">
-						<h2 class="mb-0 fs-4">Créer un compte</h2>
-					</div>
-					<div class="card-body p-4">
-						{{ form_start(registrationForm) }}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h2 class="mb-0 fs-4">Créer un compte</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        {{ form_start(registrationForm) }}
 
-						{{ form_row(registrationForm.email) }}
+                        {{ form_row(registrationForm.email) }}
 
-						<div class="row">
-							<div class="col-md-6">
-								{{ form_row(registrationForm.plainPassword.first) }}
-							</div>
-							<div class="col-md-6">
-								{{ form_row(registrationForm.plainPassword.second) }}
-							</div>
-						</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.plainPassword.first) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.plainPassword.second) }}
+                            </div>
+                        </div>
 
-						<hr class="my-4">
-						<h5 class="mb-3 text-muted">Informations personnelles</h5>
+                        <hr class="my-4">
+                        <h5 class="mb-3 text-muted">Informations personnelles</h5>
 
-						<div class="row">
-							<div class="col-md-6">
-								{{ form_row(registrationForm.nom) }}
-							</div>
-							<div class="col-md-6">
-								{{ form_row(registrationForm.prenom) }}
-							</div>
-							<div class="col-md-6">
-								{{ form_row(registrationForm.telephone) }}
-							</div>
-						</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.nom) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.prenom) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.telephone) }}
+                            </div>
+                        </div>
 
-						{{ form_row(registrationForm.adresse_postale) }}
+                        {{ form_row(registrationForm.adresse_postale) }}
 
-						<div class="row">
-							<div class="col-md-6">
-								{{ form_row(registrationForm.ville) }}
-							</div>
-							<div class="col-md-6">
-								{{ form_row(registrationForm.pays) }}
-							</div>
-						</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.ville) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(registrationForm.pays) }}
+                            </div>
+                        </div>
 
-						<div class="d-grid gap-2 mt-4">
-							<button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
-						</div>
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
+                        </div>
 
-						{{ form_end(registrationForm) }}
+                        {{ form_end(registrationForm) }}
 
-						<div class="text-center mt-3">
-							<small>Déjà un compte ?
-								<a href="{{ path('app_login') }}">Se connecter</a>
-							</small>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                        <div class="text-center mt-3">
+                            <small>Déjà un compte ?
+                                <a href="{{ path('app_login') }}">Se connecter</a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

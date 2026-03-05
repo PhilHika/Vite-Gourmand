@@ -124,6 +124,7 @@ classDiagram
 ### 🔐 Réinitialisation de mot de passe
 
 Implémentation manuelle (sans bundle externe) avec une table dédiée `reset_password_request` :
+- Le schéma de la table `utilisateur` n'est **pas modifié**
 - Tokens UUID v4, expiration 1 heure
 - Réponse identique que l'email existe ou non (pas de divulgation d'emails)
 - Session invalidée après reset

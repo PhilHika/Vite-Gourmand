@@ -14,6 +14,13 @@ class Commande
 {
     use HasPrixCommandeTrait;
 
+    // Constantes de statut
+    public const STATUT_EN_ATTENTE = 'en_attente';
+    public const STATUT_CONFIRMEE = 'confirmee';
+    public const STATUT_EN_PREPARATION = 'en_preparation';
+    public const STATUT_LIVREE = 'livree';
+    public const STATUT_ANNULEE = 'annulee';
+
     #[ORM\Id]
     #[ORM\Column(length: 50, unique: true)]
     private ?string $numeroCommande = null;
@@ -45,7 +52,7 @@ class Commande
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire')]
-    private ?string $statut = null;
+    private ?string $statut = self::STATUT_EN_ATTENTE;
 
     #[ORM\Column]
     private ?bool $pretMateriel = null;
@@ -128,9 +135,6 @@ class Commande
 
     public function setDatePrestation(\DateTimeInterface $datePrestation): static
     {
-        if ($this->dateCommande !== null && $datePrestation < $this->dateCommande) {
-            throw new \InvalidArgumentException('La date de prestation ne peut pas être antérieure à la date de commande.');
-        }
         $this->datePrestation = $datePrestation;
 
         return $this;
@@ -143,10 +147,6 @@ class Commande
 
     public function setHeureLivraison(string $heureLivraison): static
     {
-        // [0-2][0-9]:[0-5][0-9]
-        if (!preg_match('/^[0-2][\d]:[0-5][\d]$/', $heureLivraison)) {
-            throw new \InvalidArgumentException('Le format de l\'heure de livraison doit être HH:mm.');
-        }
         $this->heureLivraison = $heureLivraison;
 
         return $this;
@@ -159,9 +159,6 @@ class Commande
 
     public function setNombrePersonne(int $nombrePersonne): static
     {
-        if ($nombrePersonne <= 0) {
-            throw new \InvalidArgumentException('Le nombre de personnes doit être supérieur à zéro.');
-        }
         $this->nombrePersonne = $nombrePersonne;
 
         return $this;
@@ -176,9 +173,6 @@ class Commande
 
     public function setStatut(string $statut): static
     {
-        if (empty(trim($statut))) {
-            throw new \InvalidArgumentException('Le statut ne peut pas être vide.');
-        }
         $this->statut = $statut;
 
         return $this;
@@ -206,5 +200,24 @@ class Commande
         $this->restitutionMateriel = $restitutionMateriel;
 
         return $this;
+    }
+
+    /**
+     * Calcule le prixMenu à partir du menu et du nombrePersonne.
+     * Applique une réduction de 10% si nombrePersonne >= menu.nombrePersonneMinimum + 5.
+     */
+    public function calculerPrixMenu(): void
+    {
+        if ($this->menu === null || $this->nombrePersonne === null) {
+            return;
+        }
+
+        $prixBase = $this->menu->getPrixParPersonne() * $this->nombrePersonne;
+
+        if ($this->nombrePersonne >= $this->menu->getNombrePersonneMinimum() + 5) {
+            $prixBase *= 0.90; // réduction de 10%
+        }
+
+        $this->prixMenu = round($prixBase, 2);
     }
 }

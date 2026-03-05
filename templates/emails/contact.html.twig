@@ -1,0 +1,19 @@
+{# Variables attendues :
+    - data : App\DTO\ContactData
+#}
+{% extends 'emails/_layout.html.twig' %}
+
+{% block content %}
+    <h2>Nouveau message de contact</h2>
+
+    <p>
+        <strong>De :</strong> {{ data.nom }} ({{ data.email }})<br>
+        <strong>Code postal :</strong> {{ data.code_postal }}<br>
+        <strong>Sujet :</strong> {{ data.sujet }}
+    </p>
+
+    <hr class="divider">
+
+    <h3 style="font-size: 16px; color: #1a1a2e;">Message :</h3>
+    <p>{{ data.message|nl2br }}</p>
+{% endblock %}

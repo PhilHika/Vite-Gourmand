@@ -1,94 +1,234 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	{% if menu.id %}
-		Éditer le menu :
-		{{ menu.titre }}
-	{% else %}
-		Créer un nouveau menu
-	{% endif %}
+    {% if menu.id %}
+        Éditer le menu :
+        {{ menu.titre }}
+    {% else %}
+        Créer un nouveau menu
+    {% endif %}
 {% endblock %}
 
 {% block body %}
-	<div class="container mt-5">
-		<h1 class="mb-4">
-			{% if menu.id %}
-				Éditer le menu
-			{% else %}
-				Créer un menu
-			{% endif %}
-		</h1>
+    <div class="container mt-5">
+        <h1 class="mb-4">
+            {% if menu.id %}
+                Éditer le menu
+            {% else %}
+                Créer un menu
+            {% endif %}
+        </h1>
 
-		{{ form_start(form) }}
-		<div class="row">
-			<div class="col-md-6">
-				{{ form_row(form.titre) }}
-				{{ form_row(form.description) }}
-				{{ form_row(form.prixParPersonne) }}
-			</div>
-			<div class="col-md-6">
-				{{ form_row(form.nombrePersonneMinimum) }}
-				{{ form_row(form.quantiteRestante) }}
-				{{ form_row(form.imageUrl) }}
-			</div>
-		</div>
+        {{ form_start(form) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.titre) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.prixParPersonne) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.nombrePersonneMinimum) }}
+                {{ form_row(form.quantiteRestante) }}
 
-		<div class="row mt-3">
-			<div class="col-md-6">
-				<label class="form-label">Régime alimentaire</label>
-				<div class="input-group mb-3">
-					{{ form_widget(form.regime) }}
-					<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#regimeModal">
-						<i class="bi bi-gear"></i>
-						Gérer
-					</button>
-				</div>
-				{{ form_row(form.theme) }}
-			</div>
-			<div class="col-md-6">
-				{{ form_row(form.plats) }}
-			</div>
-		</div>
+            </div>
+        </div>
 
-		<button type="submit" class="btn btn-primary mt-4">
-			{% if menu.id %}
-				Mettre à jour
-			{% else %}
-				Créer
-			{% endif %}
-		</button>
-		<a href="{{ path('app_home') }}" class="btn btn-secondary mt-4 ms-2">Retour au site</a>
-		{{ form_end(form) }}
-	</div>
+        <div class="row mt-3">
+            <div
+                class="col-md-6" data-controller="entity-picker" data-entity-picker-mode-value="single" data-entity-picker-modal-id-value="regimeModal" data-entity-picker-empty-message-value="Aucun régime sélectionné" data-entity-picker-create-url-value="{{ path('app_admin_referentiel_regime_new') }}" data-entity-picker-form-field-name-value="regime_form[libelle]">
 
-	<!-- Modal Regime Controlled by Stimulus -->
-	<div class="modal fade" id="regimeModal" tabindex="-1" aria-hidden="true" data-controller="referentiel" data-referentiel-list-url-value="{{ path('app_admin_referentiel_regime_list') }}" data-referentiel-add-url-value="{{ path('app_admin_referentiel_regime_new') }}" data-referentiel-delete-url-template-value="{{ path('app_admin_referentiel_regime_delete', {id: 'PLACEHOLDER'}) }}" data-referentiel-select-id-value="{{ form.regime.vars.id }}" data-referentiel-form-name-value="regime_form">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Gérer les Régimes</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="mb-3">
-						<label class="form-label">Nouveau Régime</label>
-						<div class="input-group">
-							<input type="text" class="form-control" placeholder="Nom du régime" data-referentiel-target="input">
-							<button class="btn btn-success" data-referentiel-target="addButton" data-action="click->referentiel#add">Ajouter</button>
-						</div>
-					</div>
-					<hr>
-					<h6>Liste des Régimes existants</h6>
-					<ul class="list-group" data-referentiel-target="list">
-						<li class="list-group-item text-center">
-							<span class="spinner-border spinner-border-sm"></span>
-							Chargement...</li>
-					</ul>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                {# ===== REGIME SECTION ===== #}
+                <label class="form-label">Régime alimentaire</label>
+
+                <div data-entity-picker-target="originalSelect">
+                    {{ form_widget(form.regime) }}
+                </div>
+                {{ form_errors(form.regime) }}
+
+                <div class="card mb-2">
+                    <div class="list-group list-group-flush" data-entity-picker-target="list"></div>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#regimeModal" data-action="click->entity-picker#openModal">
+                    <i class="bi bi-plus-circle"></i>
+                    Choisir un régime
+                </button>
+
+                <div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Pensez à mettre à jour le menu pour sauvegarder les changements.
+                </div>
+
+                {# Modal Regime - Selection & Creation #}
+                <div class="modal fade" id="regimeModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Gérer le Régime alimentaire</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-4 p-3 bg-light rounded">
+                                    <label class="form-label small fw-bold" for="newRegimeInput">Créer un nouveau régime</label>
+                                    <div class="input-group">
+                                        <input type="text" id="newRegimeInput" class="form-control" placeholder="Nom du nouveau régime" data-entity-picker-target="newInput">
+                                        <button class="btn btn-success" data-entity-picker-target="createButton" data-action="click->entity-picker#create">
+                                            <i class="bi bi-plus-lg"></i>
+                                            Créer & Sélectionner
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Cela l'ajoutera à la liste globale et le sélectionnera pour ce menu.</div>
+                                </div>
+
+                                <hr>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" for="modalRegimeSelect">Ou choisir un existant</label>
+                                    <select id="modalRegimeSelect" class="form-select" data-entity-picker-target="modalSelect">
+                                        <option value="">-- Sélectionner un régime --</option>
+                                        {% for choice in form.regime.vars.choices %}
+                                            <option value="{{ choice.value }}">{{ choice.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Sélectionner</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# ===== THEME SECTION ===== #}
+                <div data-controller="entity-picker" data-entity-picker-mode-value="single" data-entity-picker-modal-id-value="themeModal" data-entity-picker-empty-message-value="Aucun thème sélectionné" data-entity-picker-create-url-value="{{ path('app_admin_referentiel_theme_new') }}" data-entity-picker-form-field-name-value="theme_form[libelle]">
+
+                    <label class="form-label">Thème du menu</label>
+
+                    <div data-entity-picker-target="originalSelect">
+                        {{ form_widget(form.theme) }}
+                    </div>
+                    {{ form_errors(form.theme) }}
+
+                    <div class="card mb-2">
+                        <div class="list-group list-group-flush" data-entity-picker-target="list"></div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#themeModal" data-action="click->entity-picker#openModal">
+                        <i class="bi bi-plus-circle"></i>
+                        Choisir un thème
+                    </button>
+
+                    <div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Pensez à mettre à jour le menu pour sauvegarder les changements.
+                    </div>
+
+                    {# Modal Theme - Selection & Creation #}
+                    <div class="modal fade" id="themeModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Gérer le Thème du menu</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-4 p-3 bg-light rounded">
+                                        <label class="form-label small fw-bold" for="newThemeInput">Créer un nouveau thème</label>
+                                        <div class="input-group">
+                                            <input type="text" id="newThemeInput" class="form-control" placeholder="Nom du nouveau thème" data-entity-picker-target="newInput">
+                                            <button class="btn btn-success" data-entity-picker-target="createButton" data-action="click->entity-picker#create">
+                                                <i class="bi bi-plus-lg"></i>
+                                                Créer & Sélectionner
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Cela l'ajoutera à la liste globale et le sélectionnera pour ce menu.</div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold" for="modalThemeSelect">Ou choisir un existant</label>
+                                        <select id="modalThemeSelect" class="form-select" data-entity-picker-target="modalSelect">
+                                            <option value="">-- Sélectionner un thème --</option>
+                                            {% for choice in form.theme.vars.choices %}
+                                                <option value="{{ choice.value }}">{{ choice.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Sélectionner</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="col-md-6" data-controller="entity-picker" data-entity-picker-mode-value="multiple" data-entity-picker-modal-id-value="platsModal" data-entity-picker-empty-message-value="Aucun plat associé" data-entity-picker-edit-url-template-value="{{ path('app_admin_plat_edit', {id: '__ID__'})|replace({__ID__: '__ID__'}) }}">
+
+                {# ===== PLATS SECTION ===== #}
+                <label class="form-label">Plats inclus</label>
+
+                <div data-entity-picker-target="originalSelect">
+                    {{ form_widget(form.plats) }}
+                </div>
+                {{ form_errors(form.plats) }}
+
+                <div class="card mb-2">
+                    <ul class="list-group list-group-flush" data-entity-picker-target="list"></ul>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#platsModal" data-action="click->entity-picker#openModal">
+                    <i class="bi bi-plus-circle"></i>
+                    Ajouter un plat
+                </button>
+
+                <div class="alert alert-warning py-2 small d-none" data-entity-picker-target="reminder">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Pensez à mettre à jour le menu pour sauvegarder les changements.
+                </div>
+
+                {# Modal Plats - Selection #}
+                <div class="modal fade" id="platsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Ajouter un plat</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" for="modalPlatSelect">Choisir un plat</label>
+                                    <select id="modalPlatSelect" class="form-select" data-entity-picker-target="modalSelect">
+                                        <option value="">-- Sélectionner un plat --</option>
+                                        {% for choice in form.plats.vars.choices %}
+                                            <option value="{{ choice.value }}">{{ choice.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary" data-action="click->entity-picker#add">Ajouter la sélection</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">
+            {% if menu.id %}
+                Mettre à jour
+            {% else %}
+                Créer
+            {% endif %}
+        </button>
+        <a href="{{ path('app_admin_menu_index') }}" class="btn btn-secondary mt-4 ms-2">Retour à la gestion</a>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
