@@ -31,3 +31,7 @@ docker/db_data/
 ###> vincentlanglet/twig-cs-fixer ###
 /.twig-cs-fixer.cache
 ###< vincentlanglet/twig-cs-fixer ###
+
+###> Claude Code ###
+/.claude/
+###< Claude Code ###

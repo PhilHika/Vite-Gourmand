@@ -1,0 +1,34 @@
+{# Variables attendues :
+    - commande : App\Entity\Commande
+    - isStaff  : bool (true = email interne staff, false = email client)
+#}
+{% extends 'emails/_layout.html.twig' %}
+
+{% block content %}
+    {% if isStaff %}
+        <h2>Nouvelle commande reçue</h2>
+        <p>
+            <strong>Client :</strong> {{ commande.utilisateur.prenom }} {{ commande.utilisateur.nom }}<br>
+            <strong>Email :</strong> {{ commande.utilisateur.email }}<br>
+            <strong>N° de commande :</strong> {{ commande.numeroCommande }}
+        </p>
+    {% else %}
+        <h2>Merci pour votre commande !</h2>
+        <p>Bonjour <strong>{{ commande.utilisateur.prenom }}</strong>,</p>
+        <p>Votre commande <strong>{{ commande.numeroCommande }}</strong> a bien été enregistrée.</p>
+    {% endif %}
+
+    <hr class="divider">
+
+    <ul>
+        <li><strong>Menu :</strong> {{ commande.menu.titre }}</li>
+        <li><strong>Date de prestation :</strong> {{ commande.datePrestation|date('d/m/Y') }}</li>
+        <li><strong>Heure de livraison :</strong> {{ commande.heureLivraison }}</li>
+        <li><strong>Nombre de personnes :</strong> {{ commande.nombrePersonne }}</li>
+        <li><strong>Prix menu :</strong> {{ commande.prixMenu|number_format(2, ',', ' ') }} €</li>
+    </ul>
+
+    {% if not isStaff %}
+        <p>Notre équipe vous contactera pour confirmer les détails de livraison.</p>
+    {% endif %}
+{% endblock %}

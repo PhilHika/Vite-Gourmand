@@ -80,37 +80,48 @@ Nous utilisons la validation standard de Symfony pour garantir l'intégrité des
 - Utilisation du standard Symfony `UserPasswordHasherInterface` avec l'algorithme par défaut (auto) pour une sécurité optimale.
 - Stockage en base de données sur 255 caractères (`VARCHAR(255)`). Contrairement a montrer dans le Schema annexe de la base de données.
 
-### 📧 Configuration de l'envoi d'emails (Symfony Mailer)
+### 📧 Système d'emails (Symfony Mailer + Pattern Service)
 
-**Choix technique : Mode synchrone (`sync`) pour l'envoi d'emails**
+#### Architecture Service
 
-Par défaut, Symfony 7 utilise **Messenger** pour envoyer les emails en mode **asynchrone** via une file d'attente. Cela nécessite de lancer un worker en continu pour consommer les messages :
-```bash
-php bin/console messenger:consume async
+Les emails sont gérés par des **services dédiés** (Pattern Service / SRP)
+src/Service/
+├── CommandeMailerService.php          ← Emails liés aux commandes
+├── ContactMailerService.php           ← Emails liés au formulaire de contact
+└── PasswordResetMailerService.php     ← Emails liés au reset de mot de passe
 ```
 
-#### Pourquoi le mode synchrone ?
+#### Emails automatiques
 
-Pour ce projet, nous avons configuré `Symfony\Component\Mailer\Messenger\SendEmailMessage: sync` dans `config/packages/messenger.yaml`.
+| Trigger | Destinataire | Service |
+| :--- | :--- | :--- |
+| Nouvelle commande confirmée | Client + tous gestionnaires `[STAFF]` | `CommandeMailerService` |
+| Changement de statut (admin) | Client + tous gestionnaires `[STAFF]` | `CommandeMailerService` |
+| Formulaire de contact | Équipe admin | `ContactMailerService` |
+| Réinitialisation mot de passe | Utilisateur demandeur | `PasswordResetMailerService` |
 
-**Avantages pour notre contexte :**
-- ✅ **Simplicité opérationnelle** : Pas besoin de gérer un worker Messenger en production
-- ✅ **Volume faible** : Application à petit/moyen trafic (formulaire de contact & commande a priori...)
-- ✅ **Feedback immédiat** : L'utilisateur peut le vérifier immédiatement
-- ✅ **Déploiement** : Configuration identique en dev et prod
+Les gestionnaires (ROLE_SALARIE + ROLE_ADMIN) sont récupérés dynamiquement via `UtilisateurRepository::findGestionnaires()`.
 
-**Mode asynchrone SI :**
-Volume d'emails ++ (> 100/jour)
-si les temps de réponse deviennent trop longs
-Et alors :
-1. Repasser en mode `async`
-2. Déployer un worker Messenger
-3. Transport plus robuste que Doctrine
+#### Mode synchrone
 
-**Configuration :**
-- **Transport SMTP** : Configuré via `MAILER_DSN` dans `.env.local`
-- **Mode développement** : MailHog sur `smtp://localhost:1025`
-- **Mode production** : SMTP réel (Gmail, SendGrid, Brevo, etc.)
+Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml`. 
+
+#### Configuration SMTP
+- **Dev** : MailHog sur `smtp://localhost:1025` (interface : http://localhost:8025)
+- **Prod** : SMTP réel (Gmail, SendGrid, Brevo, etc.) via `MAILER_DSN` dans `.env.local`
+
+### 🔐 Réinitialisation de mot de passe
+
+Implémentation manuelle (sans bundle externe) avec une **table dédiée** `reset_password_request` :
+- Le schéma de la table `utilisateur` n'est **pas modifié**
+- Tokens UUID v4, expiration 1 heure
+- Message identique que l'email existe ou non (sécurité : pas de divulgation d'emails)
+- Après reset : session invalidée, l'utilisateur doit se reconnecter
+
+| Route | Description |
+| :--- | :--- |
+| `/reset-password` | Formulaire de demande (saisie email) |
+| `/reset-password/{token}` | Formulaire de saisie du nouveau mot de passe |
 
 ### 🛒 Système de Commande
 
@@ -129,6 +140,17 @@ Et alors :
 #### Gestion du stock
 - Le bouton "Commander" est remplacé par **"Épuisé"** si `quantiteRestante <= 0`
 - Une **vérification serveur** est effectuée au moment de la soumission (protection contre les commandes concurrentes) + stock est **décrémenté automatiquement** à chaque commande validée
+
+#### Gestion admin des commandes (`ROLE_SALARIE` / `ROLE_ADMIN`)
+
+| Route | Description |
+| :--- | :--- |
+| `/admin/commande/` | Listing de **toutes** les commandes (tous clients) |
+| `/admin/commande/{id}/edit` | Formulaire d'édition complet (statut, prix, dates, matériel) |
+
+- **Prix total** affiché avec décomposition : `prixMenu + prixLivraison = Total`
+- **Recalcul automatique** du prix menu (bouton dédié, basé sur `prixParPersonne × nbPersonnes ± réduction`)
+- **Navigation** : Liens dans le dropdown Compte + bouton sur la page profil
 
 > Le changement de statut est réservé aux rôles `ROLE_SALARIE` et `ROLE_ADMIN` tout comme le calcul du prix de la livraison a partir de l'adresse renseignée par le client.
 
