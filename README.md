@@ -147,7 +147,7 @@ src/Service/
 └── PasswordResetMailerService.php     ← Emails liés au reset de mot de passe
 ```
 
-Les corps d'emails sont construits en HTML directement dans les services (pas de templates Twig séparés).
+Les vues des emails sont dans `templates/emails/` (layout + un template par type). Les services se chargent uniquement de l'envoi.
 
 #### Emails automatiques
 
