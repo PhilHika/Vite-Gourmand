@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des horaires{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0 fs-4">
+                            <i class="bi bi-clock"></i>
+                            Gestion des horaires d'ouverture
+                        </h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">
+                            Renseignez les heures d'ouverture et de fermeture pour chaque jour (format <strong>HH:mm</strong>, ex: <code>09:00</code>).
+                            Laissez les deux champs vides pour marquer un jour comme fermé.
+                        </p>
+
+                        <form method="post" action="{{ path('app_profile_horaires') }}" novalidate>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle mb-4">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 130px;">Jour</th>
+                                            <th>Heure d'ouverture</th>
+                                            <th>Heure de fermeture</th>
+                                            <th class="text-center" style="width: 100px;">Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for jour in jours %}
+                                            {% set key = jour|lower %}
+                                            {% set horaire = horaires[jour] ?? null %}
+                                            {% set hasError = errors[jour] is defined %}
+
+                                            {# Valeur à afficher : données soumises (si erreur) ou données en BDD #}
+                                            {% set valOuverture = formData[jour].ouverture ?? (horaire ? horaire.heureOuverture : '') %}
+                                            {% set valFermeture = formData[jour].fermeture ?? (horaire ? horaire.heureFermeture : '') %}
+
+                                            <tr class="{{ hasError ? 'table-danger' : '' }}">
+                                                <td class="fw-semibold">{{ jour }}</td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        name="ouverture_{{ key }}"
+                                                        value="{{ valOuverture }}"
+                                                        class="form-control form-control-sm {{ hasError ? 'is-invalid' : '' }}"
+                                                        placeholder="09:00"
+                                                        maxlength="5"
+                                                    >
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        name="fermeture_{{ key }}"
+                                                        value="{{ valFermeture }}"
+                                                        class="form-control form-control-sm {{ hasError ? 'is-invalid' : '' }}"
+                                                        placeholder="18:30"
+                                                        maxlength="5"
+                                                    >
+                                                    {% if hasError %}
+                                                        <div class="invalid-feedback d-block">{{ errors[jour] }}</div>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-center">
+                                                    {% if horaire and not hasError %}
+                                                        <span class="badge bg-success">Ouvert</span>
+                                                    {% elseif not horaire and not hasError %}
+                                                        <span class="badge bg-secondary">Fermé</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i>
+                                    Retour au profil
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-floppy"></i>
+                                    Enregistrer les horaires
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
