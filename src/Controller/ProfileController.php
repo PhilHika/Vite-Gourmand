@@ -61,14 +61,12 @@ class ProfileController extends AbstractController
             }
         }
 
-        $response = new Response('', empty($errors) ? Response::HTTP_OK : Response::HTTP_UNPROCESSABLE_ENTITY);
-
         return $this->render('profile/horaires.html.twig', [
             'jours' => $jours,
             'horaires' => $horairesExistants,
             'errors' => $errors,
             'formData' => $formData,
-        ], $response);
+        ]);
     }
 
     /**

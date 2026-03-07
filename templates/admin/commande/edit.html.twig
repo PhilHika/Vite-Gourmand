@@ -125,8 +125,7 @@
                             </h5>
                         </div>
                         <div class="card-body p-4">
-                            {# data-turbo="false" : on re-rend la page lors du recalcul prix (pas de redirect) #}
-                            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
+                            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
                             <h6 class="text-primary fw-bold mb-3">Prestation</h6>
 

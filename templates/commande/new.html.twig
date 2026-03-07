@@ -114,10 +114,7 @@
 							</div>
 							<div
 								class="card-body p-4">
-								{# data-turbo="false" : Turbo (Symfony UX) exige qu'un formulaire POST
-								                               renvoie un redirect (303). Ici on re-rend la même page (200) pour
-								                               afficher le récap prix avant confirmation → on désactive Turbo. #}
-								{{ form_start(form, {attr: {novalidate: 'novalidate', 'data-turbo': 'false'}}) }}
+								{{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
 
 								<div class="mb-3">
 									{{ form_label(form.datePrestation) }}
