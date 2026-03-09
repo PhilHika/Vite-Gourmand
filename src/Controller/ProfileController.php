@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Document\Horaire;
+use App\Form\ProfileFormType;
 use App\Repository\CommandeRepository;
 use App\Repository\HoraireRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,17 +17,32 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
-    #[Route('/profil', name: 'app_profile')]
-    public function index(CommandeRepository $commandeRepository): Response
-    {
+    #[Route('/profil', name: 'app_profile', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request,
+        CommandeRepository $commandeRepository,
+        EntityManagerInterface $em
+    ): Response {
+        $user = $this->getUser();
+
+        $profileForm = $this->createForm(ProfileFormType::class, $user);
+        $profileForm->handleRequest($request);
+
+        if ($profileForm->isSubmitted() && $profileForm->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Vos informations ont été mises à jour.');
+            return $this->redirectToRoute('app_profile');
+        }
+
         $commandes = $commandeRepository->findBy(
-            ['utilisateur' => $this->getUser()],
+            ['utilisateur' => $user],
             ['dateCommande' => 'DESC']
         );
 
         return $this->render('profile/index.html.twig', [
-            'user' => $this->getUser(),
+            'user' => $user,
             'commandes' => $commandes,
+            'profile_form' => $profileForm,
         ]);
     }
 
