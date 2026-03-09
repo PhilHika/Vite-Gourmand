@@ -67,6 +67,15 @@
                                                 {% endif %}
                                             </td>
                                             <td class="text-end">
+                                            {% if commande.statut in ['en_attente', 'confirmee', 'en_preparation'] %}
+                                                <form action="{{ path('app_admin_commande_annuler', {numeroCommande: commande.numeroCommande}) }}" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_annuler_' ~ commande.numeroCommande) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-x-circle"></i>
+                                                        Annuler
+                                                    </button>
+                                                </form>
+                                            {% endif %}
                                                 <a href="{{ path('app_admin_commande_edit', {numeroCommande: commande.numeroCommande}) }}" class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-pencil-square"></i>
                                                     Gérer
