@@ -117,6 +117,16 @@
                                                             <span class="badge bg-secondary">{{ commande.statut }}</span>
                                                         {% endif %}
                                                     </td>
+                                                {% if commande.statut == 'en_attente' %}
+                                                    <form action="{{ path('app_commande_annuler', {numeroCommande: commande.numeroCommande}) }}" method="post" 
+                                                        class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ commande.numeroCommande) }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="bi bi-x-circle"></i>
+                                                            Annuler
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
                                                     <td class="text-end">
                                                         <a href="{{ path('app_commande_show', {numeroCommande: commande.numeroCommande}) }}" class="btn btn-sm btn-outline-primary">
                                                             <i class="bi bi-eye"></i>

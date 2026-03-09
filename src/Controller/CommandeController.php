@@ -134,6 +134,40 @@ class CommandeController extends AbstractController
         ]);
     }
 
+    #[Route('/{numeroCommande}/annuler', name: 'app_commande_annuler', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function annuler(
+        #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
+        Commande $commande,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        if ($commande->getUtilisateur() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette commande.');
+        }
+
+        if ($commande->getStatut() !== Commande::STATUT_EN_ATTENTE) {
+            $this->addFlash('danger', 'Cette commande ne peut plus être annulée.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        if (!$this->isCsrfTokenValid('annuler_' . $commande->getNumeroCommande(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $commande->setStatut(Commande::STATUT_ANNULEE);
+
+        // Restituer le stock du menu
+        $menu = $commande->getMenu();
+        $menu->setQuantiteRestante($menu->getQuantiteRestante() + 1);
+
+        $em->flush();
+
+        $this->addFlash('success', 'Votre commande a été annulée.');
+        return $this->redirectToRoute('app_profile');
+    }
+
     #[Route('/{numeroCommande}', name: 'app_commande_show', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function show(
