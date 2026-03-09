@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Form\CommandeFormType;
+use App\Form\EditCommandeFormType;
 use App\Repository\MenuRepository;
 use App\Service\CommandeMailerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -168,11 +169,13 @@ class CommandeController extends AbstractController
         return $this->redirectToRoute('app_profile');
     }
 
-    #[Route('/{numeroCommande}', name: 'app_commande_show', methods: ['GET'])]
+    #[Route('/{numeroCommande}', name: 'app_commande_show', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
     public function show(
         #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
-        Commande $commande
+        Commande $commande,
+        Request $request,
+        EntityManagerInterface $em
     ): Response {
         // Sécurité : seul le propriétaire ou un salarié/admin peut voir
         if (
@@ -180,6 +183,36 @@ class CommandeController extends AbstractController
             && !$this->isGranted('ROLE_SALARIE')
         ) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette commande.');
+        }
+
+        $editable = $commande->getStatut() === Commande::STATUT_EN_ATTENTE;
+        $editForm = null;
+
+        if ($editable) {
+            $menu = $commande->getMenu();
+            $editForm = $this->createForm(EditCommandeFormType::class, $commande, [
+                'nombre_personne_min' => $menu->getNombrePersonneMinimum(),
+            ]);
+            $editForm->handleRequest($request);
+
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                // Validation nombrePersonne >= minimum
+                if ($commande->getNombrePersonne() < $menu->getNombrePersonneMinimum()) {
+                    $this->addFlash('danger', sprintf(
+                        'Le nombre de personnes doit être d\'au moins %d pour ce menu.',
+                        $menu->getNombrePersonneMinimum()
+                    ));
+                } else {
+                    // Recalculer le prix si le nombre de personnes a changé
+                    $commande->calculerPrixMenu();
+                    $em->flush();
+
+                    $this->addFlash('success', 'La commande a été mise à jour.');
+                    return $this->redirectToRoute('app_commande_show', [
+                        'numeroCommande' => $commande->getNumeroCommande(),
+                    ]);
+                }
+            }
         }
 
         // Vérifier si la réduction a été appliquée
@@ -191,6 +224,8 @@ class CommandeController extends AbstractController
             'commande' => $commande,
             'reduction_appliquee' => $reductionAppliquee,
             'prix_sans_reduction' => $prixSansReduction,
+            'edit_form' => $editForm?->createView(),
+            'editable' => $editable,
         ]);
     }
 }

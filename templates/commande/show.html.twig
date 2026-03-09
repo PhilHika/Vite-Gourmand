@@ -22,6 +22,9 @@
                     </div>
 
                     {# Détails de la commande #}
+                    {% if editable and edit_form is not null %}
+                    {{ form_start(edit_form) }}
+                    {% endif %}
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-dark text-white">
                             <h5 class="mb-0">
@@ -36,32 +39,64 @@
                                         <strong>Date de commande :</strong><br>
                                         {{ commande.dateCommande|date('d/m/Y') }}
                                     </p>
-                                    <p>
-                                        <strong>Date de prestation :</strong><br>
-                                        {{ commande.datePrestation|date('d/m/Y') }}
-                                    </p>
-                                    <p>
-                                        <strong>Heure de livraison :</strong><br>
-                                        {{ commande.heureLivraison }}
-                                    </p>
+                                    {% if editable and edit_form is not null %}
+                                        <div class="mb-3">
+                                            {{ form_label(edit_form.datePrestation) }}
+                                            {{ form_widget(edit_form.datePrestation) }}
+                                            {{ form_errors(edit_form.datePrestation) }}
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ form_label(edit_form.heureLivraison) }}
+                                            {{ form_widget(edit_form.heureLivraison) }}
+                                            {{ form_errors(edit_form.heureLivraison) }}
+                                        </div>
+                                    {% else %}
+                                        <p>
+                                            <strong>Date de prestation :</strong><br>
+                                            {{ commande.datePrestation|date('d/m/Y') }}
+                                        </p>
+                                        <p>
+                                            <strong>Heure de livraison :</strong><br>
+                                            {{ commande.heureLivraison }}
+                                        </p>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <p>
-                                        <strong>Nombre de personnes :</strong><br>
-                                        {{ commande.nombrePersonne }}
-                                    </p>
-                                    <p>
-                                        <strong>Prêt de matériel :</strong><br>
-                                        {% if commande.pretMateriel %}
-                                            <span class="badge bg-success">Oui</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Non</span>
-                                        {% endif %}
-                                    </p>
+                                    {% if editable and edit_form is not null %}
+                                        <div class="mb-3">
+                                            {{ form_label(edit_form.nombrePersonne) }}
+                                            {{ form_widget(edit_form.nombrePersonne) }}
+                                            {{ form_errors(edit_form.nombrePersonne) }}
+                                        </div>
+                                        <div class="mb-3 form-check">
+                                            {{ form_widget(edit_form.pretMateriel) }}
+                                            {{ form_label(edit_form.pretMateriel) }}
+                                            {{ form_errors(edit_form.pretMateriel) }}
+                                        </div>
+                                    {% else %}
+                                        <p>
+                                            <strong>Nombre de personnes :</strong><br>
+                                            {{ commande.nombrePersonne }}
+                                        </p>
+                                        <p>
+                                            <strong>Prêt de matériel :</strong><br>
+                                            {% if commande.pretMateriel %}
+                                                <span class="badge bg-success">Oui</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Non</span>
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
                                     <p>
                                         <strong>Statut :</strong><br>
                                         <span class="badge bg-warning text-dark">{{ commande.statut|replace({_: ' '})|capitalize }}</span>
                                     </p>
+                                    {% if editable and edit_form is not null %}
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-lg"></i>
+                                        Sauvegarder
+                                    </button>
+                                {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -185,6 +220,9 @@
                             Accueil
                         </a>
                     </div>
+                    {% if editable and edit_form is not null %}
+                    {{ form_end(edit_form) }}
+                    {% endif %}
                 </div>
             </div>
         </div>
