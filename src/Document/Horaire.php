@@ -3,7 +3,7 @@
 namespace App\Document;
 
 use App\Repository\HoraireRepository;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[MongoDB\Document(collection: 'horaires', repositoryClass: HoraireRepository::class)]

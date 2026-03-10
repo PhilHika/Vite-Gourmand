@@ -67,9 +67,9 @@
                                 <a href="{{ path('app_admin_menu_index') }}" class="btn btn-success me-md-2">Gestion Menus</a>
                                 <a href="{{ path('app_admin_plat_index') }}" class="btn btn-success me-md-2">Gestion Plats</a>
                                 <a href="{{ path('app_admin_commande_index') }}" class="btn btn-success me-md-2">Gestion Commandes</a>
-                                <a href="{{ path('app_profile_horaires') }}" class="btn btn-warning me-md-2">
-                                    <i class="bi bi-clock"></i>
-                                    Gérer les horaires
+                                <a href="{{ path('app_profile_gestion_site') }}" class="btn btn-warning me-md-2">
+                                    <i class="bi bi-gear"></i>
+                                    Gérer le site
                                 </a>
                             {% endif %}
                             {% if is_granted('ROLE_ADMIN') %}

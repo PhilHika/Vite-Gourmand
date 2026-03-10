@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Document\ContenuSite;
 use App\Document\Horaire;
 use App\Form\ProfileFormType;
 use App\Repository\CommandeRepository;
+use App\Repository\ContenuSiteRepository;
 use App\Repository\HoraireRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -151,9 +153,13 @@ class ProfileController extends AbstractController
      * Applique les modifications MongoDB (persist/remove) sans flush.
      *
      * @param array<string, array{ouverture: string, fermeture: string}> $formData
-     * @param array<string, Horaire> $horairesExistants
+     * @param array<string, Horaire>                                     $horairesExistants
      */
-    private function applyHoraires(DocumentManager $dm, array $formData, array $horairesExistants): void
+    private function applyHoraires(
+        DocumentManager $dm,
+        array $formData,
+        array $horairesExistants
+    ): void
     {
         foreach ($formData as $jour => $heures) {
             $ouverture = $heures['ouverture'];
@@ -175,5 +181,56 @@ class ProfileController extends AbstractController
                 $dm->persist($horaire);
             }
         }
+    }
+
+    #[Route('/profil/gestion-site', name: 'app_profile_gestion_site', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_SALARIE')]
+    public function gestionSite(
+        Request $request,
+        HoraireRepository $horaireRepository,
+        ContenuSiteRepository $contenuSiteRepository,
+        DocumentManager $dm
+    ): Response {
+        if ($request->isMethod('POST')) {
+            $type = $request->request->get('type');
+            $contenu = $request->request->get('contenu', '');
+
+            $clesAutorisees = ['description', 'conditions_vente'];
+            if (!in_array($type, $clesAutorisees, true)) {
+                $this->addFlash('danger', 'Type de contenu invalide.');
+
+                return $this->redirectToRoute('app_profile_gestion_site');
+            }
+
+            $document = $contenuSiteRepository->findByCle($type);
+            if (!$document) {
+                $document = new ContenuSite();
+                $document->setCle($type);
+                $dm->persist($document);
+            }
+            $document->setContenu($contenu);
+            $dm->flush();
+
+            $label = $type === 'description'
+                ? 'Description'
+                : 'Conditions de vente';
+            $this->addFlash('success', $label . ' mise à jour avec succès.');
+
+            return $this->redirectToRoute('app_profile_gestion_site');
+        }
+
+        $horairesExistants = [];
+        foreach ($horaireRepository->findAll() as $horaire) {
+            $horairesExistants[$horaire->getJour()] = $horaire;
+        }
+
+        $description = $contenuSiteRepository->findByCle('description');
+        $conditionsVente = $contenuSiteRepository->findByCle('conditions_vente');
+
+        return $this->render('profile/gestion_site.html.twig', [
+            'horaires' => $horairesExistants,
+            'description' => $description?->getContenu(),
+            'conditions_vente' => $conditionsVente?->getContenu(),
+        ]);
     }
 }

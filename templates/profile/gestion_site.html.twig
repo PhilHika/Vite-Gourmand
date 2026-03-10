@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion du site{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="bi bi-gear"></i>
+                        Gestion du site
+                    </h2>
+                    <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Retour au profil
+                    </a>
+                </div>
+
+                {# === Card Horaires === #}
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock"></i>
+                            Horaires d'ouverture
+                        </h5>
+                        <a href="{{ path('app_profile_horaires') }}" class="btn btn-sm btn-dark">
+                            <i class="bi bi-pencil-square"></i>
+                            Modifier les horaires
+                        </a>
+                    </div>
+                    <div class="card-body p-4">
+                        {% set jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] %}
+                        {% if horaires|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0 align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Jour</th>
+                                            <th>Ouverture</th>
+                                            <th>Fermeture</th>
+                                            <th class="text-center">Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for jour in jours %}
+                                            {% set horaire = horaires[jour] ?? null %}
+                                            <tr>
+                                                <td class="fw-semibold">{{ jour }}</td>
+                                                {% if horaire %}
+                                                    <td>{{ horaire.heureOuverture }}</td>
+                                                    <td>{{ horaire.heureFermeture }}</td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-success">Ouvert</span>
+                                                    </td>
+                                                {% else %}
+                                                    <td colspan="2" class="text-muted fst-italic">—</td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-secondary">Fermé</span>
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0 fst-italic">Aucun horaire configuré.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# === Card Description === #}
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-card-text"></i>
+                            Description du site
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editDescriptionModal">
+                            <i class="bi bi-pencil-square"></i>
+                            Modifier
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if description %}
+                            <p class="mb-0">
+                                {{ description|length > 400 ? description|slice(0, 400) ~ '...' : description }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted mb-0 fst-italic">Aucune description définie.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# === Card Conditions de vente === #}
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-text"></i>
+                            Conditions de vente
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editConditionsModal">
+                            <i class="bi bi-pencil-square"></i>
+                            Modifier
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if conditions_vente %}
+                            <p class="mb-0">
+                                {{ conditions_vente|length > 400 ? conditions_vente|slice(0, 400) ~ '...' : conditions_vente }}
+                            </p>
+                        {% else %}
+                            <p class="text-muted mb-0 fst-italic">Aucune condition de vente définie.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {# === Modal édition Description === #}
+    <div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-labelledby="editDescriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="post" action="{{ path('app_profile_gestion_site') }}">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="editDescriptionModalLabel">
+                            <i class="bi bi-card-text"></i>
+                            Modifier la description
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="type" value="description">
+                        <div class="mb-3">
+                            <label for="descriptionContenu" class="form-label">Description du site</label>
+                            <textarea
+                                class="form-control"
+                                id="descriptionContenu"
+                                name="contenu"
+                                rows="8"
+                                placeholder="Saisissez la description de votre site..."
+                            >{{ description }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# === Modal édition Conditions de vente === #}
+    <div class="modal fade" id="editConditionsModal" tabindex="-1" aria-labelledby="editConditionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="post" action="{{ path('app_profile_gestion_site') }}">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="editConditionsModalLabel">
+                            <i class="bi bi-file-earmark-text"></i>
+                            Modifier les conditions de vente
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="type" value="conditions_vente">
+                        <div class="mb-3">
+                            <label for="conditionsContenu" class="form-label">Conditions de vente</label>
+                            <textarea
+                                class="form-control"
+                                id="conditionsContenu"
+                                name="contenu"
+                                rows="8"
+                                placeholder="Saisissez les conditions de vente..."
+                            >{{ conditions_vente }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
