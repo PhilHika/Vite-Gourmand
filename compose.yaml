@@ -14,7 +14,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:-}
       MONGODB_URI: ${MONGODB_URI:-}
-      MONGODB_DB: ${MONGODB_DB:-}
+      MONGODB_DBNAME: ${MONGODB_DBNAME:-}
 
   nginx:
     image: nginx:alpine
