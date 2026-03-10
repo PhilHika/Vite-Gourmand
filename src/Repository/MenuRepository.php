@@ -40,6 +40,43 @@ class MenuRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    /**
+     * @return Menu[]
+     */
+    public function findByFilters(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('m');
+
+        if (!empty($filters['prixMin'])) {
+            $qb->andWhere('m.prixParPersonne >= :prixMin')
+               ->setParameter('prixMin', $filters['prixMin']);
+        }
+
+        if (!empty($filters['prixMax'])) {
+            $qb->andWhere('m.prixParPersonne <= :prixMax')
+               ->setParameter('prixMax', $filters['prixMax']);
+        }
+
+        if (!empty($filters['theme'])) {
+            $qb->andWhere('m.theme = :theme')
+               ->setParameter('theme', $filters['theme']);
+        }
+
+        if (!empty($filters['regime'])) {
+            $qb->andWhere('m.regime = :regime')
+               ->setParameter('regime', $filters['regime']);
+        }
+
+        if (!empty($filters['nombrePersonne'])) {
+            $qb->andWhere('m.nombrePersonneMinimum <= :nombrePersonne')
+               ->setParameter('nombrePersonne', $filters['nombrePersonne']);
+        }
+
+        return $qb->orderBy('m.titre', 'ASC')
+                   ->getQuery()
+                   ->getResult();
+    }
+
     public function save(Menu $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);

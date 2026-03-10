@@ -29,6 +29,42 @@
                 {% endif %}
             </div>
 
+            <!-- Filtres -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    {{ form_start(filterForm, {'attr': {'class': 'row g-3 align-items-end'}}) }}
+                        <div class="col-md-2">
+                            {{ form_label(filterForm.prixMin) }}
+                            {{ form_widget(filterForm.prixMin, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form_label(filterForm.prixMax) }}
+                            {{ form_widget(filterForm.prixMax, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form_label(filterForm.theme) }}
+                            {{ form_widget(filterForm.theme, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form_label(filterForm.regime) }}
+                            {{ form_widget(filterForm.regime, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form_label(filterForm.nombrePersonne) }}
+                            {{ form_widget(filterForm.nombrePersonne, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel"></i> Filtrer
+                            </button>
+                            <a href="{{ path('app_menu_index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        </div>
+                    {{ form_end(filterForm) }}
+                </div>
+            </div>
+
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 {% for menu in menus %}
                     <div class="col mb-5">
