@@ -25,7 +25,14 @@
 
     <div class="container mt-5">
         <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
-            <div class="container-fluid py-5"></div>
+            <div class="container-fluid py-5">
+                {% set description = get_description_site() %}
+                {% if description %}
+                    <h2 class="fw-bold mb-3">Qui sommes-nous ?</h2>
+                    <p class="lead">{{ description }}</p>
+                {% endif %}
+            </div>
         </div>
     </div>
+
 {% endblock %}

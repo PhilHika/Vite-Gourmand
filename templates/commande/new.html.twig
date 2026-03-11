@@ -198,9 +198,17 @@
 											Le prix de livraison sera calculé et ajouté par notre équipe.
 										</p>
 									</div>
+									<div class="form-check mb-3">
+										<input class="form-check-input" type="checkbox" id="acceptCgv" onchange="document.getElementById('btnConfirmerCommande').disabled = !this.checked">
+										<label class="form-check-label" for="acceptCgv">
+											J'ai lu et j'accepte les
+											<a href="#" data-bs-toggle="modal" data-bs-target="#conditionsVenteModal">conditions générales de vente</a>
+										</label>
+									</div>
+
 									<div class="d-grid gap-2">
 										<input type="hidden" name="_confirmed" value="1">
-										<button type="submit" class="btn btn-success btn-lg">
+										<button type="submit" id="btnConfirmerCommande" class="btn btn-success btn-lg" disabled>
 											<i class="bi bi-check-lg"></i>
 											Confirmer la commande —
 											{{ prix_final|number_format(2, ',', ' ') }}
