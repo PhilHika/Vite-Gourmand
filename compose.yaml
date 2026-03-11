@@ -12,9 +12,9 @@ services:
     networks:
       - app-network
     environment:
-      DATABASE_URL: ${DATABASE_URL:-}
-      MONGODB_URI: ${MONGODB_URI:-}
-      MONGODB_DBNAME: ${MONGODB_DBNAME:-}
+      DATABASE_URL: "postgresql://postgresql_user:postgreSQL_dev_2026@db:5432/vite_gourmand?serverVersion=16&charset=utf8"
+      MONGODB_URI: "mongodb://mongoDB_user:mongoDB_dev_2026@mongodb:27017"
+      MONGODB_DBNAME: vite_gourmand
 
   nginx:
     image: nginx:alpine
@@ -30,34 +30,32 @@ services:
 
   ###> doctrine/doctrine-bundle ###
   db:
-    image: postgres:${POSTGRES_VERSION}-alpine
+    image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: vite_gourmand
+      POSTGRES_PASSWORD: postgreSQL_dev_2026
+      POSTGRES_USER: postgresql_user
     ports:
       - "5433:5432"
     healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}" ]
+      test: [ "CMD", "pg_isready", "-d", "vite_gourmand", "-U", "postgresql_user" ]
       timeout: 5s
       retries: 5
       start_period: 60s
     volumes:
       - ./docker/db/data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
     networks:
       - app-network
-      ###< doctrine/doctrine-bundle ###
+  ###< doctrine/doctrine-bundle ###
 
-      ###> doctrine/mongodb-odm-bundle ###
+  ###> doctrine/mongodb-odm-bundle ###
   mongodb:
     image: mongo:7
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: mongoDB_user
+      MONGO_INITDB_ROOT_PASSWORD: mongoDB_dev_2026
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -68,9 +66,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mongoDB_user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongoDB_dev_2026
+      ME_CONFIG_MONGODB_URL: mongodb://mongoDB_user:mongoDB_dev_2026@mongodb:27017/
       ME_CONFIG_BASICAUTH: "false"
     depends_on:
       - mongodb
