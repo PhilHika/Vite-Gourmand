@@ -59,6 +59,27 @@ class CommandeMailerService
         $user = $commande->getUtilisateur();
         $labelStatut = self::STATUT_LABELS[$commande->getStatut()] ?? $commande->getStatut();
 
+        // Commande.status === "Livrée"
+        // Envoi email au client pour inciter aux retours/avis
+        if ($commande->getStatut() === Commande::STATUT_LIVREE) {
+            $this->mailer->send(
+                new TemplatedEmail()
+                    ->from(self::EXPEDITEUR)
+                    ->to($user->getEmail())
+                    ->subject('Commande ' . $commande->getNumeroCommande() . ' — Livrée')
+                    ->htmlTemplate('emails/commande_livree.html.twig')
+                    ->context(['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => false])
+            );
+            // notify gestionnaire avec l'email classique de changement de status
+            $this->notifierGestionnaires(
+                'Commande ' . $commande->getNumeroCommande() . ' — Statut : ' . $labelStatut,
+                'emails/commande_statut.html.twig',
+                ['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => true]
+            );
+
+            return;
+        }
+
         $this->mailer->send(
             new TemplatedEmail()
                 ->from(self::EXPEDITEUR)
