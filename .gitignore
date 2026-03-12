@@ -34,3 +34,8 @@ docker/db_data/
 ###> Claude Code ###
 /.claude/
 ###< Claude Code ###
+
+###> Antigravity ###
+/.gemini/
+###< Antigravity ###
+
