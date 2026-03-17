@@ -196,6 +196,25 @@ Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml` (p
 | `/admin/commande/` | Listing de toutes les commandes (tous clients) |
 | `/admin/commande/{id}/edit` | Édition complète (statut, prix, dates, matériel) |
 
+### ⭐ Système d'Avis et Modération
+
+#### Côté Client
+- Possibilité de laisser un avis (note de 1 à 5 + commentaire) sur une commande **livrée** depuis l'espace profil.
+- Affichage dynamique des 4 derniers avis publiés sur la page d'accueil.
+- Bouton ouvrant une modale à défilement pour consulter l'intégralité de l'historique des avis publiés.
+
+#### Côté Administration (`ROLE_SALARIE` / `ROLE_ADMIN`)
+- Tableau de bord recensant en priorité les avis **en attente** de modération.
+- Accès à l'historique complet des avis via une fenêtre modale.
+- Possibilité de changer le statut d'un avis (`En attente`, `Publié`, `Refusé`). 
+- **Sécurité et visibilité** : Seuls les avis avec le statut `Publié` sont affichés sur la page d'accueil publique.
+
+> **📍 Justification architecturale (Écart par rapport au schéma initial ECF)**
+> Afin de proposer une fonctionnalité d'avis réaliste et robuste, l'entité `Avis` a bénéficié de quelques ajustements pro-actifs par rapport au schéma conceptuel basique :
+> 1. **Relation `OneToOne` avec `Commande`** : Au lieu d'une simple relation générique "1 Utilisateur -> N Avis", un avis est strictement lié à **une** commande unique (qui doit avoir le statut livrée). Cela évite le spam d'avis sans achat et garantit que chaque avis représente une prestation réelle.
+> 2. **Typage de la `note` en `SMALLINT`** (1 à 5) : Garantit l'intégrité de la note directement au niveau de la base de données PostgreSQL, empêchant d'éventuelles failles de saisie.
+> 3. **Ajout d'un système d'état (`statut` en `VARCHAR(255)`)** : Gérer un site sans modération expose le propriétaire à des avis indésirables ou diffamatoires. L'ajout natif des statuts constants (`STATUT_EN_ATTENTE`, `STATUT_PUBLIE`, `STATUT_REFUSE`) était indispensable pour simuler un véritable outil de gestion e-commerce professionnel.
+
 ---
 
 ## 🛠️ Installation & Workflow
