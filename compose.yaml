@@ -12,7 +12,7 @@ services:
     networks:
       - app-network
     environment:
-      DATABASE_URL: "postgresql://postgresql_user:postgreSQL_dev_2026@db:5432/vite_gourmand?serverVersion=16&charset=utf8"
+      DATABASE_URL: "postgresql://postgres:postgres2026@db:5432/vite_gourmand?serverVersion=16&charset=utf8"
       MONGODB_URI: "mongodb://mongoDB_user:mongoDB_dev_2026@mongodb:27017"
       MONGODB_DBNAME: vite_gourmand
 
