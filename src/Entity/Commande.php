@@ -68,6 +68,9 @@ class Commande
     #[ORM\JoinColumn(name: 'menu_id', referencedColumnName: 'menu_id', nullable: false)]
     private ?Menu $menu = null;
 
+    #[ORM\OneToOne(mappedBy: 'commande', targetEntity: Avis::class, cascade: ['persist', 'remove'])]
+    private ?Avis $avis = null;
+
     public function getUtilisateur(): ?Utilisateur
     {
         return $this->utilisateur;
@@ -202,10 +205,6 @@ class Commande
         return $this;
     }
 
-    /**
-     * Calcule le prixMenu à partir du menu et du nombrePersonne.
-     * Applique une réduction de 10% si nombrePersonne >= menu.nombrePersonneMinimum + 5.
-     */
     public function calculerPrixMenu(): void
     {
         if ($this->menu === null || $this->nombrePersonne === null) {
@@ -219,5 +218,22 @@ class Commande
         }
 
         $this->prixMenu = round($prixBase, 2);
+    }
+
+    public function getAvis(): ?Avis
+    {
+        return $this->avis;
+    }
+
+    public function setAvis(Avis $avis): static
+    {
+        // set the owning side of the relation if necessary
+        if ($avis->getCommande() !== $this) {
+            $avis->setCommande($this);
+        }
+
+        $this->avis = $avis;
+
+        return $this;
     }
 }

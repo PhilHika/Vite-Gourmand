@@ -207,6 +207,17 @@
 
                     {# Boutons #}
                     <div class="d-flex gap-2 justify-content-center mt-4">
+                        {% if avis_form is defined and avis_form is not null %}
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#avisModal">
+                                <i class="bi bi-star-fill text-dark"></i>
+                                Donner mon avis
+                            </button>
+                        {% elseif commande.statut == 'livree' and commande.avis is not null %}
+                            <div class="alert alert-success d-inline-block px-4 py-2 mb-0">
+                                <i class="bi bi-check-circle-fill"></i> Avis enregistré
+                            </div>
+                        {% endif %}
+
                         <a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark">
                             <i class="bi bi-arrow-left"></i>
                             Retour aux menus
@@ -227,4 +238,40 @@
             </div>
         </div>
     </section>
+
+    {# Modal Avis #}
+    {% if avis_form is defined and avis_form is not null %}
+        <div class="modal fade" id="avisModal" tabindex="-1" aria-labelledby="avisModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="avisModalLabel">Votre avis compte !</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(avis_form) }}
+                            <div class="form-group mb-3 text-center">
+                                {{ form_label(avis_form.note) }}
+                                <div class="rating-stars mt-2">
+                                    {{ form_widget(avis_form.note, {'attr': {'class': 'd-flex justify-content-center gap-3'}}) }}
+                                </div>
+                                {{ form_errors(avis_form.note) }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                {{ form_label(avis_form.description) }}
+                                {{ form_widget(avis_form.description, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(avis_form.description) }}
+                            </div>
+
+                            <div class="text-end">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-warning">Envoyer mon avis</button>
+                            </div>
+                        {{ form_end(avis_form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

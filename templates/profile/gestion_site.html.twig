@@ -18,6 +18,76 @@
                     </a>
                 </div>
 
+                {# === Card Modération des Avis === #}
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-star-half"></i>
+                            Modération des Avis
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#historiqueAvisModal">
+                            <i class="bi bi-clock-history"></i>
+                            Tout les avis
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date Avis</th>
+                                        <th>N° Commande</th>
+                                        <th>Client</th>
+                                        <th>Menu associé</th>
+                                        <th>Note</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for avis in avis_en_attente %}
+                                    <tr>
+                                        <td>{{ avis.commande.datePrestation|date('d/m/Y') }}</td>
+                                        <td>{{ avis.commande.numeroCommande }}</td>
+                                        <td>{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</td>
+                                        <td>{{ avis.commande.menu.titre }}</td>
+                                        <td>
+                                            <div class="text-warning">
+                                                {% for i in 1..5 %}
+                                                    {% if i <= avis.note %}
+                                                        <i class="bi bi-star-fill"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if avis.statut == constant('App\\Entity\\Avis::STATUT_EN_ATTENTE') %}
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> En attente</span>
+                                            {% elseif avis.statut == constant('App\\Entity\\Avis::STATUT_PUBLIE') %}
+                                                <span class="badge bg-success"><i class="bi bi-check"></i> Publié</span>
+                                            {% elseif avis.statut == constant('App\\Entity\\Avis::STATUT_REFUSE') %}
+                                                <span class="badge bg-danger"><i class="bi bi-x"></i> Refusé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('app_profile_gerer_avis', {numeroCommande: avis.commande.numeroCommande}) }}" class="btn btn-sm btn-primary">
+                                                Gérer l'avis
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-3">Aucun nouveau avis à modérer.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 {# === Card Horaires === #}
                 <div class="card shadow border-0 mb-4">
                     <div class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center">
@@ -25,7 +95,7 @@
                             <i class="bi bi-clock"></i>
                             Horaires d'ouverture
                         </h5>
-                        <a href="{{ path('app_profile_horaires') }}" class="btn btn-sm btn-dark">
+                        <a href="{{ path('app_profile_horaires') }}" class="btn btn-sm btn-light">
                             <i class="bi bi-pencil-square"></i>
                             Modifier les horaires
                         </a>
@@ -191,6 +261,79 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    {# === Modal Historique Avis === #}
+    <div class="modal fade" id="historiqueAvisModal" tabindex="-1" aria-labelledby="historiqueAvisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="historiqueAvisModalLabel">
+                        <i class="bi bi-clock-history"></i>
+                        Historique de tous les avis
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date Avis</th>
+                                    <th>N° Commande</th>
+                                    <th>Client</th>
+                                    <th>Menu associé</th>
+                                    <th>Note</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for avis in historique_avis %}
+                                <tr>
+                                    <td>{{ avis.commande.datePrestation|date('d/m/Y') }}</td>
+                                    <td>{{ avis.commande.numeroCommande }}</td>
+                                    <td>{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</td>
+                                    <td>{{ avis.commande.menu.titre }}</td>
+                                    <td>
+                                        <div class="text-warning">
+                                            {% for i in 1..5 %}
+                                                {% if i <= avis.note %}
+                                                    <i class="bi bi-star-fill"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if avis.statut == constant('App\\Entity\\Avis::STATUT_EN_ATTENTE') %}
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> En attente</span>
+                                        {% elseif avis.statut == constant('App\\Entity\\Avis::STATUT_PUBLIE') %}
+                                            <span class="badge bg-success"><i class="bi bi-check"></i> Publié</span>
+                                        {% elseif avis.statut == constant('App\\Entity\\Avis::STATUT_REFUSE') %}
+                                            <span class="badge bg-danger"><i class="bi bi-x"></i> Refusé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('app_profile_gerer_avis', {numeroCommande: avis.commande.numeroCommande}) }}" class="btn btn-sm btn-primary">
+                                            Gérer l'avis
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-3">Aucun avis dans l'historique.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
             </div>
         </div>
     </div>

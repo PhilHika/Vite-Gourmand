@@ -4,12 +4,16 @@ namespace App\Controller;
 
 use App\Document\ContenuSite;
 use App\Document\Horaire;
+use App\Entity\Commande;
+use App\Entity\Avis;
 use App\Form\ProfileFormType;
 use App\Repository\CommandeRepository;
 use App\Repository\ContenuSiteRepository;
 use App\Repository\HoraireRepository;
+use App\Repository\AvisRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,8 +163,7 @@ class ProfileController extends AbstractController
         DocumentManager $dm,
         array $formData,
         array $horairesExistants
-    ): void
-    {
+    ): void {
         foreach ($formData as $jour => $heures) {
             $ouverture = $heures['ouverture'];
             $fermeture = $heures['fermeture'];
@@ -189,7 +192,8 @@ class ProfileController extends AbstractController
         Request $request,
         HoraireRepository $horaireRepository,
         ContenuSiteRepository $contenuSiteRepository,
-        DocumentManager $dm
+        DocumentManager $dm,
+        AvisRepository $avisRepository
     ): Response {
         if ($request->isMethod('POST')) {
             $type = $request->request->get('type');
@@ -227,10 +231,46 @@ class ProfileController extends AbstractController
         $description = $contenuSiteRepository->findByCle('description');
         $conditionsVente = $contenuSiteRepository->findByCle('conditions_vente');
 
+        // Récupère les avis en attente et l'historique
+        $avisEnAttente = $avisRepository->findBy(['statut' => Avis::STATUT_EN_ATTENTE], ['id' => 'DESC']);
+        $historiqueAvis = $avisRepository->findBy([], ['id' => 'DESC']);
+
         return $this->render('profile/gestion_site.html.twig', [
             'horaires' => $horairesExistants,
             'description' => $description?->getContenu(),
             'conditions_vente' => $conditionsVente?->getContenu(),
+            'avis_en_attente' => $avisEnAttente,
+            'historique_avis' => $historiqueAvis,
+        ]);
+    }
+
+    #[Route('/profil/gestion-site/avis/{numeroCommande}', name: 'app_profile_gerer_avis', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_SALARIE')]
+    public function gererAvis(
+        #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])] Commande $commande,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        $avis = $commande->getAvis();
+
+        if (!$avis) {
+            $this->addFlash('warning', 'Aucun avis n\'a encore été laissé pour cette commande.');
+            return $this->redirectToRoute('app_profile_gestion_site');
+        }
+
+        $form = $this->createForm(\App\Form\AvisStatutFormType::class, $avis);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Le statut de l\'avis a été mis à jour.');
+            return $this->redirectToRoute('app_profile_gestion_site');
+        }
+
+        return $this->render('profile/gerer_avis.html.twig', [
+            'commande' => $commande,
+            'avis' => $avis,
+            'form' => $form->createView()
         ]);
     }
 }

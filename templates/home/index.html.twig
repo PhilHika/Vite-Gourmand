@@ -24,13 +24,94 @@
     </header>
 
     <div class="container mt-5">
-        <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
-            <div class="container-fluid py-5">
-                {% set description = get_description_site() %}
-                {% if description %}
-                    <h2 class="fw-bold mb-3">Qui sommes-nous ?</h2>
-                    <p class="lead">{{ description }}</p>
-                {% endif %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="p-5 mb-4 bg-light rounded-3 shadow-sm h-100">
+                    <div class="container-fluid py-3">
+                        {% set description = get_description_site() %}
+                        {% if description %}
+                            <h2 class="fw-bold mb-3">Qui sommes-nous ?</h2>
+                            <p class="lead">{{ description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="p-4 mb-4 bg-white rounded-3 shadow-sm border border-warning h-100">
+                    <h3 class="fw-bold mb-4 text-warning"><i class="bi bi-star-fill"></i> Avis de nos clients</h3>
+                    {% if tous_les_avis is defined and tous_les_avis|length > 0 %}
+                        <div class="avis-list">
+                            {% for avis in tous_les_avis|slice(0, 4) %}
+                                <div class="avis-item mb-4 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong class="text-primary">{{ avis.utilisateur.prenom }}</strong>
+                                        <div class="text-warning">
+                                            {% for i in 1..5 %}
+                                                {% if i <= avis.note %}
+                                                    <i class="bi bi-star-fill"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 text-muted fst-italic">"{{ avis.description }}"</p>
+                                    <small class="text-secondary">- Prestation du {{ avis.commande.datePrestation|date('d/m/Y') }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if tous_les_avis|length > 4 %}
+                            <div class="text-center mt-3">
+                                <button type="button" class="btn btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#tousLesAvisModal">
+                                    Voir tous les avis ({{ tous_les_avis|length }})
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">Aucun avis publié pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# === Modal Tous les Avis === #}
+    <div class="modal fade" id="tousLesAvisModal" tabindex="-1" aria-labelledby="tousLesAvisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="tousLesAvisModalLabel">
+                        <i class="bi bi-star-fill"></i> Tous nos avis clients
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    {% if tous_les_avis is defined %}
+                        {% for avis in tous_les_avis %}
+                            <div class="avis-item mb-4 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong class="text-primary">{{ avis.utilisateur.prenom }}</strong>
+                                    <div class="text-warning">
+                                        {% for i in 1..5 %}
+                                            {% if i <= avis.note %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="mb-0 text-muted fst-italic">"{{ avis.description }}"</p>
+                                <small class="text-secondary">- Prestation du {{ avis.commande.datePrestation|date('d/m/Y') }}</small>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
             </div>
         </div>
     </div>

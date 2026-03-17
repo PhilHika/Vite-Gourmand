@@ -220,12 +220,39 @@ class CommandeController extends AbstractController
         $prixSansReduction = $menu->getPrixParPersonne() * $commande->getNombrePersonne();
         $reductionAppliquee = $commande->getPrixMenu() < $prixSansReduction;
 
+        $avisForm = null;
+
+        // Si la commande est livrée et qu'aucun avis n'a été déposé
+        if ($commande->getStatut() === Commande::STATUT_LIVREE && !$commande->getAvis()) {
+            $avis = new \App\Entity\Avis();
+            $avis->setCommande($commande);
+            $avis->setUtilisateur($this->getUser());
+            $avis->setStatut(\App\Entity\Avis::STATUT_EN_ATTENTE);
+
+            // Create form directly using fully-qualified name to avoid missing imports in use statements
+            $form = $this->createForm(\App\Form\AvisFormType::class, $avis);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->persist($avis);
+                $em->flush();
+
+                $this->addFlash('success', 'Merci pour votre avis ! Il sera publié après validation par notre équipe.');
+                return $this->redirectToRoute('app_commande_show', [
+                    'numeroCommande' => $commande->getNumeroCommande(),
+                ]);
+            }
+
+            $avisForm = $form->createView();
+        }
+
         return $this->render('commande/show.html.twig', [
             'commande' => $commande,
             'reduction_appliquee' => $reductionAppliquee,
             'prix_sans_reduction' => $prixSansReduction,
             'edit_form' => $editForm?->createView(),
             'editable' => $editable,
+            'avis_form' => $avisForm,
         ]);
     }
 }
