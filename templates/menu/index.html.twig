@@ -5,244 +5,281 @@
 
 {% block body %}
 
-    <!-- Section -->
-    <section class="py-5">
-        <div class="listing-container container px-4 px-lg-5 mt-5">
+	<!-- Section -->
+	<section class="py-5">
+		<div
+			class="listing-container container px-4 px-lg-5 mt-5">
 
-            <!-- Bouton Commander sans menu -->
-            <div class="text-center mb-4">
-                {% if app.user %}
-                    <a class="btn btn-success btn-lg" href="{{ path('app_commande_new') }}">
-                        <i class="bi bi-cart-plus"></i>
-                        Passer commande
-                    </a>
-                {% else %}
-                    <button type="button"
-                        class="btn btn-success btn-lg btn-commander-login"
-                        data-bs-toggle="modal"
-                        data-bs-target="#loginModal"
-                        data-menu-id=""
-                        data-menu-titre="personnalisée">
-                        <i class="bi bi-cart-plus"></i>
-                        Passer commande
-                    </button>
-                {% endif %}
-            </div>
+			<!-- Bouton Commander sans menu -->
+			<div class="text-center mb-4">
+				{% if app.user %}
+					<a class="btn btn-success btn-lg" href="{{ path('app_commande_new') }}">
+						<i class="bi bi-cart-plus"></i>
+						Passer commande
+					</a>
+				{% else %}
+					<button type="button" class="btn btn-success btn-lg btn-commander-login" data-bs-toggle="modal" data-bs-target="#loginModal" data-menu-id="" data-menu-titre="personnalisée">
+						<i class="bi bi-cart-plus"></i>
+						Passer commande
+					</button>
+				{% endif %}
+			</div>
 
-            <!-- Filtres -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    {{ form_start(filterForm, {'attr': {'class': 'row g-3 align-items-end'}}) }}
-                        <div class="col-md-2">
-                            {{ form_label(filterForm.prixMin) }}
-                            {{ form_widget(filterForm.prixMin, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form_label(filterForm.prixMax) }}
-                            {{ form_widget(filterForm.prixMax, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form_label(filterForm.theme) }}
-                            {{ form_widget(filterForm.theme, {'attr': {'class': 'form-select'}}) }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form_label(filterForm.regime) }}
-                            {{ form_widget(filterForm.regime, {'attr': {'class': 'form-select'}}) }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form_label(filterForm.nombrePersonne) }}
-                            {{ form_widget(filterForm.nombrePersonne, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                        <div class="col-md-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-funnel"></i> Filtrer
-                            </button>
-                            <a href="{{ path('app_menu_index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-x-circle"></i>
-                            </a>
-                        </div>
-                    {{ form_end(filterForm) }}
-                </div>
-            </div>
+			<!-- Filtres -->
+			<div class="card mb-4">
+				<div class="card-body">
+					{{ form_start(filterForm, {'attr': {'class': 'row g-3 align-items-end'}}) }}
+					<div class="col-md-2">
+						{{ form_label(filterForm.prixMin) }}
+						{{ form_widget(filterForm.prixMin, {'attr': {'class': 'form-control'}}) }}
+					</div>
+					<div class="col-md-2">
+						{{ form_label(filterForm.prixMax) }}
+						{{ form_widget(filterForm.prixMax, {'attr': {'class': 'form-control'}}) }}
+					</div>
+					<div class="col-md-2">
+						{{ form_label(filterForm.theme) }}
+						{{ form_widget(filterForm.theme, {'attr': {'class': 'form-select'}}) }}
+					</div>
+					<div class="col-md-2">
+						{{ form_label(filterForm.regime) }}
+						{{ form_widget(filterForm.regime, {'attr': {'class': 'form-select'}}) }}
+					</div>
+					<div class="col-md-2">
+						{{ form_label(filterForm.nombrePersonne) }}
+						{{ form_widget(filterForm.nombrePersonne, {'attr': {'class': 'form-control'}}) }}
+					</div>
+					<div class="col-md-2 d-flex gap-2">
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-funnel"></i>
+							Filtrer
+						</button>
+						<a href="{{ path('app_menu_index') }}" class="btn btn-outline-secondary">
+							<i class="bi bi-x-circle"></i>
+						</a>
+					</div>
+					{{ form_end(filterForm) }}
+				</div>
+			</div>
 
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                {% for menu in menus %}
-                    <div class="col mb-5">
-                        <div
-                            class="card h-100">
+			<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+				{% for menu in menus %}
+					<div class="col mb-5">
+						<div
+							class="card h-100">
 
-                            <!-- Image du menu (via le premier plat) -->
-                            {% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
-                                {% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
-                            {% else %}
-                                {% set menuImage = asset('images/menus/default.jpg') %}
-                            {% endif %}
-                            <img
-                            class="card-img-top" src="{{ menuImage }}" alt="{{ menu.titre }}"/>
+							<!-- Titre du menu + boutons carrousel -->
+							<div class="card-header bg-transparent border-0 p-3" style="height:80px;">
+								<div class="d-flex align-items-center justify-content-between">
+									{% if menu.plats|length > 1 %}
+										<button class="btn btn-sm btn-outline-dark" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="prev" style="position: relative; z-index: 2;">
+											<i class="bi bi-chevron-left"></i>
+										</button>
+									{% else %}
+										<span></span>
+									{% endif %}
 
-                            <!-- Détails du menu -->
-                            <div class="card-body p-4">
-                                <div
-                                    class="text-center">
+									<a href="{{ path('app_menu_show', {id: menu.id}) }}" class="stretched-link link-dark text-center">
+										<h5 class="fw-bolder mb-0">{{ menu.titre }}</h5>
+									</a>
 
-                                    <!-- Régime (many-to-one) -->
-                                    {% if menu.regime is not null %}
-                                        <span class="badge bg-secondary mb-2">{{ menu.regime.libelle }}</span>
-                                    {% endif %}
+									{% if menu.plats|length > 1 %}
+										<button class="btn btn-sm btn-outline-dark" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="next" style="position: relative; z-index: 2;">
+											<i class="bi bi-chevron-right"></i>
+										</button>
+									{% else %}
+										<span></span>
+									{% endif %}
+								</div>
+							</div>
 
-                                    <!-- Nom du menu -->
-                                    <a href="{{ path('app_menu_show', {id: menu.id}) }}" class="stretched-link link-dark">
-                                        <h5 class="fw-bolder">{{ menu.titre }}</h5>
-                                    </a>
+							<!-- Carrousel des images de plats -->
+							{% if menu.plats|length > 0 %}
+								<div id="carouselMenu{{ menu.id }}" class="carousel slide" data-bs-ride="false">
+									<div class="carousel-inner">
+										{% for plat in menu.plats %}
+											<div class="carousel-item{% if loop.first %} active{% endif %}">
+												{% if plat.photo is not empty %}
+													<img class="d-block w-100" src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}"/>
+												{% else %}
+													<img class="d-block w-100" src="{{ asset('images/menus/default.jpg') }}" alt="{{ plat.titrePlat }}"/>
+												{% endif %}
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							{% else %}
+								<img class="card-img-top" src="{{ asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}"/>
+							{% endif %}
 
-                                    <!-- Description courte -->
-                                    {% if menu.description is not empty %}
-                                        <p class="text-muted small">{{ menu.description }}</p>
-                                    {% endif %}
+							<!-- Détails du menu -->
+							<div class="card-body p-4">
+								<div
+									class="text-center">
 
-                                    <!-- Plats -->
-                                    {% if menu.plats|length > 0 %}
-                                        <ul class="list-unstyled mt-2">
-                                            {% for plat in menu.plats %}
-                                                <li class="mb-1">
-                                                    <span class="small">{{ plat.titrePlat }}</span>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% else %}
-                                        <p class="text-muted fst-italic small">Aucun plat renseigné</p>
-                                    {% endif %}
+									<!-- Régime (many-to-one) -->
+									{% if menu.regime is not null %}
+										<span class="badge bg-secondary mb-2">{{ menu.regime.libelle }}</span>
+									{% endif %}
 
-                                    <!-- Allergènes (dédupliqués par libelle) -->
-                                    {% set seenAllergenes = [] %}
-                                    {% for plat in menu.plats %}
-                                        {% for allergene in plat.allergenes %}
-                                            {% if allergene.libelle not in seenAllergenes %}
-                                                {% set seenAllergenes = seenAllergenes|merge([allergene.libelle]) %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                    {% if seenAllergenes|length > 0 %}
-                                        <div class="mt-2">
-                                            {% for libelle in seenAllergenes %}
-                                                <span class="badge bg-warning text-dark me-1">{{ libelle }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+									<!-- Description courte -->
+									{% if menu.description is not empty %}
+										<p class="text-muted small">{{ menu.description }}</p>
+									{% endif %}
 
-                                </div>
-                            </div>
+									<!-- Plats (cliquables pour changer l'image du carrousel) -->
+									{% if menu.plats|length > 0 %}
+										<ul class="list-unstyled mt-2" id="platListMenu{{ menu.id }}">
+											{% for plat in menu.plats %}
+												<li class="mb-1">
+													<span class="carousel-plat-marker small text-primary fw-bold"{% if not loop.first %} style="visibility: hidden;"{% endif %}>▶ </span>
+													<a href="javascript:void(0)" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide-to="{{ loop.index0 }}" class="text-decoration-none text-dark small carousel-plat-link" style="cursor: pointer; position: relative; z-index: 2;">
+														{{ plat.titrePlat }}
+													</a>
+												</li>
+											{% endfor %}
+										</ul>
+									{% else %}
+										<p class="text-muted fst-italic small">Aucun plat renseigné</p>
+									{% endif %}
 
-                            <!-- Prix + actions -->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div
-                                    class="text-center">
+									<!-- Allergènes (dédupliqués par libelle) -->
+									{% set seenAllergenes = [] %}
+									{% for plat in menu.plats %}
+										{% for allergene in plat.allergenes %}
+											{% if allergene.libelle not in seenAllergenes %}
+												{% set seenAllergenes = seenAllergenes|merge([allergene.libelle]) %}
+											{% endif %}
+										{% endfor %}
+									{% endfor %}
+									{% if seenAllergenes|length > 0 %}
+										<div class="mt-2">
+											{% for libelle in seenAllergenes %}
+												<span class="badge bg-warning text-dark me-1">{{ libelle }}</span>
+											{% endfor %}
+										</div>
+									{% endif %}
 
-                                    <!-- Prix -->
-                                    {% if menu.getPrixParPersonne is not null %}
-                                        <p class="fw-bold mb-2">{{ menu.getPrixParPersonne|number_format(2, ',', ' ') }}
-                                            €</p>
-                                    {% endif %}
+								</div>
+							</div>
 
-                                    <!-- Boutons -->
-                                    {% if menu.getQuantiteRestante > 0 %}
-                                        <a class="btn btn-outline-dark mt-auto" href="{{ path('app_menu_show', {id: menu.id}) }}">
-                                            Voir le menu
-                                        </a>
+							<!-- Prix + actions -->
+							<div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+								<div
+									class="text-center">
 
-                                        <!-- Bouton Commander -->
-                                        {% if app.user %}
-                                            <a class="btn btn-success mt-2" href="{{ path('app_commande_new', {menu: menu.id}) }}" style="position: relative; z-index: 2;">
-                                                <i class="bi bi-cart-plus"></i>
-                                                Commander
-                                            </a>
-                                        {% else %}
-                                            <button type="button"
-                                                class="btn btn-success mt-2 btn-commander-login"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#loginModal"
-                                                data-menu-id="{{ menu.id }}"
-                                                data-menu-titre="{{ menu.titre }}"
-                                                style="position: relative; z-index: 2;">
-                                                <i class="bi bi-cart-plus"></i>
-                                                Commander
-                                            </button>
-                                        {% endif %}
-                                    {% else %}
-                                        <button class="btn btn-secondary mt-auto" disabled>
-                                            <i class="bi bi-x-circle"></i>
-                                            Épuisé
-                                        </button>
-                                    {% endif %}
+									<!-- Prix -->
+									{% if menu.getPrixParPersonne is not null %}
+										<p class="fw-bold mb-2">{{ menu.getPrixParPersonne|number_format(2, ',', ' ') }}
+											€</p>
+									{% endif %}
 
-                                    <!-- Bouton Modifier (salarié / admin uniquement) -->
-                                    {% if is_granted('ROLE_SALARIE') %}
-                                        <a class="btn btn-primary mt-2" href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" style="position: relative; z-index: 2;">
-                                            <i class="bi bi-pencil"></i>
-                                            Modifier
-                                        </a>
-                                    {% endif %}
+									<!-- Boutons -->
+									{% if menu.getQuantiteRestante > 0 %}
+										<a class="btn btn-outline-dark mt-auto" href="{{ path('app_menu_show', {id: menu.id}) }}">
+											Voir le menu
+										</a>
 
-                                </div>
-                            </div>
+										<!-- Bouton Commander -->
+										{% if app.user %}
+											<a class="btn btn-success mt-2" href="{{ path('app_commande_new', {menu: menu.id}) }}" style="position: relative; z-index: 2;">
+												<i class="bi bi-cart-plus"></i>
+												Commander
+											</a>
+										{% else %}
+											<button type="button" class="btn btn-success mt-2 btn-commander-login" data-bs-toggle="modal" data-bs-target="#loginModal" data-menu-id="{{ menu.id }}" data-menu-titre="{{ menu.titre }}" style="position: relative; z-index: 2;">
+												<i class="bi bi-cart-plus"></i>
+												Commander
+											</button>
+										{% endif %}
+									{% else %}
+										<button class="btn btn-secondary mt-auto" disabled>
+											<i class="bi bi-x-circle"></i>
+											Épuisé
+										</button>
+									{% endif %}
 
-                        </div>
-                    </div>
-                {% else %}
-                    <p>Aucun menu disponible.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
+									<!-- Bouton Modifier (salarié / admin uniquement) -->
+									{% if is_granted('ROLE_SALARIE') %}
+										<a class="btn btn-primary mt-2" href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" style="position: relative; z-index: 2;">
+											<i class="bi bi-pencil"></i>
+											Modifier
+										</a>
+									{% endif %}
 
-    {# Modale de connexion pour les non-connectés #}
-    {% if not app.user %}
-        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="loginModalLabel">
-                            <i class="bi bi-lock"></i>
-                            Connexion requise
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                    </div>
-                    <div class="modal-body text-center py-4">
-                        <i class="bi bi-person-circle display-1 text-primary mb-3"></i>
-                        <p class="lead" id="modalMessage">Pour passer une commande, veuillez vous connecter ou créer un compte.</p>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <a id="modalLoginLink" href="{{ path('app_login', {'_target_path': path('app_commande_new')}) }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            Se connecter
-                        </a>
-                        <a href="{{ path('app_register') }}" class="btn btn-outline-secondary btn-lg">
-                            <i class="bi bi-person-plus"></i>
-                            Créer un compte
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+								</div>
+							</div>
 
-        <script>
-            document.getElementById('loginModal').addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                if (!button) {
-                    return;
-                }
+						</div>
+					</div>
+				{% else %}
+					<p>Aucun menu disponible.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</section>
 
-                const menuId = button.getAttribute('data-menu-id');
-                const menuTitre = button.getAttribute('data-menu-titre');
-                const targetPath = menuId ? '/commande/new?menu=' + menuId : '/commande/new';
+	{# Modale de connexion pour les non-connectés #}
+	{% if not app.user %}
+		<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="loginModalLabel">
+							<i class="bi bi-lock"></i>
+							Connexion requise
+						</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+					</div>
+					<div class="modal-body text-center py-4">
+						<i class="bi bi-person-circle display-1 text-primary mb-3"></i>
+						<p class="lead" id="modalMessage">Pour passer une commande, veuillez vous connecter ou créer un compte.</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<a id="modalLoginLink" href="{{ path('app_login', {'_target_path': path('app_commande_new')}) }}" class="btn btn-primary btn-lg">
+							<i class="bi bi-box-arrow-in-right"></i>
+							Se connecter
+						</a>
+						<a href="{{ path('app_register') }}" class="btn btn-outline-secondary btn-lg">
+							<i class="bi bi-person-plus"></i>
+							Créer un compte
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
-                document.getElementById('modalMessage').innerHTML = menuId
-                    ? 'Pour commander le menu <strong>' + menuTitre + '</strong>, veuillez vous connecter ou créer un compte.'
-                    : 'Pour passer une commande personnalisée, veuillez vous connecter ou créer un compte.';
+		<script>
+			document.getElementById('loginModal').addEventListener('show.bs.modal', function (event) {
+const button = event.relatedTarget;
+if (! button) {
+return;
+}
 
-                document.getElementById('modalLoginLink').href = '{{ path('app_login') }}?_target_path=' + encodeURIComponent(targetPath);
-            });
-        </script>
-    {% endif %}
+const menuId = button.getAttribute('data-menu-id');
+const menuTitre = button.getAttribute('data-menu-titre');
+const targetPath = menuId ? '/commande/new?menu=' + menuId : '/commande/new';
+
+document.getElementById('modalMessage').innerHTML = menuId ? 'Pour commander le menu <strong>' + menuTitre + '</strong>, veuillez vous connecter ou créer un compte.' : 'Pour passer une commande personnalisée, veuillez vous connecter ou créer un compte.';
+
+document.getElementById('modalLoginLink').href = '{{ path('app_login') }}?_target_path=' + encodeURIComponent(targetPath);
+});
+		</script>
+	{% endif %}
+
+	<script>
+		document.querySelectorAll('.carousel').forEach(function(carousel) {
+			carousel.addEventListener('slid.bs.carousel', function(event) {
+				const carouselId = carousel.id;
+				const platList = document.getElementById('platList' + carouselId.replace('carousel', ''));
+				if (!platList) return;
+
+				const markers = platList.querySelectorAll('.carousel-plat-marker');
+				markers.forEach(function(marker, index) {
+					marker.style.visibility = (index === event.to) ? 'visible' : 'hidden';
+				});
+			});
+		});
+	</script>
 
 {% endblock %}
