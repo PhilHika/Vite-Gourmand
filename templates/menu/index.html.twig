@@ -68,29 +68,11 @@
 						<div
 							class="card h-100">
 
-							<!-- Titre du menu + boutons carrousel -->
-							<div class="card-header bg-transparent border-0 p-3" style="height:80px;">
-								<div class="d-flex align-items-center justify-content-between">
-									{% if menu.plats|length > 1 %}
-										<button class="btn btn-sm btn-outline-dark" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="prev" style="position: relative; z-index: 2;">
-											<i class="bi bi-chevron-left"></i>
-										</button>
-									{% else %}
-										<span></span>
-									{% endif %}
-
-									<a href="{{ path('app_menu_show', {id: menu.id}) }}" class="stretched-link link-dark text-center">
-										<h5 class="fw-bolder mb-0">{{ menu.titre }}</h5>
-									</a>
-
-									{% if menu.plats|length > 1 %}
-										<button class="btn btn-sm btn-outline-dark" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="next" style="position: relative; z-index: 2;">
-											<i class="bi bi-chevron-right"></i>
-										</button>
-									{% else %}
-										<span></span>
-									{% endif %}
-								</div>
+							<!-- Titre du menu -->
+							<div class="card-header bg-transparent border-0 p-3 text-center" style="height:80px;">
+								<a href="{{ path('app_menu_show', {id: menu.id}) }}" class="stretched-link link-dark">
+									<h5 class="fw-bolder mb-0">{{ menu.titre }}</h5>
+								</a>
 							</div>
 
 							<!-- Carrousel des images de plats -->
@@ -108,14 +90,44 @@
 										{% endfor %}
 									</div>
 								</div>
+
+								<!-- Navigation : < [liste plats] > -->
+								<div class="d-flex align-items-center justify-content-between px-2 py-2" style="position: relative; z-index: 2;">
+									{% if menu.plats|length > 1 %}
+										<button class="btn btn-sm btn-outline-dark flex-shrink-0" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="prev">
+											<i class="bi bi-chevron-left"></i>
+										</button>
+									{% else %}
+										<span></span>
+									{% endif %}
+
+									<ul class="list-unstyled mb-0 text-center flex-grow-1 mx-2" id="platListMenu{{ menu.id }}">
+										{% for plat in menu.plats %}
+											<li>
+												<span class="carousel-plat-marker small text-primary fw-bold"{% if not loop.first %} style="visibility: hidden;"{% endif %}>▶ </span>
+												<a href="javascript:void(0)" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide-to="{{ loop.index0 }}" class="text-decoration-none text-dark small carousel-plat-link" style="cursor: pointer;">
+													{{ plat.titrePlat }}
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+
+									{% if menu.plats|length > 1 %}
+										<button class="btn btn-sm btn-outline-dark flex-shrink-0" type="button" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide="next">
+											<i class="bi bi-chevron-right"></i>
+										</button>
+									{% else %}
+										<span></span>
+									{% endif %}
+								</div>
 							{% else %}
 								<img class="card-img-top" src="{{ asset('images/menus/default.jpg') }}" alt="{{ menu.titre }}"/>
+								<p class="text-muted fst-italic small text-center mt-2">Aucun plat renseigné</p>
 							{% endif %}
 
 							<!-- Détails du menu -->
 							<div class="card-body p-4">
-								<div
-									class="text-center">
+								<div class="text-center">
 
 									<!-- Régime (many-to-one) -->
 									{% if menu.regime is not null %}
@@ -125,22 +137,6 @@
 									<!-- Description courte -->
 									{% if menu.description is not empty %}
 										<p class="text-muted small">{{ menu.description }}</p>
-									{% endif %}
-
-									<!-- Plats (cliquables pour changer l'image du carrousel) -->
-									{% if menu.plats|length > 0 %}
-										<ul class="list-unstyled mt-2" id="platListMenu{{ menu.id }}">
-											{% for plat in menu.plats %}
-												<li class="mb-1">
-													<span class="carousel-plat-marker small text-primary fw-bold"{% if not loop.first %} style="visibility: hidden;"{% endif %}>▶ </span>
-													<a href="javascript:void(0)" data-bs-target="#carouselMenu{{ menu.id }}" data-bs-slide-to="{{ loop.index0 }}" class="text-decoration-none text-dark small carousel-plat-link" style="cursor: pointer; position: relative; z-index: 2;">
-														{{ plat.titrePlat }}
-													</a>
-												</li>
-											{% endfor %}
-										</ul>
-									{% else %}
-										<p class="text-muted fst-italic small">Aucun plat renseigné</p>
 									{% endif %}
 
 									<!-- Allergènes (dédupliqués par libelle) -->

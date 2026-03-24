@@ -1,194 +1,191 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ menu.titre }}
+	{{ menu.titre }}
 {% endblock %}
 
 {% block body %}
-    <section class="py-5">
-        <div
-            class="container px-4 px-lg-5">
+	<section class="py-5">
+		<div
+			class="container px-4 px-lg-5">
 
-            {# Header image + titre #}
-            <div class="row gx-4 gx-lg-5 align-items-center mb-5">
-                <div
-                    class="col-md-5">
-                    {# Image du menu (via le premier plat) #}
-                    {% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
-                        {% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
-                    {% else %}
-                        {% set menuImage = asset('images/menus/default.jpg') %}
-                    {% endif %}
-                    <img class="img-fluid rounded shadow" src="{{ menuImage }}" alt="{{ menu.titre }}">
-                </div>
-                <div class="col-md-7">
-                    <h1 class="fw-bolder mb-3">{{ menu.titre }}</h1>
+			{# Header image + titre #}
+			<div class="row gx-4 gx-lg-5 align-items-center mb-5">
+				<div
+					class="col-md-5">
+					{# Image du menu (via le premier plat) #}
+					{% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
+						{% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+					{% else %}
+						{% set menuImage = asset('images/menus/default.jpg') %}
+					{% endif %}
+					<img class="img-fluid rounded shadow" src="{{ menuImage }}" alt="{{ menu.titre }}">
+				</div>
+				<div class="col-md-7">
+					<h1 class="fw-bolder mb-3">{{ menu.titre }}</h1>
 
-                    {% if menu.description is not empty %}
-                        <p class="lead mb-3">{{ menu.description }}</p>
-                    {% endif %}
+					{% if menu.description is not empty %}
+						<p class="lead mb-3">{{ menu.description }}</p>
+					{% endif %}
 
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        {% if menu.regime is not null %}
-                            <span class="badge bg-secondary fs-6">
-                                <i class="bi bi-leaf"></i>
-                                {{ menu.regime.libelle }}
-                            </span>
-                        {% endif %}
-                        {% if menu.theme is not null %}
-                            <span class="badge bg-info text-dark fs-6">
-                                <i class="bi bi-palette"></i>
-                                {{ menu.theme.libelle }}
-                            </span>
-                        {% endif %}
-                    </div>
+					<div class="d-flex flex-wrap gap-2 mb-3">
+						{% if menu.regime is not null %}
+							<span class="badge bg-secondary fs-6">
+								<i class="bi bi-leaf"></i>
+								{{ menu.regime.libelle }}
+							</span>
+						{% endif %}
+						{% if menu.theme is not null %}
+							<span class="badge bg-info text-dark fs-6">
+								<i class="bi bi-palette"></i>
+								{{ menu.theme.libelle }}
+							</span>
+						{% endif %}
+					</div>
 
-                    <div class="mb-3">
-                        {% if menu.prixParPersonne is not null %}
-                            <span class="fs-4 fw-bold text-primary">
-                                {{ menu.prixParPersonne|number_format(2, ',', ' ') }}
-                                € / pers.
-                            </span>
-                        {% endif %}
-                        {% if menu.nombrePersonneMinimum is not null and menu.nombrePersonneMinimum > 0 %}
-                            <span class="text-muted ms-2">
-                                (min.
-                                {{ menu.nombrePersonneMinimum }}
-                                pers.)
-                            </span>
-                        {% endif %}
-                    </div>
+					<div class="mb-3">
+						{% if menu.prixParPersonne is not null %}
+							<span class="fs-4 fw-bold text-primary">
+								{{ menu.prixParPersonne|number_format(2, ',', ' ') }}
+								€ / pers.
+							</span>
+						{% endif %}
+						{% if menu.nombrePersonneMinimum is not null and menu.nombrePersonneMinimum > 0 %}
+							<span class="text-muted ms-2">
+								(min.
+								{{ menu.nombrePersonneMinimum }}
+								pers.)
+							</span>
+						{% endif %}
+					</div>
 
-                    {% if menu.quantiteRestante is not null %}
-                        {% if menu.quantiteRestante > 0 %}
-                            <span class="badge bg-success fs-6">
-                                <i class="bi bi-check-circle"></i>
-                                Disponible ({{ menu.quantiteRestante }}
-                                restant{{ menu.quantiteRestante > 1 ? 's' : '' }})
-                            </span>
-                        {% else %}
-                            <span class="badge bg-danger fs-6">
-                                <i class="bi bi-x-circle"></i>
-                                Indisponible
-                            </span>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
+					{% if menu.quantiteRestante is not null %}
+						{% if menu.quantiteRestante > 0 %}
+							<span class="badge bg-success fs-6">
+								<i class="bi bi-check-circle"></i>
+								Disponible ({{ menu.quantiteRestante }}
+								restant{{ menu.quantiteRestante > 1 ? 's' : '' }})
+							</span>
+						{% else %}
+							<span class="badge bg-danger fs-6">
+								<i class="bi bi-x-circle"></i>
+								Indisponible
+							</span>
+						{% endif %}
+					{% endif %}
+				</div>
+			</div>
 
-            {# Plats inclus #}
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="fw-bolder mb-4">
-                        <i class="bi bi-list-ul"></i>
-                        Plats inclus dans ce menu
-                    </h3>
+			{# Plats inclus #}
+			<div class="row">
+				<div class="col-12">
+					<h3 class="fw-bolder mb-4">
+						<i class="bi bi-list-ul"></i>
+						Plats inclus dans ce menu
+					</h3>
 
-                    {% if menu.plats|length > 0 %}
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                            {% for plat in menu.plats %}
-                                <div class="col">
-                                    <div class="card h-100 shadow-sm">
-                                        {% if plat.photo %}
-                                            <img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}" class="card-img-top" style="max-height: 180px; object-fit: cover;">
-                                        {% endif %}
-                                        <div class="card-body">
-                                            <h5 class="card-title fw-bold">{{ plat.titrePlat }}</h5>
+					{% if menu.plats|length > 0 %}
+						<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+							{% for plat in menu.plats %}
+								<div class="col">
+									<div class="card h-100 shadow-sm">
+										{% if plat.photo %}
+											<img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}" class="card-img-top" style="max-height: 180px; object-fit: cover;">
+										{% endif %}
+										<div class="card-body">
+											<h5 class="card-title fw-bold">{{ plat.titrePlat }}</h5>
 
-                                            {% if plat.allergenes|length > 0 %}
-                                                <div class="mt-2">
-                                                    {% for allergene in plat.allergenes %}
-                                                        <span class="badge bg-warning text-dark me-1">
-                                                            <i class="bi bi-exclamation-triangle-fill"></i>
-                                                            {{ allergene.libelle }}
-                                                        </span>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="alert alert-secondary">
-                            <i class="bi bi-info-circle"></i>
-                            Aucun plat renseigné pour ce menu.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+											{% if plat.allergenes|length > 0 %}
+												<div class="mt-2">
+													{% for allergene in plat.allergenes %}
+														<span class="badge bg-warning text-dark me-1">
+															<i class="bi bi-exclamation-triangle-fill"></i>
+															{{ allergene.libelle }}
+														</span>
+													{% endfor %}
+												</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					{% else %}
+						<div class="alert alert-secondary">
+							<i class="bi bi-info-circle"></i>
+							Aucun plat renseigné pour ce menu.
+						</div>
+					{% endif %}
+				</div>
+			</div>
 
-            {# Boutons d'action #}
-            <div class="mt-5 d-flex flex-wrap gap-2">
-                <a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark">
-                    <i class="bi bi-arrow-left"></i>
-                    Retour à la liste des menus
-                </a>
+			{# Boutons d'action #}
+			<div class="mt-5 d-flex flex-wrap gap-2">
+				<a href="{{ path('app_menu_index') }}" class="btn btn-outline-dark">
+					<i class="bi bi-arrow-left"></i>
+					Retour à la liste des menus
+				</a>
 
-                {% if is_granted('ROLE_SALARIE') %}
-                    <a href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" class="btn btn-outline-primary">
-                        <i class="bi bi-pencil"></i>
-                        Modifier ce menu
-                    </a>
-                {% endif %}
+				{% if is_granted('ROLE_SALARIE') %}
+					<a href="{{ path('app_admin_menu_edit', {id: menu.id}) }}" class="btn btn-outline-primary">
+						<i class="bi bi-pencil"></i>
+						Modifier ce menu
+					</a>
+				{% endif %}
 
-                {# Bouton Commander #}
-                {% if menu.quantiteRestante is not null and menu.quantiteRestante > 0 %}
-                    {% if app.user %}
-                        <a class="btn btn-success btn-lg" href="{{ path('app_commande_new', {menu: menu.id}) }}">
-                            <i class="bi bi-cart-plus"></i>
-                            Commander ce menu
-                        </a>
-                    {% else %}
-                        <button type="button"
-                            class="btn btn-success btn-lg"
-                            data-bs-toggle="modal"
-                            data-bs-target="#loginModal">
-                            <i class="bi bi-cart-plus"></i>
-                            Commander ce menu
-                        </button>
-                    {% endif %}
-                {% else %}
-                    <button class="btn btn-secondary btn-lg" disabled>
-                        <i class="bi bi-x-circle"></i>
-                        Épuisé
-                    </button>
-                {% endif %}
-            </div>
+				{# Bouton Commander #}
+				{% if menu.quantiteRestante is not null and menu.quantiteRestante > 0 %}
+					{% if app.user %}
+						<a class="btn btn-success btn-lg" href="{{ path('app_commande_new', {menu: menu.id}) }}">
+							<i class="bi bi-cart-plus"></i>
+							Commander ce menu
+						</a>
+					{% else %}
+						<button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+							<i class="bi bi-cart-plus"></i>
+							Commander ce menu
+						</button>
+					{% endif %}
+				{% else %}
+					<button class="btn btn-secondary btn-lg" disabled>
+						<i class="bi bi-x-circle"></i>
+						Épuisé
+					</button>
+				{% endif %}
+			</div>
 
-        </div>
-    </section>
+		</div>
+	</section>
 
-    {# Modale de connexion pour les non-connectés #}
-    {% if not app.user %}
-        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="loginModalLabel">
-                            <i class="bi bi-lock"></i>
-                            Connexion requise
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                    </div>
-                    <div class="modal-body text-center py-4">
-                        <i class="bi bi-person-circle display-1 text-primary mb-3"></i>
-                        <p class="lead">Pour commander le menu
-                            <strong>{{ menu.titre }}</strong>, veuillez vous connecter ou créer un compte.</p>
-                    </div>
-                    <div class="modal-footer justify-content-center">
-                        <a href="{{ path('app_login') }}?_target_path={{ path('app_commande_new', {menu: menu.id})|url_encode }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            Se connecter
-                        </a>
-                        <a href="{{ path('app_register') }}" class="btn btn-outline-secondary btn-lg">
-                            <i class="bi bi-person-plus"></i>
-                            Créer un compte
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
+	{# Modale de connexion pour les non-connectés #}
+	{% if not app.user %}
+		<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="loginModalLabel">
+							<i class="bi bi-lock"></i>
+							Connexion requise
+						</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+					</div>
+					<div class="modal-body text-center py-4">
+						<i class="bi bi-person-circle display-1 text-primary mb-3"></i>
+						<p class="lead">Pour commander le menu
+							<strong>{{ menu.titre }}</strong>, veuillez vous connecter ou créer un compte.</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<a href="{{ path('app_login') }}?_target_path={{ path('app_commande_new', {menu: menu.id})|url_encode }}" class="btn btn-primary btn-lg">
+							<i class="bi bi-box-arrow-in-right"></i>
+							Se connecter
+						</a>
+						<a href="{{ path('app_register') }}" class="btn btn-outline-secondary btn-lg">
+							<i class="bi bi-person-plus"></i>
+							Créer un compte
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
 {% endblock %}
