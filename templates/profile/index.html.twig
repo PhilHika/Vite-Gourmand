@@ -4,222 +4,222 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container mt-5">
-		<div class="row justify-content-center">
-			<div class="col-lg-10">
-				<div class="card shadow border-0">
-					<div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-						<h2 class="mb-0 fs-4">Mon Profil</h2>
-						<span class="badge bg-light text-primary">
-							{% if is_granted('ROLE_ADMIN') %}
-								Administrateur
-							{% elseif is_granted('ROLE_SALARIE') %}
-								Salarié
-							{% else %}
-								Utilisateur
-							{% endif %}
-						</span>
-					</div>
-					<div class="card-body p-4">
-						<div class="row mb-4">
-							<div class="col-md-12 text-center">
-								<div class="avatar-placeholder rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
-									{{ app.user.prenom|first|upper }}{{ app.user.email|first|upper }}
-								</div>
-								<h4>{{ app.user.prenom }}</h4>
-								<p class="text-muted">{{ app.user.email }}</p>
-							</div>
-						</div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0 fs-4">Mon Profil</h2>
+                        <span class="badge bg-light text-primary">
+                            {% if is_granted('ROLE_ADMIN') %}
+                                Administrateur
+                            {% elseif is_granted('ROLE_SALARIE') %}
+                                Salarié
+                            {% else %}
+                                Utilisateur
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-12 text-center">
+                                <div class="avatar-placeholder rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                                    {{ app.user.prenom|first|upper }}{{ app.user.email|first|upper }}
+                                </div>
+                                <h4>{{ app.user.prenom }}</h4>
+                                <p class="text-muted">{{ app.user.email }}</p>
+                            </div>
+                        </div>
 
-						<hr>
+                        <hr>
 
-						<div class="d-flex justify-content-between align-items-center mb-3">
-							<h5 class="mb-0 text-primary">Informations personnelles</h5>
-							<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-								<i class="bi bi-pencil-square"></i>
-								Modifier
-							</button>
-						</div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-primary">Informations personnelles</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                <i class="bi bi-pencil-square"></i>
+                                Modifier
+                            </button>
+                        </div>
 
-						<div class="row mb-3">
-							<div class="col-md-4 text-muted">Nom</div>
-							<div class="col-md-8 fw-bold">{{ app.user.prenom }}
-								{{ app.user.nom }}</div>
-						</div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">Nom</div>
+                            <div class="col-md-8 fw-bold">{{ app.user.prenom }}
+                                {{ app.user.nom }}</div>
+                        </div>
 
-						<div class="row mb-3">
-							<div class="col-md-4 text-muted">Téléphone</div>
-							<div class="col-md-8 fw-bold">{{ app.user.telephone }}</div>
-						</div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">Téléphone</div>
+                            <div class="col-md-8 fw-bold">{{ app.user.telephone }}</div>
+                        </div>
 
-						<div class="row mb-3">
-							<div class="col-md-4 text-muted">Adresse</div>
-							<div class="col-md-8">
-								{{ app.user.adressePostale }}<br>
-								{{ app.user.ville }},
-								{{ app.user.pays }}
-							</div>
-						</div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 text-muted">Adresse</div>
+                            <div class="col-md-8">
+                                {{ app.user.adressePostale }}<br>
+                                {{ app.user.ville }},
+                                {{ app.user.pays }}
+                            </div>
+                        </div>
 
-						<hr class="mt-4 mb-4">
+                        <hr class="mt-4 mb-4">
 
-						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-							{% if is_granted('ROLE_SALARIE') %}
-								<a href="{{ path('app_admin_menu_index') }}" class="btn btn-success me-md-2">Gestion Menus</a>
-								<a href="{{ path('app_admin_plat_index') }}" class="btn btn-success me-md-2">Gestion Plats</a>
-								<a href="{{ path('app_admin_commande_index') }}" class="btn btn-success me-md-2">Gestion Commandes</a>
-								<a href="{{ path('app_profile_gestion_site') }}" class="btn btn-warning me-md-2">
-									<i class="bi bi-gear"></i>
-									Gérer le site
-								</a>
-							{% endif %}
-							{% if is_granted('ROLE_ADMIN') %}
-								<a href="{{ path('app_admin_user_index') }}" class="btn btn-primary me-md-2">Gérer les roles</a>
-							{% endif %}
-							<a href="{{ path('app_logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            {% if is_granted('ROLE_SALARIE') %}
+                                <a href="{{ path('app_admin_menu_index') }}" class="btn btn-success me-md-2">Gestion Menus</a>
+                                <a href="{{ path('app_admin_plat_index') }}" class="btn btn-success me-md-2">Gestion Plats</a>
+                                <a href="{{ path('app_admin_commande_index') }}" class="btn btn-success me-md-2">Gestion Commandes</a>
+                                <a href="{{ path('app_profile_gestion_site') }}" class="btn btn-warning me-md-2">
+                                    <i class="bi bi-gear"></i>
+                                    Gérer le site
+                                </a>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_admin_user_index') }}" class="btn btn-primary me-md-2">Gérer les roles</a>
+                            {% endif %}
+                            <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		{# === Listing des commandes personnelles === #}
-		<div class="row justify-content-center mt-4">
-			<div class="col-lg-10">
-				<div class="card shadow border-0">
-					<div class="card-header bg-dark text-white py-3">
-						<h5 class="mb-0">
-							<i class="bi bi-bag-check"></i>
-							Mes commandes
-						</h5>
-					</div>
-					<div class="card-body p-0">
-						{% if commandes|length > 0 %}
-							<div class="table-responsive">
-								<table class="table table-hover mb-0 align-middle">
-									<thead class="table-light">
-										<tr>
-											<th>Date prestation</th>
-											<th>Heure</th>
-											<th>Menu</th>
-											<th class="text-end">Prix</th>
-											<th class="text-center">Statut</th>
-											<th class="text-end"></th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for commande in commandes %}
-											<tr>
-												<td>{{ commande.datePrestation|date('d/m/Y') }}</td>
-												<td>{{ commande.heureLivraison }}</td>
-												<td>{{ commande.menu.titre }}</td>
-												<td class="text-end fw-bold">{{ commande.prixMenu|number_format(2, ',', ' ') }}
-													€</td>
-												<td class="text-center">
-													{% if commande.statut == 'en_attente' %}
-														<span class="badge bg-warning text-dark">En attente</span>
-													{% elseif commande.statut == 'confirmee' %}
-														<span class="badge bg-success">Confirmée</span>
-													{% elseif commande.statut == 'en_preparation' %}
-														<span class="badge bg-info">En préparation</span>
-													{% elseif commande.statut == 'livree' %}
-														<span class="badge bg-primary">Livrée</span>
-													{% elseif commande.statut == 'annulee' %}
-														<span class="badge bg-danger">Annulée</span>
-													{% else %}
-														<span class="badge bg-secondary">{{ commande.statut }}</span>
-													{% endif %}
-												</td>
-												<td class="text-end">
-													{% if commande.statut == 'en_attente' %}
-														<form action="{{ path('app_commande_annuler', {numeroCommande: commande.numeroCommande}) }}" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
-															<input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ commande.numeroCommande) }}">
-															<button type="submit" class="btn btn-sm btn-outline-danger">
-																<i class="bi bi-x-circle"></i>
-																Annuler
-															</button>
-														</form>
-													{% endif %}
-													<a href="{{ path('app_commande_show', {numeroCommande: commande.numeroCommande}) }}" class="btn btn-sm btn-outline-primary">
-														<i class="bi bi-eye"></i>
-														Voir détail
-													</a>
-												</td>
-											</tr>
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						{% else %}
-							<div class="text-center py-5">
-								<i class="bi bi-bag display-1 text-muted"></i>
-								<p class="text-muted mt-3 mb-0">Vous n'avez pas encore passé de commande.</p>
-								<a href="{{ path('app_menu_index') }}" class="btn btn-primary mt-3">
-									<i class="bi bi-shop"></i>
-									Découvrir nos menus
-								</a>
-							</div>
-						{% endif %}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+        {# === Listing des commandes personnelles === #}
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-10">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bag-check"></i>
+                            Mes commandes
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if commandes|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date prestation</th>
+                                            <th>Heure</th>
+                                            <th>Menu</th>
+                                            <th class="text-end">Prix</th>
+                                            <th class="text-center">Statut</th>
+                                            <th class="text-end"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for commande in commandes %}
+                                            <tr>
+                                                <td>{{ commande.datePrestation|date('d/m/Y') }}</td>
+                                                <td>{{ commande.heureLivraison }}</td>
+                                                <td>{{ commande.menu.titre }}</td>
+                                                <td class="text-end fw-bold">{{ commande.prixMenu|number_format(2, ',', ' ') }}
+                                                    €</td>
+                                                <td class="text-center">
+                                                    {% if commande.statut == 'en_attente' %}
+                                                        <span class="badge bg-warning text-dark">En attente</span>
+                                                    {% elseif commande.statut == 'confirmee' %}
+                                                        <span class="badge bg-success">Confirmée</span>
+                                                    {% elseif commande.statut == 'en_preparation' %}
+                                                        <span class="badge bg-info">En préparation</span>
+                                                    {% elseif commande.statut == 'livree' %}
+                                                        <span class="badge bg-primary">Livrée</span>
+                                                    {% elseif commande.statut == 'annulee' %}
+                                                        <span class="badge bg-danger">Annulée</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end">
+                                                    {% if commande.statut == 'en_attente' %}
+                                                        <form action="{{ path('app_commande_annuler', {numeroCommande: commande.numeroCommande}) }}" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?')">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ commande.numeroCommande) }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-x-circle"></i>
+                                                                Annuler
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    <a href="{{ path('app_commande_show', {numeroCommande: commande.numeroCommande}) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i>
+                                                        Voir détail
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-bag display-1 text-muted"></i>
+                                <p class="text-muted mt-3 mb-0">Vous n'avez pas encore passé de commande.</p>
+                                <a href="{{ path('app_menu_index') }}" class="btn btn-primary mt-3">
+                                    <i class="bi bi-shop"></i>
+                                    Découvrir nos menus
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	{# === Modal édition profil === #}
-	<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header bg-primary text-white">
-					<h5 class="modal-title" id="editProfileModalLabel">
-						<i class="bi bi-pencil-square"></i>
-						Modifier mes informations
-					</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-				</div>
-				{{ form_start(profile_form, {attr: {novalidate: 'novalidate'}}) }}
-				<div class="modal-body">
-					<div class="row mb-3">
-						<div class="col-md-6">
-							{{ form_row(profile_form.prenom) }}
-						</div>
-						<div class="col-md-6">
-							{{ form_row(profile_form.nom) }}
-						</div>
-					</div>
-					<div class="mb-3">
-						{{ form_row(profile_form.telephone) }}
-					</div>
-					<div class="mb-3">
-						{{ form_row(profile_form.adresse_postale) }}
-					</div>
-					<div class="row mb-3">
-						<div class="col-md-6">
-							{{ form_row(profile_form.ville) }}
-						</div>
-						<div class="col-md-6">
-							{{ form_row(profile_form.pays) }}
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-					<button type="submit" class="btn btn-primary">
-						<i class="bi bi-check-lg"></i>
-						Enregistrer
-					</button>
-				</div>
-				{{ form_end(profile_form) }}
-			</div>
-		</div>
-	</div>
+    {# === Modal édition profil === #}
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editProfileModalLabel">
+                        <i class="bi bi-pencil-square"></i>
+                        Modifier mes informations
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                {{ form_start(profile_form, {attr: {novalidate: 'novalidate'}}) }}
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_row(profile_form.prenom) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(profile_form.nom) }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(profile_form.telephone) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(profile_form.adresse_postale) }}
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_row(profile_form.ville) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(profile_form.pays) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i>
+                        Enregistrer
+                    </button>
+                </div>
+                {{ form_end(profile_form) }}
+            </div>
+        </div>
+    </div>
 
-	{# Ouvrir automatiquement le modal si erreurs de validation #}
-	{% if profile_form.vars.submitted and not profile_form.vars.valid %}
-		<script>
-			document.addEventListener('DOMContentLoaded', function () {
+    {# Ouvrir automatiquement le modal si erreurs de validation #}
+    {% if profile_form.vars.submitted and not profile_form.vars.valid %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
 new bootstrap.Modal(document.getElementById('editProfileModal')).show();
 });
-		</script>
-	{% endif %}
+        </script>
+    {% endif %}
 {% endblock %}
