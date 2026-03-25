@@ -71,6 +71,17 @@ class Commande
     #[ORM\OneToOne(mappedBy: 'commande', targetEntity: Avis::class, cascade: ['persist', 'remove'])]
     private ?Avis $avis = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'L\'adresse de livraison est obligatoire')]
+    private ?string $adresseLivraison = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\NotBlank(message: 'La ville de livraison est obligatoire')]
+    private ?string $villeLivraison = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $paysLivraison = null;
+
     public function getUtilisateur(): ?Utilisateur
     {
         return $this->utilisateur;
@@ -233,6 +244,42 @@ class Commande
         }
 
         $this->avis = $avis;
+
+        return $this;
+    }
+
+    public function getAdresseLivraison(): ?string
+    {
+        return $this->adresseLivraison;
+    }
+
+    public function setAdresseLivraison(?string $adresseLivraison): static
+    {
+        $this->adresseLivraison = $adresseLivraison;
+
+        return $this;
+    }
+
+    public function getVilleLivraison(): ?string
+    {
+        return $this->villeLivraison;
+    }
+
+    public function setVilleLivraison(?string $villeLivraison): static
+    {
+        $this->villeLivraison = $villeLivraison;
+
+        return $this;
+    }
+
+    public function getPaysLivraison(): ?string
+    {
+        return $this->paysLivraison;
+    }
+
+    public function setPaysLivraison(?string $paysLivraison): static
+    {
+        $this->paysLivraison = $paysLivraison;
 
         return $this;
     }

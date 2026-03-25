@@ -142,6 +142,28 @@
                                 </div>
                             </div>
 
+                            <hr>
+                            <h6 class="text-primary fw-bold mb-3">Adresse de livraison</h6>
+
+                            <div class="mb-3">
+                                {{ form_label(form.adresseLivraison) }}
+                                {{ form_widget(form.adresseLivraison) }}
+                                {{ form_errors(form.adresseLivraison) }}
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_label(form.villeLivraison) }}
+                                    {{ form_widget(form.villeLivraison) }}
+                                    {{ form_errors(form.villeLivraison) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.paysLivraison) }}
+                                    {{ form_widget(form.paysLivraison) }}
+                                    {{ form_errors(form.paysLivraison) }}
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 {{ form_label(form.nombrePersonne) }}
                                 {{ form_widget(form.nombrePersonne) }}

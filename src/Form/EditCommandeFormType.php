@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -38,6 +39,22 @@ class EditCommandeFormType extends AbstractType
                     'class' => 'form-control',
                     'min' => $nombrePersonneMin,
                 ],
+            ])
+            ->add('adresseLivraison', TextareaType::class, [
+                'label' => 'Adresse de livraison',
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 2,
+                ],
+            ])
+            ->add('villeLivraison', TextType::class, [
+                'label' => 'Ville de livraison',
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('paysLivraison', TextType::class, [
+                'label' => 'Pays',
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('pretMateriel', CheckboxType::class, [
                 'label' => 'Prêt de matériel (tables, chaises, etc.)',

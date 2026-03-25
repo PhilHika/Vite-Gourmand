@@ -24,6 +24,7 @@
         <li><strong>Menu :</strong> {{ commande.menu.titre }}</li>
         <li><strong>Date de prestation :</strong> {{ commande.datePrestation|date('d/m/Y') }}</li>
         <li><strong>Heure de livraison :</strong> {{ commande.heureLivraison }}</li>
+        <li><strong>Adresse de livraison :</strong> {{ commande.adresseLivraison }} - {{ commande.villeLivraison }} {{ commande.paysLivraison ? '(' ~ commande.paysLivraison ~ ')' : '' }}</li>
         <li><strong>Nombre de personnes :</strong> {{ commande.nombrePersonne }}</li>
         <li><strong>Prix menu :</strong> {{ commande.prixMenu|number_format(2, ',', ' ') }} €</li>
     </ul>

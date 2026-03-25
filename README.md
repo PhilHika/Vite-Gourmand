@@ -171,11 +171,17 @@ Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml` (p
 
 ### 🛒 Système de Commande
 
-#### Parcours utilisateur
+#### Parcours de Commande & Checkout Interactif
 
-1. **Connecté** : Clic sur "Commander" (menu ciblé) → Formulaire pré-rempli → Récapitulatif
-2. **Non connecté** : Clic sur "Commander" → Modale d'invitation → Redirection automatique après login
-3. **Accès direct** (`/commande/new`) : Sélection du menu dans le listing intégré → Formulaire
+Afin d'offrir une expérience utilisateur (UX) moderne et fluide, le tunnel de validation de commande a été repensé en deux approches :
+1. **Accès direct sans menu initial** : L'utilisateur se rend sur la page de commande `/commande/new`. Il renseigne **d'abord** ses informations de livraison (date, heure, adresse, nombre de personnes). Ensuite, un bouton ouvre une **fenêtre modale (popup) interactive** affichant le catalogue. La sélection soumet dynamiquement le formulaire (via JavaScript) sans perte de contexte, l'amenant directement au récapitulatif final.
+2. **Accès ciblé depuis une fiche Menu** : L'utilisateur arrive sur le formulaire avec le menu déjà pré-sélectionné en URL (`?menu=ID`). Le formulaire de livraison et le récapitulatif tarifaire sont affichés simultanément.
+3. *Note : Si l'utilisateur n'est pas connecté, une modale d'invitation le redirige vers le login.*
+
+> **📍 Justification architecturale (Écart par rapport au schéma initial ECF)**
+> Le schéma de base de données (UML) fourni en annexe de l'évaluation ne prévoyait pas d'informations d'adresse sur l'entité `Commande` (les coordonnées n'étaient rattachées qu'à `Utilisateur`).
+> Toutefois, la logique métier inhérente à une application Traiteur/E-commerce exige la possibilité de spécifier une adresse de livraison ponctuelle (entreprise, lieu de réception) différente de l'adresse de facturation/profil, et requiert de conserver une trace *immuable* de cette adresse dans l'historique de la commande même en cas de déménagement du client.
+> **J'ai donc fait le choix conceptuel fort d'ajouter les attributs `adresseLivraison`, `villeLivraison` et `paysLivraison` directement sur l'entité `Commande`**. Cet écart assumé par rapport au schéma de départ permet de répondre aux véritables exigences de l'évaluation avec un livrable réaliste, fonctionnel et professionnel.
 
 #### Réduction tarifaire
 

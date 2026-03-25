@@ -50,6 +50,23 @@
                                             {{ form_widget(edit_form.heureLivraison) }}
                                             {{ form_errors(edit_form.heureLivraison) }}
                                         </div>
+                                        <div class="mb-3">
+                                            {{ form_label(edit_form.adresseLivraison) }}
+                                            {{ form_widget(edit_form.adresseLivraison) }}
+                                            {{ form_errors(edit_form.adresseLivraison) }}
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                {{ form_label(edit_form.villeLivraison) }}
+                                                {{ form_widget(edit_form.villeLivraison) }}
+                                                {{ form_errors(edit_form.villeLivraison) }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form_label(edit_form.paysLivraison) }}
+                                                {{ form_widget(edit_form.paysLivraison) }}
+                                                {{ form_errors(edit_form.paysLivraison) }}
+                                            </div>
+                                        </div>
                                     {% else %}
                                         <p>
                                             <strong>Date de prestation :</strong><br>
@@ -58,6 +75,11 @@
                                         <p>
                                             <strong>Heure de livraison :</strong><br>
                                             {{ commande.heureLivraison }}
+                                        </p>
+                                        <p>
+                                            <strong>Adresse de livraison :</strong><br>
+                                            {{ commande.adresseLivraison }}<br>
+                                            {{ commande.villeLivraison }} {{ commande.paysLivraison ? ' - ' ~ commande.paysLivraison : '' }}
                                         </p>
                                     {% endif %}
                                 </div>

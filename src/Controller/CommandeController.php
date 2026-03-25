@@ -40,19 +40,14 @@ class CommandeController extends AbstractController
             }
         }
 
-        // Si pas de menu sélectionné → afficher le listing des menus
-        if (!$menu) {
-            return $this->render('commande/new.html.twig', [
-                'menu' => null,
-                'menus' => $menuRepository->findAll(),
-                'form' => null,
-            ]);
-        }
-
-        // Créer la commande et pré-remplir
+        // On instancie toujours la commande et le formulaire
         $commande = new Commande();
-        $commande->setMenu($menu);
-        $commande->setNombrePersonne($menu->getNombrePersonneMinimum());
+        if ($menu) {
+            $commande->setMenu($menu);
+            $commande->setNombrePersonne($menu->getNombrePersonneMinimum());
+        } else {
+            $commande->setNombrePersonne(1);
+        }
         $commande->setDatePrestation(new \DateTime('+1 day'));
         $commande->setHeureLivraison('12:00');
 
@@ -62,12 +57,27 @@ class CommandeController extends AbstractController
         $commande->setRestitutionMateriel(false);
         $commande->setPrixLivraison(0);
 
+        // Pré-remplir l'adresse de livraison depuis le profil utilisateur
+        $commande->setAdresseLivraison($this->getUser()->getAdressePostale());
+        $commande->setVilleLivraison($this->getUser()->getVille());
+        $commande->setPaysLivraison($this->getUser()->getPays());
+
         $form = $this->createForm(CommandeFormType::class, $commande, [
-            'nombre_personne_min' => $menu->getNombrePersonneMinimum(),
+            'nombre_personne_min' => $menu ? $menu->getNombrePersonneMinimum() : 1,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$menu) {
+                $this->addFlash('error', 'Veuillez choisir un menu avant de pouvoir calculer le prix.');
+                return $this->render('commande/new.html.twig', [
+                    'menu' => null,
+                    'menus' => $menuRepository->findAll(),
+                    'form' => $form->createView(),
+                    'seuil_reduction' => 0,
+                ]);
+            }
+
             // Vérification stock au moment de la soumission
             if ($menu->getQuantiteRestante() <= 0) {
                 $this->addFlash('error', 'Désolé, ce menu vient d\'être épuisé.');
@@ -82,8 +92,8 @@ class CommandeController extends AbstractController
                 ));
                 return $this->render('commande/new.html.twig', [
                     'menu' => $menu,
-                    'menus' => null,
-                    'form' => $form,
+                    'menus' => $menuRepository->findAll(),
+                    'form' => $form->createView(),
                     'seuil_reduction' => $menu->getNombrePersonneMinimum() + 5,
                 ]);
             }
@@ -114,8 +124,8 @@ class CommandeController extends AbstractController
 
             return $this->render('commande/new.html.twig', [
                 'menu' => $menu,
-                'menus' => null,
-                'form' => $form,
+                'menus' => $menuRepository->findAll(),
+                'form' => $form->createView(),
                 'seuil_reduction' => $menu->getNombrePersonneMinimum() + 5,
                 'recap_prix' => true,
                 'prix_base' => $prixBase,
@@ -125,12 +135,12 @@ class CommandeController extends AbstractController
         }
 
         // Vérifier si réduction applicable pour l'affichage
-        $seuilReduction = $menu->getNombrePersonneMinimum() + 5;
+        $seuilReduction = $menu ? $menu->getNombrePersonneMinimum() + 5 : 0;
 
         return $this->render('commande/new.html.twig', [
             'menu' => $menu,
-            'menus' => null,
-            'form' => $form,
+            'menus' => $menuRepository->findAll(),
+            'form' => $form->createView(),
             'seuil_reduction' => $seuilReduction,
         ]);
     }
