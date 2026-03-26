@@ -166,8 +166,10 @@
 
                                     <!-- Prix -->
                                     {% if menu.getPrixParPersonne is not null %}
-                                        <p class="fw-bold mb-2">{{ menu.getPrixParPersonne|number_format(2, ',', ' ') }}
-                                            €</p>
+                                        <div class="mb-3">
+                                            <p class="fw-bold mb-0">{{ menu.getPrixParPersonne|number_format(2, ',', ' ') }} € <small class="text-muted fw-normal">/ pers.</small></p>
+                                            <span class="text-muted small"><i class="bi bi-people"></i> Minimum {{ menu.nombrePersonneMinimum }} personne{{ menu.nombrePersonneMinimum > 1 ? 's' : '' }}</span>
+                                        </div>
                                     {% endif %}
 
                                     <!-- Boutons -->

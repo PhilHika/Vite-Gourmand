@@ -269,7 +269,10 @@
                                         </div>
                                         <div class="card-footer bg-transparent border-top-0 d-grid gap-2">
                                             {% if m.getPrixParPersonne is not null %}
-                                                <p class="fw-bold text-center mb-2">{{ m.getPrixParPersonne|number_format(2, ',', ' ') }} €</p>
+                                                <div class="text-center mb-2">
+                                                    <p class="fw-bold mb-0">{{ m.getPrixParPersonne|number_format(2, ',', ' ') }} € <small class="text-muted fw-normal">/ pers.</small></p>
+                                                    <span class="text-muted small"><i class="bi bi-people"></i> Min. {{ m.nombrePersonneMinimum }} pers.</span>
+                                                </div>
                                             {% endif %}
                                             
                                             {% if m.getQuantiteRestante > 0 %}
