@@ -105,6 +105,9 @@ class CommandeController extends AbstractController
             if ($request->request->get('_confirmed') === '1') {
                 // Décrémenter le stock
                 $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+                
+                // Mémoriser les conditions du menu (snapshot)
+                $commande->setConditionsMenu($menu->getConditions());
 
                 $em->persist($commande);
                 $em->flush();

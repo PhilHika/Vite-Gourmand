@@ -55,6 +55,9 @@ class Menu
     #[Assert\PositiveOrZero(message: 'La quantité doit être positive')]
     private ?int $quantiteRestante = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $conditions = null;
+
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -150,6 +153,18 @@ class Menu
     public function setQuantiteRestante(int $quantiteRestante): static
     {
         $this->quantiteRestante = $quantiteRestante;
+
+        return $this;
+    }
+
+    public function getConditions(): ?array
+    {
+        return $this->conditions;
+    }
+
+    public function setConditions(?array $conditions): static
+    {
+        $this->conditions = $conditions;
 
         return $this;
     }

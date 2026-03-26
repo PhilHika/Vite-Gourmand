@@ -82,6 +82,9 @@ class Commande
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $paysLivraison = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $conditionsMenu = null;
+
     public function getUtilisateur(): ?Utilisateur
     {
         return $this->utilisateur;
@@ -280,6 +283,18 @@ class Commande
     public function setPaysLivraison(?string $paysLivraison): static
     {
         $this->paysLivraison = $paysLivraison;
+
+        return $this;
+    }
+
+    public function getConditionsMenu(): ?array
+    {
+        return $this->conditionsMenu;
+    }
+
+    public function setConditionsMenu(?array $conditionsMenu): static
+    {
+        $this->conditionsMenu = $conditionsMenu;
 
         return $this;
     }

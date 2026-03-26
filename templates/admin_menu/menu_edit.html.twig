@@ -221,6 +221,44 @@
             </div>
         </div>
 
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Conditions et précautions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-text mb-3">Ajoutez des règles spécifiques pour ce menu (ex: "A conserver au frais", "Commander 48h à l'avance").</div>
+                        
+                        {# Wrapper for the items, with prototype for JS #}
+                        <div class="conditions-wrapper" 
+                             data-index="{{ form.conditions|length > 0 ? form.conditions|last.vars.name + 1 : 0 }}"
+                             data-prototype="{{ form_widget(form.conditions.vars.prototype)|e('html_attr') }}">
+                            
+                            {% for condition in form.conditions %}
+                                <div class="condition-item mb-2 d-flex">
+                                    <div class="flex-grow-1">
+                                        {{ form_widget(condition) }}
+                                        {{ form_errors(condition) }}
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger ms-2 remove-condition">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-success mt-2 add-condition">
+                            <i class="bi bi-plus-circle"></i> Ajouter une condition
+                        </button>
+                        
+                        {# Mark conditions as rendered so form_end doesn't reprint them #}
+                        {% do form.conditions.setRendered() %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-primary mt-4">
             {% if menu.id %}
                 Mettre à jour
@@ -231,4 +269,47 @@
         <a href="{{ path('app_admin_menu_index') }}" class="btn btn-secondary mt-4 ms-2">Retour à la gestion</a>
         {{ form_end(form) }}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.querySelector('.conditions-wrapper');
+            const addButton = document.querySelector('.add-condition');
+            
+            if (!wrapper || !addButton) return;
+            
+            addButton.addEventListener('click', function() {
+                const prototype = wrapper.dataset.prototype;
+                const index = parseInt(wrapper.dataset.index);
+                
+                // Replace __name__ with the new index
+                let newForm = prototype.replace(/__name__/g, index);
+                
+                // Increment index
+                wrapper.dataset.index = index + 1;
+                
+                // Create new element
+                const div = document.createElement('div');
+                div.className = 'condition-item mb-2 d-flex';
+                div.innerHTML = `
+                    <div class="flex-grow-1">${newForm}</div>
+                    <button type="button" class="btn btn-outline-danger ms-2 remove-condition" title="Supprimer">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                
+                wrapper.appendChild(div);
+            });
+            
+            // Delegate event listener for delete buttons
+            wrapper.addEventListener('click', function(e) {
+                const removeBtn = e.target.closest('.remove-condition');
+                if (removeBtn) {
+                    removeBtn.closest('.condition-item').remove();
+                }
+            });
+        });
+    </script>
 {% endblock %}

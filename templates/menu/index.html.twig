@@ -149,6 +149,17 @@
 									                                        <p class="text-muted small">{{ menu.description }}</p>
 									                                    {% endif %}
 									#}
+
+                                    {% if menu.conditions|length > 0 %}
+                                        <div class="mt-2 text-start">
+                                            <p class="small fw-bold mb-1 text-primary"><i class="bi bi-info-circle"></i> Conditions :</p>
+                                            <ul class="small text-muted ps-3 mb-0">
+                                            {% for condition in menu.conditions %}
+                                                <li>{{ condition }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
 									{#
                                     <!-- Allergènes (dédupliqués par libelle) -->
                                     {% set seenAllergenes = [] %}

@@ -160,6 +160,17 @@
                                     {% endfor %}
                                 </ul>
                             {% endif %}
+                            
+                            {% if commande.conditionsMenu|length > 0 %}
+                                <h6 class="mt-4 fw-bold text-info-emphasis"><i class="bi bi-info-circle-fill me-1"></i>Conditions applicables :</h6>
+                                <ul class="list-group list-group-flush border-start border-4 border-info rounded">
+                                    {% for condition in commande.conditionsMenu %}
+                                        <li class="list-group-item bg-light text-muted small py-2">
+                                            {{ condition }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     </div>
 
