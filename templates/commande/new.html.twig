@@ -199,6 +199,19 @@
                                     </label>
                                 </div>
 
+                                {% if menu and menu.conditions is defined and menu.conditions|length > 0 %}
+                                    <div class="border border-warning p-3 mb-3 text-start" style="border-radius: 5px; background-color: #fffaf0;">
+                                        <h6 class="fw-bold text-warning-emphasis mb-2">
+                                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Conditions
+                                        </h6>
+                                        <ul class="mb-0 small text-muted ps-3">
+                                            {% for condition in menu.conditions %}
+                                                <li>{{ condition }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+
                                 <div class="d-grid gap-2">
                                     <input type="hidden" name="_confirmed" value="1">
                                     <button type="submit" id="btnConfirmerCommande" class="btn btn-success btn-lg" disabled>
@@ -211,6 +224,19 @@
 
                             {% else %}
                                 {# === ÉTAPE 1 : Soumettre === #}
+                                {% if menu and menu.conditions is defined and menu.conditions|length > 0 %}
+                                    <div class="border border-warning p-3 mt-4 mb-3 text-start" style="border-radius: 5px; background-color: #fffaf0;">
+                                        <h6 class="fw-bold text-warning-emphasis mb-2">
+                                            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Conditions
+                                        </h6>
+                                        <ul class="mb-0 small text-muted ps-3">
+                                            {% for condition in menu.conditions %}
+                                                <li>{{ condition }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+
                                 <div class="d-grid gap-2 mt-4">
                                     {% if menu %}
                                         <button type="submit" class="btn btn-success btn-lg">
@@ -272,6 +298,19 @@
                                                 <div class="text-center mb-2">
                                                     <p class="fw-bold mb-0">{{ m.getPrixParPersonne|number_format(2, ',', ' ') }} € <small class="text-muted fw-normal">/ pers.</small></p>
                                                     <span class="text-muted small"><i class="bi bi-people"></i> Min. {{ m.nombrePersonneMinimum }} pers.</span>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if m.conditions is defined and m.conditions|length > 0 %}
+                                                <div class="border border-warning p-2 mb-2 text-start" style="border-radius: 5px; background-color: #fffaf0;">
+                                                    <h6 class="fw-bold text-warning-emphasis mb-1" style="font-size: 0.9rem;">
+                                                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Conditions
+                                                    </h6>
+                                                    <ul class="mb-0 small text-muted ps-3" style="font-size: 0.8rem;">
+                                                        {% for condition in m.conditions %}
+                                                            <li>{{ condition }}</li>
+                                                        {% endfor %}
+                                                    </ul>
                                                 </div>
                                             {% endif %}
                                             
