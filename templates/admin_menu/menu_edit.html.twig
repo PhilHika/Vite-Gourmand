@@ -229,12 +229,12 @@
                     </div>
                     <div class="card-body">
                         <div class="form-text mb-3">Ajoutez des règles spécifiques pour ce menu (ex: "A conserver au frais", "Commander 48h à l'avance").</div>
-                        
+
                         {# Wrapper for the items, with prototype for JS #}
-                        <div class="conditions-wrapper" 
+                        <div class="conditions-wrapper"
                              data-index="{{ form.conditions|length > 0 ? form.conditions|last.vars.name + 1 : 0 }}"
                              data-prototype="{{ form_widget(form.conditions.vars.prototype)|e('html_attr') }}">
-                            
+
                             {% for condition in form.conditions %}
                                 <div class="condition-item mb-2 d-flex">
                                     <div class="flex-grow-1">
@@ -247,11 +247,11 @@
                                 </div>
                             {% endfor %}
                         </div>
-                        
+
                         <button type="button" class="btn btn-outline-success mt-2 add-condition">
                             <i class="bi bi-plus-circle"></i> Ajouter une condition
                         </button>
-                        
+
                         {# Mark conditions as rendered so form_end doesn't reprint them #}
                         {% do form.conditions.setRendered() %}
                     </div>
@@ -277,19 +277,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             const wrapper = document.querySelector('.conditions-wrapper');
             const addButton = document.querySelector('.add-condition');
-            
+
             if (!wrapper || !addButton) return;
-            
+
             addButton.addEventListener('click', function() {
                 const prototype = wrapper.dataset.prototype;
                 const index = parseInt(wrapper.dataset.index);
-                
+
                 // Replace __name__ with the new index
                 let newForm = prototype.replace(/__name__/g, index);
-                
+
                 // Increment index
                 wrapper.dataset.index = index + 1;
-                
+
                 // Create new element
                 const div = document.createElement('div');
                 div.className = 'condition-item mb-2 d-flex';
@@ -299,10 +299,10 @@
                         <i class="bi bi-trash"></i>
                     </button>
                 `;
-                
+
                 wrapper.appendChild(div);
             });
-            
+
             // Delegate event listener for delete buttons
             wrapper.addEventListener('click', function(e) {
                 const removeBtn = e.target.closest('.remove-condition');

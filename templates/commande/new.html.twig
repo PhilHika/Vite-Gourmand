@@ -313,7 +313,7 @@
                                                     </ul>
                                                 </div>
                                             {% endif %}
-                                            
+
                                             {% if m.getQuantiteRestante > 0 %}
                                                 <button type="button" class="btn btn-success btn-choose-menu" data-menu-id="{{ m.id }}">
                                                     <i class="bi bi-check-circle"></i> Sélectionner ce menu
@@ -321,7 +321,7 @@
                                             {% else %}
                                                 <button class="btn btn-secondary" disabled><i class="bi bi-x-circle"></i> Épuisé</button>
                                             {% endif %}
-                                            
+
                                             <a href="{{ path('app_menu_show', {id: m.id}) }}" target="_blank" class="btn btn-outline-dark">
                                                 <i class="bi bi-box-arrow-up-right"></i> Voir les détails
                                             </a>
@@ -341,7 +341,7 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const buttons = document.querySelectorAll('.btn-choose-menu');
                 const form = document.querySelector('form[name="commande_form"]');
-                
+
                 buttons.forEach(btn => {
                     btn.addEventListener('click', function() {
                         const menuId = this.dataset.menuId;
@@ -349,14 +349,14 @@
                         if (!action) {
                             action = window.location.pathname;
                         }
-                        
+
                         // Assurer que les paramètres existants sont nettoyés ou gérés (en particulier 'menu')
                         if (action.includes('?menu=')) {
                             action = action.split('?')[0];
                         }
-                        
+
                         form.setAttribute('action', action + '?menu=' + menuId);
-                        
+
                         // Fermer la modale visuellement avant le rechargement de la page (optionnel)
                         const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
                         if (modal) modal.hide();
