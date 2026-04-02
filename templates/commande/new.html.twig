@@ -23,8 +23,8 @@
                             </h5>
                         </div>
 
-                        {% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
-                            {% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+                        {% if menu.plats|length > 0 %}
+                            {% set menuImage = asset(menu.plats|first.photoPath) %}
                         {% else %}
                             {% set menuImage = asset('images/menus/default.jpg') %}
                         {% endif %}
@@ -276,8 +276,8 @@
                             {% for m in menus %}
                                 <div class="col">
                                     <div class="card h-100 shadow-sm border-0">
-                                        {% if m.plats|length > 0 and m.plats|first.photo is not empty %}
-                                            {% set menuImage = path('app_admin_plat_image', {id: m.plats|first.id}) %}
+                                        {% if m.plats|length > 0 %}
+                                            {% set menuImage = asset(m.plats|first.photoPath) %}
                                         {% else %}
                                             {% set menuImage = asset('images/menus/default.jpg') %}
                                         {% endif %}

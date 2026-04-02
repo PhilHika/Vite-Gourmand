@@ -20,6 +20,11 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
+###> uploads ###
+/public/uploads/plats/*
+!/public/uploads/plats/.gitkeep
+###< uploads ###
+
 ###> Docker ###
 docker/volumes
 docker/db_data/

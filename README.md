@@ -169,6 +169,18 @@ Configuré via `SendEmailMessage: sync` dans `config/packages/messenger.yaml` (p
 - **Dev** : Mailpit sur `smtp://localhost:1025` (interface : http://localhost:8025)
 - **Prod** : SMTP réel (Gmail, SendGrid, Brevo, etc.) via `MAILER_DSN` dans `.env.local`
 
+### 🖼️ Gestion des médias (Images)
+
+Afin de garantir des performances optimales et une mise en cache efficace, les images des plats ne sont pas stockées en base de données, mais téléversées dans le système de fichiers (`public/uploads/plats/`). L'entité ne conserve qu'une chaîne de caractères (`VARCHAR`) correspondant au nom du fichier.
+
+> **📍 Justification architecturale (Écart par rapport au schéma initial ECF)**
+> Le schéma de base de données (UML) fourni prévoyait un attribut `photo` de type `BLOB` sur l'entité `Plat`.
+> Dans un contexte professionnel, stocker des fichiers binaires (images) directement dans une base de données relationnelle est considéré comme une anti-pattern pour plusieurs raisons structurelles :
+> 1. **Performances et volume BDD** : Les BLOBs alourdissent considérablement le poids de la base de données, ce qui ralentit drastiquement les requêtes SQL, la consommation de RAM, ainsi que les opérations de sauvegarde (dump) et de restauration.
+> 2. **Mise en cache serveur et CDN** : Servir une image depuis un BLOB nécessite systématiquement d'invoquer le processeur PHP (via un Contrôleur) pour extraire et retourner les flux binaires. En stockant le fichier sur le disque (`/public/`), on délègue cette tâche au serveur web (Nginx) qui sert ces fichiers statiques instantanément tout en tirant parti du cache navigateur client et d'un éventuel CDN. 
+> 3. **Scalabilité** : Conserver uniquement les chemins (URL) en base de données permet d'isoler le stockage des fichiers. Si l'application évolue, il sera aisé de déporter le dossier d'upload vers un stockage objet externe de type Amazon S3 sans aucune modification du schéma de données.
+> **Ce changement vers un `VARCHAR(255)` est donc une décision d'optimisation technique majeure pour répondre aux standards de l'industrie.**
+
 ### 🛒 Système de Commande
 
 #### Parcours de Commande & Checkout Interactif

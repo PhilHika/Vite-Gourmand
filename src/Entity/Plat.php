@@ -27,8 +27,8 @@ class Plat
     #[ORM\InverseJoinColumn(name: 'allergene_id', referencedColumnName: 'allergene_id')]
     private Collection $allergenes;
 
-    #[ORM\Column(name: 'photo', type: 'blob', nullable: true)]
-    private $photo = null;
+    #[ORM\Column(name: 'photo', length: 255, nullable: true)]
+    private ?string $photo = null;
 
     #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'plats')]
     private Collection $menus;
@@ -109,21 +109,24 @@ class Plat
         return $this;
     }
 
-    /**
-     * @return resource|string|null
-     */
-    public function getPhoto()
+    public function getPhoto(): ?string
     {
         return $this->photo;
     }
 
-    /**
-     * @param resource|string|null $photo
-     */
-    public function setPhoto($photo): static
+    public function setPhoto(?string $photo): static
     {
         $this->photo = $photo;
 
         return $this;
+    }
+
+    /**
+     * Retourne le chemin web relatif de la photo pour utilisation avec asset().
+     * S'il n'y a pas d'image, retourne l'image par défaut.
+     */
+    public function getPhotoPath(): string
+    {
+        return $this->photo ? 'uploads/plats/' . $this->photo : 'images/default_plat.jpg';
     }
 }
