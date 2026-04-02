@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Form\CommandeFormType;
+use App\Form\EditCommandeFormType;
 use App\Repository\MenuRepository;
 use App\Service\CommandeMailerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,19 +40,14 @@ class CommandeController extends AbstractController
             }
         }
 
-        // Si pas de menu sélectionné → afficher le listing des menus
-        if (!$menu) {
-            return $this->render('commande/new.html.twig', [
-                'menu' => null,
-                'menus' => $menuRepository->findAll(),
-                'form' => null,
-            ]);
-        }
-
-        // Créer la commande et pré-remplir
+        // On instancie toujours la commande et le formulaire
         $commande = new Commande();
-        $commande->setMenu($menu);
-        $commande->setNombrePersonne($menu->getNombrePersonneMinimum());
+        if ($menu) {
+            $commande->setMenu($menu);
+            $commande->setNombrePersonne($menu->getNombrePersonneMinimum());
+        } else {
+            $commande->setNombrePersonne(1);
+        }
         $commande->setDatePrestation(new \DateTime('+1 day'));
         $commande->setHeureLivraison('12:00');
 
@@ -61,12 +57,27 @@ class CommandeController extends AbstractController
         $commande->setRestitutionMateriel(false);
         $commande->setPrixLivraison(0);
 
+        // Pré-remplir l'adresse de livraison depuis le profil utilisateur
+        $commande->setAdresseLivraison($this->getUser()->getAdressePostale());
+        $commande->setVilleLivraison($this->getUser()->getVille());
+        $commande->setPaysLivraison($this->getUser()->getPays());
+
         $form = $this->createForm(CommandeFormType::class, $commande, [
-            'nombre_personne_min' => $menu->getNombrePersonneMinimum(),
+            'nombre_personne_min' => $menu ? $menu->getNombrePersonneMinimum() : 1,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$menu) {
+                $this->addFlash('error', 'Veuillez choisir un menu avant de pouvoir calculer le prix.');
+                return $this->render('commande/new.html.twig', [
+                    'menu' => null,
+                    'menus' => $menuRepository->findAll(),
+                    'form' => $form->createView(),
+                    'seuil_reduction' => 0,
+                ]);
+            }
+
             // Vérification stock au moment de la soumission
             if ($menu->getQuantiteRestante() <= 0) {
                 $this->addFlash('error', 'Désolé, ce menu vient d\'être épuisé.');
@@ -81,8 +92,8 @@ class CommandeController extends AbstractController
                 ));
                 return $this->render('commande/new.html.twig', [
                     'menu' => $menu,
-                    'menus' => null,
-                    'form' => $form,
+                    'menus' => $menuRepository->findAll(),
+                    'form' => $form->createView(),
                     'seuil_reduction' => $menu->getNombrePersonneMinimum() + 5,
                 ]);
             }
@@ -94,6 +105,9 @@ class CommandeController extends AbstractController
             if ($request->request->get('_confirmed') === '1') {
                 // Décrémenter le stock
                 $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
+                
+                // Mémoriser les conditions du menu (snapshot)
+                $commande->setConditionsMenu($menu->getConditions());
 
                 $em->persist($commande);
                 $em->flush();
@@ -113,8 +127,8 @@ class CommandeController extends AbstractController
 
             return $this->render('commande/new.html.twig', [
                 'menu' => $menu,
-                'menus' => null,
-                'form' => $form,
+                'menus' => $menuRepository->findAll(),
+                'form' => $form->createView(),
                 'seuil_reduction' => $menu->getNombrePersonneMinimum() + 5,
                 'recap_prix' => true,
                 'prix_base' => $prixBase,
@@ -124,21 +138,57 @@ class CommandeController extends AbstractController
         }
 
         // Vérifier si réduction applicable pour l'affichage
-        $seuilReduction = $menu->getNombrePersonneMinimum() + 5;
+        $seuilReduction = $menu ? $menu->getNombrePersonneMinimum() + 5 : 0;
 
         return $this->render('commande/new.html.twig', [
             'menu' => $menu,
-            'menus' => null,
-            'form' => $form,
+            'menus' => $menuRepository->findAll(),
+            'form' => $form->createView(),
             'seuil_reduction' => $seuilReduction,
         ]);
     }
 
-    #[Route('/{numeroCommande}', name: 'app_commande_show', methods: ['GET'])]
+    #[Route('/{numeroCommande}/annuler', name: 'app_commande_annuler', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function annuler(
+        #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
+        Commande $commande,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        if ($commande->getUtilisateur() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette commande.');
+        }
+
+        if ($commande->getStatut() !== Commande::STATUT_EN_ATTENTE) {
+            $this->addFlash('danger', 'Cette commande ne peut plus être annulée.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        if (!$this->isCsrfTokenValid('annuler_' . $commande->getNumeroCommande(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $commande->setStatut(Commande::STATUT_ANNULEE);
+
+        // Restituer le stock du menu
+        $menu = $commande->getMenu();
+        $menu->setQuantiteRestante($menu->getQuantiteRestante() + 1);
+
+        $em->flush();
+
+        $this->addFlash('success', 'Votre commande a été annulée.');
+        return $this->redirectToRoute('app_profile');
+    }
+
+    #[Route('/{numeroCommande}', name: 'app_commande_show', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
     public function show(
         #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
-        Commande $commande
+        Commande $commande,
+        Request $request,
+        EntityManagerInterface $em
     ): Response {
         // Sécurité : seul le propriétaire ou un salarié/admin peut voir
         if (
@@ -148,15 +198,74 @@ class CommandeController extends AbstractController
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette commande.');
         }
 
+        $editable = $commande->getStatut() === Commande::STATUT_EN_ATTENTE;
+        $editForm = null;
+
+        if ($editable) {
+            $menu = $commande->getMenu();
+            $editForm = $this->createForm(EditCommandeFormType::class, $commande, [
+                'nombre_personne_min' => $menu->getNombrePersonneMinimum(),
+            ]);
+            $editForm->handleRequest($request);
+
+            if ($editForm->isSubmitted() && $editForm->isValid()) {
+                // Validation nombrePersonne >= minimum
+                if ($commande->getNombrePersonne() < $menu->getNombrePersonneMinimum()) {
+                    $this->addFlash('danger', sprintf(
+                        'Le nombre de personnes doit être d\'au moins %d pour ce menu.',
+                        $menu->getNombrePersonneMinimum()
+                    ));
+                } else {
+                    // Recalculer le prix si le nombre de personnes a changé
+                    $commande->calculerPrixMenu();
+                    $em->flush();
+
+                    $this->addFlash('success', 'La commande a été mise à jour.');
+                    return $this->redirectToRoute('app_commande_show', [
+                        'numeroCommande' => $commande->getNumeroCommande(),
+                    ]);
+                }
+            }
+        }
+
         // Vérifier si la réduction a été appliquée
         $menu = $commande->getMenu();
         $prixSansReduction = $menu->getPrixParPersonne() * $commande->getNombrePersonne();
         $reductionAppliquee = $commande->getPrixMenu() < $prixSansReduction;
 
+        $avisForm = null;
+
+        // Si la commande est livrée et qu'aucun avis n'a été déposé
+        if ($commande->getStatut() === Commande::STATUT_LIVREE && !$commande->getAvis()) {
+            $avis = new \App\Entity\Avis();
+            $avis->setCommande($commande);
+            $avis->setUtilisateur($this->getUser());
+            $avis->setStatut(\App\Entity\Avis::STATUT_EN_ATTENTE);
+
+            // Create form directly using fully-qualified name to avoid missing imports in use statements
+            $form = $this->createForm(\App\Form\AvisFormType::class, $avis);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->persist($avis);
+                $em->flush();
+
+                $this->addFlash('success', 'Merci pour votre avis ! Il sera publié après validation par notre équipe.');
+                return $this->redirectToRoute('app_commande_show', [
+                    'numeroCommande' => $commande->getNumeroCommande(),
+                ]);
+            }
+
+            $avisForm = $form->createView();
+        }
+
         return $this->render('commande/show.html.twig', [
             'commande' => $commande,
             'reduction_appliquee' => $reductionAppliquee,
             'prix_sans_reduction' => $prixSansReduction,
+            'edit_form' => $editForm?->createView(),
+            'editable' => $editable,
+            'avis_form' => $avisForm,
         ]);
     }
 }

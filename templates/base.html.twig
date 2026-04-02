@@ -23,7 +23,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="{{ asset('assets/styles/styles.css') }}"> {% block stylesheets %}{% endblock %}
+        <link rel="stylesheet" href="{{ asset('css/styles.css') }}"> {% block stylesheets %}{% endblock %}
 
         {% block javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -77,11 +77,94 @@
 
             <footer class="py-5 bg-dark flex-shrink-0">
                 <div class="container">
+                    {% set horaires = get_horaires() %}
+                    {% if horaires|filter(h => h is not null)|length > 0 %}
+                        <div class="footer-horaires text-center mb-4">
+                            <h6 class="footer-horaires__titre text-white mb-3">
+                                <i class="bi bi-clock"></i> Horaires d'ouverture
+                            </h6>
+                            {% set colGauche = ['Lundi', 'Mardi', 'Mercredi'] %}
+                            {% set colDroite = ['Jeudi', 'Vendredi', 'Samedi'] %}
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <table class="footer-horaires__table table table-sm mb-0" style="width: auto;">
+                                        <thead class="visually-hidden">
+                                            <tr>
+                                                <th>Jour</th>
+                                                <th>Horaires</th>
+                                                <th>Jour</th>
+                                                <th>Horaires</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for i in 0..2 %}
+                                                <tr class="footer-horaires__row">
+                                                    <td class="footer-horaires__jour fw-semibold">{{ colGauche[i] }}</td>
+                                                    <td class="footer-horaires__heures">
+                                                        {% if horaires[colGauche[i]] %}
+                                                            {{ horaires[colGauche[i]].ouverture }} - {{ horaires[colGauche[i]].fermeture }}
+                                                        {% else %}
+                                                            <span class="footer-horaires__ferme fst-italic">Fermé</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="footer-horaires__jour fw-semibold">{{ colDroite[i] }}</td>
+                                                    <td class="footer-horaires__heures">
+                                                        {% if horaires[colDroite[i]] %}
+                                                            {{ horaires[colDroite[i]].ouverture }} - {{ horaires[colDroite[i]].fermeture }}
+                                                        {% else %}
+                                                            <span class="footer-horaires__ferme fst-italic">Fermé</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            <tr class="footer-horaires__row">
+                                                <td class="footer-horaires__jour fw-semibold" colspan="2">Dimanche</td>
+                                                <td class="footer-horaires__heures" colspan="2">
+                                                    {% if horaires['Dimanche'] %}
+                                                        {{ horaires['Dimanche'].ouverture }} - {{ horaires['Dimanche'].fermeture }}
+                                                    {% else %}
+                                                        <span class="footer-horaires__ferme fst-italic">Fermé</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="footer-horaires__separator border-secondary">
+                    {% endif %}
                     <p class="m-0 text-center text-white">Copyrights &copy; Vite & Gourmand 2026</p>
                     <p class="m-0 text-center text-white">
-                        <a href="{{ path('app_login') }}">Condition de vente</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#conditionsVenteModal">Nos conditions générales de vente</a>
                     </p>
                 </div>
             </footer>
+
+            {# === Modal Conditions générales de vente === #}
+            {% set conditions_vente = get_conditions_vente() %}
+            <div class="modal fade" id="conditionsVenteModal" tabindex="-1" aria-labelledby="conditionsVenteModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title" id="conditionsVenteModalLabel">
+                                <i class="bi bi-file-earmark-text"></i>
+                                Conditions générales de vente
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if conditions_vente %}
+                                <p>{{ conditions_vente|nl2br }}</p>
+                            {% else %}
+                                <p class="text-muted fst-italic">Aucune condition de vente définie pour le moment.</p>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </body>
     </html>

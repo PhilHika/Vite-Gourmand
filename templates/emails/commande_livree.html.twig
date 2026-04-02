@@ -1,0 +1,20 @@
+{# Variables attendues :
+    - commande     : App\Entity\Commande
+    - labelStatut  : string "Livrée"
+    - isStaff      : false
+#}
+{% extends 'emails/_layout.html.twig' %}
+
+{% block content %}
+    <h2>Commande livrée</h2>
+    <p>Bonjour <strong>{{ commande.utilisateur.prenom }}</strong>,</p>
+    <p>Le statut de votre commande <strong>{{ commande.numeroCommande }}</strong> a été livrée :</p>
+    <p>Nouveau statut : <span class="badge">{{ labelStatut }}</span></p>
+    <p>Donner nous votre avis sur le menu :</p>
+    <p><strong>Menu :</strong> {{ commande.menu.titre }}</p>
+    <p><strong>Faites nous vos retours sur cette commande sur notre site web :</strong>
+        <a href="{{ url('app_commande_show', {numeroCommande: commande.numeroCommande}) }}">
+            Donnez votre avis
+        </a>
+    </p>
+{% endblock %}

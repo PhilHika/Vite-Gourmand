@@ -8,6 +8,7 @@ use App\Entity\Regime;
 use App\Entity\Theme;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -63,6 +64,18 @@ class MenuFormType extends AbstractType
                 'expanded' => false, // Set to true for checkboxes if preferred
                 'attr' => ['class' => 'form-select', 'size' => 10], // size to show multiple items
                 'by_reference' => false, // Important for ManyToMany to call add/remove methods
+            ])
+            ->add('conditions', CollectionType::class, [
+                'entry_type' => TextType::class,
+                'entry_options' => [
+                    'label' => false,
+                    'attr' => ['class' => 'form-control mb-2', 'placeholder' => 'Saisir une condition (ex: Commander 48h à l\'avance)']
+                ],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'label' => 'Conditions et précautions de ce menu',
+                'attr' => ['class' => 'conditions-collection']
             ])
         ;
     }

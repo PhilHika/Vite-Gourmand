@@ -9,10 +9,15 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     #[Route('/acceuil', name: 'app_home')]
-    public function index(): Response
+    public function index(\App\Repository\AvisRepository $avisRepository): Response
     {
+        $tousLesAvisPublies = $avisRepository->findBy(
+            ['statut' => \App\Entity\Avis::STATUT_PUBLIE],
+            ['id' => 'DESC']
+        );
+
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
+            'tous_les_avis' => $tousLesAvisPublies,
         ]);
     }
 }

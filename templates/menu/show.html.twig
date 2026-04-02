@@ -73,6 +73,17 @@
                             </span>
                         {% endif %}
                     {% endif %}
+
+                    {% if menu.conditions|length > 0 %}
+                        <div class="mt-4 p-3 bg-light rounded border-start border-4 border-info">
+                            <h6 class="fw-bold text-info-emphasis mb-2"><i class="bi bi-info-circle-fill me-2"></i>Conditions et précautions</h6>
+                            <ul class="mb-0 text-muted small ps-3">
+                                {% for condition in menu.conditions %}
+                                    <li class="mb-1">{{ condition }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -141,10 +152,7 @@
                             Commander ce menu
                         </a>
                     {% else %}
-                        <button type="button"
-                            class="btn btn-success btn-lg"
-                            data-bs-toggle="modal"
-                            data-bs-target="#loginModal">
+                        <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
                             <i class="bi bi-cart-plus"></i>
                             Commander ce menu
                         </button>

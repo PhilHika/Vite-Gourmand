@@ -3,12 +3,11 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env.docker
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
-.env
-
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -35,3 +34,8 @@ docker/db_data/
 ###> Claude Code ###
 /.claude/
 ###< Claude Code ###
+
+###> Antigravity ###
+/.gemini/
+###< Antigravity ###
+

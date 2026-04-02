@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modération de l'avis - Commande {{ commande.numeroCommande }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('app_profile_gestion_site') }}" class="btn btn-outline-secondary me-3">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+        <h1 class="mb-0 text-primary">Modération de l'avis</h1>
+    </div>
+
+    <div class="row">
+        {# Colonne de gauche (Informations) #}
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Détails de l'Avis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="text-muted fw-bold">Client</h6>
+                            <p class="mb-0">{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</p>
+                            <p class="mb-0 text-secondary small">{{ avis.utilisateur.email }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h6 class="text-muted fw-bold">Commande liée</h6>
+                            <p class="mb-0 fw-bold">N° {{ commande.numeroCommande }}</p>
+                            <p class="mb-0 text-secondary small">Prestation du {{ commande.datePrestation|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="mt-4">
+                        <h6 class="text-muted fw-bold mb-2">Note attribuée</h6>
+                        <div class="text-warning fs-4 mb-3">
+                            {% for i in 1..5 %}
+                                {% if i <= avis.note %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-dark fs-6 ms-2">({{ avis.note }}/5)</span>
+                        </div>
+
+                        <h6 class="text-muted fw-bold mb-2">Commentaire du client</h6>
+                        <div class="p-3 bg-light rounded border fst-italic">
+                            "{{ avis.description }}"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Colonne de droite (Formulaire d'action) #}
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-warning">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    <i class="bi bi-shield-lock"></i> Décision de Modération
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="mb-4">
+                            {{ form_label(form.statut) }}
+                            {{ form_widget(form.statut) }}
+                            <div class="form-text text-muted mt-2">
+                                Seuls les avis "Publiés" seront visibles sur la page d'accueil par le grand public.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-save"></i> Sauvegarder
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

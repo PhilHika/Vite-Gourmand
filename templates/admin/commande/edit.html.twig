@@ -125,8 +125,7 @@
                             </h5>
                         </div>
                         <div class="card-body p-4">
-                            {# data-turbo="false" : on re-rend la page lors du recalcul prix (pas de redirect) #}
-                            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'data-turbo': 'false'}}) }}
+                            {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
 
                             <h6 class="text-primary fw-bold mb-3">Prestation</h6>
 
@@ -140,6 +139,28 @@
                                     {{ form_label(form.heureLivraison) }}
                                     {{ form_widget(form.heureLivraison) }}
                                     {{ form_errors(form.heureLivraison) }}
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h6 class="text-primary fw-bold mb-3">Adresse de livraison</h6>
+
+                            <div class="mb-3">
+                                {{ form_label(form.adresseLivraison) }}
+                                {{ form_widget(form.adresseLivraison) }}
+                                {{ form_errors(form.adresseLivraison) }}
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_label(form.villeLivraison) }}
+                                    {{ form_widget(form.villeLivraison) }}
+                                    {{ form_errors(form.villeLivraison) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.paysLivraison) }}
+                                    {{ form_widget(form.paysLivraison) }}
+                                    {{ form_errors(form.paysLivraison) }}
                                 </div>
                             </div>
 

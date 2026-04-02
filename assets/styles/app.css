@@ -16,6 +16,12 @@ footer.py-5.bg-dark.flex-shrink-0 {
 }
 
 /* Menu */
+.carousel.slide:hover .carousel-control-prev-icon,
+.carousel.slide:hover .carousel-control-next-icon {
+    opacity: 1 !important;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .menu-right {
     display: flex;
     gap: 20px;

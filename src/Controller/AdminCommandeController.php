@@ -28,6 +28,46 @@ class AdminCommandeController extends AbstractController
         ]);
     }
 
+    #[Route('/{numeroCommande}/annuler', name: 'app_admin_commande_annuler', methods: ['POST'])]
+    public function annuler(
+        #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
+        Commande $commande,
+        Request $request,
+        EntityManagerInterface $em,
+        CommandeMailerService $commandeMailer
+    ): Response {
+        $statutsAnnulables = [
+            Commande::STATUT_EN_ATTENTE,
+            Commande::STATUT_CONFIRMEE,
+            Commande::STATUT_EN_PREPARATION,
+        ];
+
+        if (!in_array($commande->getStatut(), $statutsAnnulables, true)) {
+            $this->addFlash('danger', 'Cette commande ne peut plus être annulée.');
+            return $this->redirectToRoute('app_admin_commande_index');
+        }
+
+        if (!$this->isCsrfTokenValid('admin_annuler_' . $commande->getNumeroCommande(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton CSRF invalide.');
+            return $this->redirectToRoute('app_admin_commande_index');
+        }
+
+        $ancienStatut = $commande->getStatut();
+        $commande->setStatut(Commande::STATUT_ANNULEE);
+
+        // Restituer le stock du menu
+        $menu = $commande->getMenu();
+        $menu->setQuantiteRestante($menu->getQuantiteRestante() + 1);
+
+        $em->flush();
+
+        // Notifier le client du changement de statut
+        $commandeMailer->envoyerChangementStatut($commande, $ancienStatut);
+
+        $this->addFlash('success', sprintf('La commande %s a été annulée.', $commande->getNumeroCommande()));
+        return $this->redirectToRoute('app_admin_commande_index');
+    }
+
     #[Route('/{numeroCommande}/edit', name: 'app_admin_commande_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['numeroCommande' => 'numeroCommande'])]
