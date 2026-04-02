@@ -305,7 +305,59 @@ php bin/console doctrine:mongodb:schema:create
 
 > Les fixtures créent les **3 rôles** (`ROLE_USER`, `ROLE_SALARIE`, `ROLE_ADMIN`) en base. Les comptes utilisateurs sont à créer via l'interface `/register`.
 
-### 5. Commandes utiles
+### 5. Créer un administrateur (post-déploiement)
+
+Après un déploiement en production (ou sur un environnement vierge sans fixtures), la commande `app:create-admin` permet de créer un compte administrateur en une seule étape :
+
+```bash
+php bin/console app:create-admin --email=admin@viteetgourmand.fr --password=MonMotDePasse
+```
+
+**Ce que fait la commande automatiquement :**
+1. Vérifie si la table `role` contient les 3 rôles standards (`ROLE_USER`, `ROLE_SALARIE`, `ROLE_ADMIN`). Si des rôles manquent, elle les crée.
+2. Vérifie si un utilisateur avec cet email existe déjà. Si oui, elle s'arrête sans erreur (idempotent).
+3. Crée l'utilisateur avec le rôle `ROLE_ADMIN` et un mot de passe hashé.
+
+**Options disponibles :**
+
+| Option | Obligatoire | Valeur par défaut | Description |
+| :--- | :--- | :--- | :--- |
+| `--email` | Oui | — | Email de l'admin |
+| `--password` | Oui | — | Mot de passe (sera hashé) |
+| `--prenom` | Non | `Admin` | Prénom |
+| `--nom` | Non | `Admin` | Nom |
+| `--telephone` | Non | `0000000000` | Téléphone |
+| `--ville` | Non | `Paris` | Ville |
+| `--pays` | Non | `France` | Pays |
+| `--adresse` | Non | `Adresse admin` | Adresse postale |
+
+**Exemple sur Heroku :**
+```bash
+heroku run php bin/console app:create-admin --email=admin@viteetgourmand.fr --password=S3cur3P@ss!
+```
+
+> **Sécurité** : ces commandes ne sont accessibles que via le terminal serveur (CLI). Elles ne peuvent pas être exécutées depuis le navigateur. Seul un utilisateur authentifié sur la plateforme d'hébergement (Heroku, Upsun, SSH, etc.) peut les exécuter.
+
+### 6. Réinitialiser les mots de passe admin
+
+La commande `app:reset-admin` permet de réinitialiser le mot de passe des comptes admin sans les supprimer (préserve les commandes et avis liés).
+
+**Trois modes d'utilisation :**
+
+```bash
+# Mode interactif (recommandé) : demande un mot de passe pour chaque admin
+php bin/console app:reset-admin
+
+# Mode batch : même mot de passe pour tous les admins
+php bin/console app:reset-admin --password=NouveauMotDePasse
+
+# Mode ciblé : un seul admin spécifique
+php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=NouveauMotDePasse
+```
+
+> En mode interactif, le mot de passe est saisi de manière **cachée** (non affiché à l'écran). Si vous appuyez sur Entrée sans rien taper, l'admin est ignoré.
+
+### 7. Commandes utiles
 
 | Action | Commande |
 | :--- | :--- |
@@ -316,6 +368,9 @@ php bin/console doctrine:mongodb:schema:create
 | Valider le schéma | `php bin/console doctrine:schema:validate` |
 | **MongoDB (ODM)** | |
 | Créer le schéma MongoDB | `php bin/console doctrine:mongodb:schema:create` |
+| **Déploiement** | |
+| Créer un admin (+ init rôles) | `php bin/console app:create-admin --email=... --password=...` |
+| Reset mot de passe admin | `php bin/console app:reset-admin` |
 | **Tests** | |
 | Lancer les tests PHPUnit | `php bin/phpunit` |
 | **Qualité & Debug** | |
