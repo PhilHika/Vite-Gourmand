@@ -98,11 +98,7 @@
                                     <div class="carousel-inner">
                                         {% for plat in menu.plats %}
                                             <div class="carousel-item{% if loop.first %} active{% endif %}">
-                                                {% if plat.photo is not empty %}
-                                                    <img class="d-block w-100" src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}"/>
-                                                {% else %}
-                                                    <img class="d-block w-100" src="{{ asset('images/menus/default.jpg') }}" alt="{{ plat.titrePlat }}"/>
-                                                {% endif %}
+                                                <img class="d-block w-100" src="{{ asset(plat.photoPath) }}" alt="{{ plat.titrePlat }}"/>
                                             </div>
                                         {% endfor %}
                                     </div>

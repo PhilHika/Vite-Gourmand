@@ -6,15 +6,24 @@ use App\Entity\Plat;
 use App\Form\PlatFormType;
 use App\Repository\PlatRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/admin/plat')]
 #[IsGranted('ROLE_SALARIE')]
 class AdminPlatController extends AbstractController
 {
+    public function __construct(
+        private readonly SluggerInterface $slugger,
+        #[Autowire('%kernel.project_dir%/public/uploads/plats')]
+        private readonly string $uploadDir,
+    ) {
+    }
+
     #[Route('/', name: 'app_admin_plat_index', methods: ['GET'])]
     public function index(PlatRepository $platRepository): Response
     {
@@ -34,8 +43,8 @@ class AdminPlatController extends AbstractController
             $photoFile = $form->get('photoFile')->getData();
 
             if ($photoFile) {
-                $fileContent = file_get_contents($photoFile->getPathname());
-                $plat->setPhoto($fileContent);
+                $newFilename = $this->handleUpload($photoFile);
+                $plat->setPhoto($newFilename);
             }
 
             $platRepository->save($plat, true);
@@ -60,14 +69,18 @@ class AdminPlatController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Handle Deletion
             if ($form->get('deletePhoto')->getData()) {
+                $this->removePhotoFile($plat->getPhoto());
                 $plat->setPhoto(null);
             }
 
-            // Handle Upload (Overwrites deletion if both selected, or we can prioritize)
+            // Handle Upload (Overwrites deletion if both selected)
             $photoFile = $form->get('photoFile')->getData();
             if ($photoFile) {
-                $fileContent = file_get_contents($photoFile->getPathname());
-                $plat->setPhoto($fileContent);
+                // Remove old file first
+                $this->removePhotoFile($plat->getPhoto());
+
+                $newFilename = $this->handleUpload($photoFile);
+                $plat->setPhoto($newFilename);
             }
 
             $platRepository->save($plat, true);
@@ -83,36 +96,6 @@ class AdminPlatController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/image', name: 'app_admin_plat_image', methods: ['GET'])]
-    public function image(Plat $plat): Response
-    {
-        $photoContent = $plat->getPhoto();
-
-        if (!$photoContent) {
-            throw $this->createNotFoundException('Image non trouvée');
-        }
-
-        if (is_resource($photoContent)) {
-            $photoContent = stream_get_contents($photoContent);
-        }
-
-        $response = new Response($photoContent);
-
-        // Assuming JPEG or PNG based on common web usage.
-        // `finfo` is better.
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($photoContent) ?: 'image/jpeg';
-
-        $response->headers->set('Content-Type', $mimeType);
-
-        // Caching
-        $response->setPublic();
-        $response->setMaxAge(3600); // 1 hour cache
-        $response->setEtag(md5($photoContent)); // Simple ETag based on content usage
-
-        return $response;
-    }
-
     #[Route('/{id}/delete-photo', name: 'app_admin_plat_delete_photo', methods: ['POST'])]
     public function deletePhoto(Request $request, Plat $plat, PlatRepository $platRepository): Response
     {
@@ -122,6 +105,7 @@ class AdminPlatController extends AbstractController
             return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
         }
 
+        $this->removePhotoFile($plat->getPhoto());
         $plat->setPhoto(null);
         $platRepository->save($plat, true);
 
@@ -139,10 +123,43 @@ class AdminPlatController extends AbstractController
         }
 
         $titre = $plat->getTitrePlat();
+
+        // Remove photo file before deleting the entity
+        $this->removePhotoFile($plat->getPhoto());
+
         $platRepository->remove($plat, true);
 
         $this->addFlash('success', 'Le plat "' . $titre . '" a bien été supprimé.');
 
         return $this->redirectToRoute('app_admin_plat_index');
+    }
+
+    /**
+     * Upload a photo file and return the generated filename.
+     */
+    private function handleUpload(\Symfony\Component\HttpFoundation\File\UploadedFile $file): string
+    {
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $this->slugger->slug($originalFilename)->lower();
+        $newFilename = uniqid() . '_' . $safeFilename . '.' . $file->guessExtension();
+
+        $file->move($this->uploadDir, $newFilename);
+
+        return $newFilename;
+    }
+
+    /**
+     * Remove a photo file from disk if it exists.
+     */
+    private function removePhotoFile(?string $filename): void
+    {
+        if (!$filename) {
+            return;
+        }
+
+        $filePath = $this->uploadDir . '/' . $filename;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 }

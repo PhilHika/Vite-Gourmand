@@ -14,8 +14,8 @@
                 <div
                     class="col-md-5">
                     {# Image du menu (via le premier plat) #}
-                    {% if menu.plats|length > 0 and menu.plats|first.photo is not empty %}
-                        {% set menuImage = path('app_admin_plat_image', {id: menu.plats|first.id}) %}
+                    {% if menu.plats|length > 0 %}
+                        {% set menuImage = asset(menu.plats|first.photoPath) %}
                     {% else %}
                         {% set menuImage = asset('images/menus/default.jpg') %}
                     {% endif %}
@@ -100,9 +100,7 @@
                             {% for plat in menu.plats %}
                                 <div class="col">
                                     <div class="card h-100 shadow-sm">
-                                        {% if plat.photo %}
-                                            <img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="{{ plat.titrePlat }}" class="card-img-top" style="max-height: 180px; object-fit: cover;">
-                                        {% endif %}
+                                        <img src="{{ asset(plat.photoPath) }}" alt="{{ plat.titrePlat }}" class="card-img-top" style="max-height: 180px; object-fit: cover;">
                                         <div class="card-body">
                                             <h5 class="card-title fw-bold">{{ plat.titrePlat }}</h5>
 

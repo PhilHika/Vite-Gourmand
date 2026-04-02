@@ -31,7 +31,7 @@
 
                         {% if plat.photo %}
                             <div class="mb-3 text-center">
-                                <img src="{{ path('app_admin_plat_image', {id: plat.id}) }}" alt="Plat" class="img-thumbnail mb-2" style="max-height: 200px;">
+                                <img src="{{ asset(plat.photoPath) }}" alt="Plat" class="img-thumbnail mb-2" style="max-height: 200px;">
                             </div>
                         {% else %}
                             <div class="alert alert-secondary py-1 text-center">Aucune image enregistrée.</div>
