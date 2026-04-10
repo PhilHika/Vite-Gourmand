@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Regime;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,8 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RegimeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Regime::class);
     }
 
@@ -40,4 +43,17 @@ class RegimeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Retourne TOUS les régimes (en cache 24h)
+     * Utilisé par : AdminReferentielController::listRegimes (GET)
+     */
+    public function findAllCached(int $ttl = 86400): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'regimes_all',
+            fn() => $this->findAll(),
+            $ttl
+        );
+    }
 }

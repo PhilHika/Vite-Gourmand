@@ -27,7 +27,7 @@ class AdminReferentielController extends AbstractController
     #[Route('/allergene/list', name: 'app_admin_referentiel_allergene_list', methods: ['GET'])]
     public function listAllergenes(AllergeneRepository $repository): JsonResponse
     {
-        $list = $repository->findAll();
+        $list = $repository->findAllCached(ttl: 86400);
         $data = [];
         foreach ($list as $item) {
             $data[] = [
@@ -77,7 +77,7 @@ class AdminReferentielController extends AbstractController
     #[Route('/regime/list', name: 'app_admin_referentiel_regime_list', methods: ['GET'])]
     public function listRegimes(RegimeRepository $repository): JsonResponse
     {
-        $list = $repository->findAll();
+        $list = $repository->findAllCached(ttl: 86400);
         $data = [];
         foreach ($list as $item) {
             $data[] = [
@@ -124,7 +124,7 @@ class AdminReferentielController extends AbstractController
     #[Route('/theme/list', name: 'app_admin_referentiel_theme_list', methods: ['GET'])]
     public function listThemes(ThemeRepository $repository): JsonResponse
     {
-        $list = $repository->findAll();
+        $list = $repository->findAllCached(ttl: 86400);
         $data = [];
         foreach ($list as $item) {
             $data[] = [

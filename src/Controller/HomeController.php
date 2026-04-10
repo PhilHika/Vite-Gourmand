@@ -11,10 +11,7 @@ class HomeController extends AbstractController
     #[Route('/acceuil', name: 'app_home')]
     public function index(\App\Repository\AvisRepository $avisRepository): Response
     {
-        $tousLesAvisPublies = $avisRepository->findBy(
-            ['statut' => \App\Entity\Avis::STATUT_PUBLIE],
-            ['id' => 'DESC']
-        );
+        $tousLesAvisPublies = $avisRepository->findPubliesCached(ttl: 3600);
 
         return $this->render('home/index.html.twig', [
             'tous_les_avis' => $tousLesAvisPublies,

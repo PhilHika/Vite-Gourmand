@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Allergene;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,8 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AllergeneRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Allergene::class);
     }
 
@@ -40,4 +43,17 @@ class AllergeneRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Retourne TOUS les allergènes (en cache 24h)
+     * Utilisé par : AdminReferentielController::listAllergenes (GET)
+     */
+    public function findAllCached(int $ttl = 86400): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'allergenes_all',
+            fn() => $this->findAll(),
+            $ttl
+        );
+    }
 }

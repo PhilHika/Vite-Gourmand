@@ -22,14 +22,14 @@ class ContenuSiteExtension extends AbstractExtension
 
     public function getDescriptionSite(): ?string
     {
-        $doc = $this->contenuSiteRepository->findByCle('description');
+        $doc = $this->contenuSiteRepository->findByCleCached('description', ttl: 3600);
 
         return $doc?->getContenu();
     }
 
     public function getConditionsVente(): ?string
     {
-        $doc = $this->contenuSiteRepository->findByCle('conditions_vente');
+        $doc = $this->contenuSiteRepository->findByCleCached('conditions_vente', ttl: 3600);
 
         return $doc?->getContenu();
     }

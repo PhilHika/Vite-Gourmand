@@ -22,7 +22,7 @@ class MenuController extends AbstractController
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $menus = $menuRepository->findByFilters($filterForm->getData());
         } else {
-            $menus = $menuRepository->findAll();
+            $menus = $menuRepository->findAllCached(ttl: 1800);
         }
 
         return $this->render('menu/index.html.twig', [

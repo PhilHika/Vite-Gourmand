@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Theme;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,8 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ThemeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Theme::class);
     }
 
@@ -40,4 +43,17 @@ class ThemeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Retourne TOUS les thèmes (en cache 24h)
+     * Utilisé par : AdminReferentielController::listThemes (GET)
+     */
+    public function findAllCached(int $ttl = 86400): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'themes_all',
+            fn() => $this->findAll(),
+            $ttl
+        );
+    }
 }

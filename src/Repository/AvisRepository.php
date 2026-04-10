@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Avis;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,8 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AvisRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Avis::class);
     }
 
@@ -40,4 +43,17 @@ class AvisRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Retourne les avis PUBLIÉS (en cache)
+     * Utilisé par : HomeController::index
+     */
+    public function findPubliesCached(int $ttl = 3600): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'avis_publis',
+            fn() => $this->findBy(['statut' => Avis::STATUT_PUBLIE], ['id' => 'DESC']),
+            $ttl
+        );
+    }
 }

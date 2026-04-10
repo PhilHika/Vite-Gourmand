@@ -29,7 +29,7 @@ class HoraireExtension extends AbstractExtension
         $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
         $horairesParJour = [];
-        foreach ($this->horaireRepository->findAll() as $horaire) {
+        foreach ($this->horaireRepository->findAllCached(ttl: 3600) as $horaire) {
             $horairesParJour[$horaire->getJour()] = [
                 'ouverture' => $horaire->getHeureOuverture(),
                 'fermeture' => $horaire->getHeureFermeture(),

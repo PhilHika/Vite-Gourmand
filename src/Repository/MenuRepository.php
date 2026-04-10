@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Menu;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,8 +12,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MenuRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Menu::class);
     }
 
@@ -93,5 +96,31 @@ class MenuRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Retourne TOUS les menus (en cache)
+     * Utilisé par : MenuController::index (sans filtres)
+     */
+    public function findAllCached(int $ttl = 1800): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'menus_all',
+            fn() => $this->findAll(),
+            $ttl
+        );
+    }
+
+    /**
+     * Retourne un menu par ID (en cache)
+     * Utilisé par : MenuController::show
+     */
+    public function findByIdCached(int $id, int $ttl = 3600): ?Menu
+    {
+        return $this->queryCacheService->getOrFetch(
+            "menu_id_{$id}",
+            fn() => $this->find($id),
+            $ttl
+        );
     }
 }

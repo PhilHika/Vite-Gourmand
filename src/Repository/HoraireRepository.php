@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Document\Horaire;
+use App\Service\QueryCacheService;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
 
@@ -11,8 +12,10 @@ use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
  */
 class HoraireRepository extends ServiceDocumentRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly QueryCacheService $queryCacheService
+    ) {
         parent::__construct($registry, Horaire::class);
     }
 
@@ -29,4 +32,17 @@ class HoraireRepository extends ServiceDocumentRepository
     //            ->execute()
     //            ->toArray();
     //    }
+
+    /**
+     * Retourne TOUS les horaires (en cache 1h)
+     * Utilisé par : HorairesExtension (Twig)
+     */
+    public function findAllCached(int $ttl = 3600): array
+    {
+        return $this->queryCacheService->getOrFetch(
+            'horaires_all',
+            fn() => $this->findAll(),
+            $ttl
+        );
+    }
 }
