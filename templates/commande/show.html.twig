@@ -111,7 +111,23 @@
                                     {% endif %}
                                     <p>
                                         <strong>Statut :</strong><br>
-                                        <span class="badge bg-warning text-dark">{{ commande.statut|replace({_: ' '})|capitalize }}</span>
+                                        {% if commande.statut == 'en_attente' %}
+                                            <span class="badge bg-warning text-dark">En attente</span>
+                                        {% elseif commande.statut == 'confirmee' %}
+                                            <span class="badge bg-success">Confirmée</span>
+                                        {% elseif commande.statut == 'en_preparation' %}
+                                            <span class="badge bg-info">En préparation</span>
+                                        {% elseif commande.statut == 'livree' %}
+                                            <span class="badge bg-primary">Livrée</span>
+                                        {% elseif commande.statut == 'annulee' %}
+                                            <span class="badge bg-danger">Annulée</span>
+                                        {% elseif commande.statut == 'en_attente_retour_materiel' %}
+                                            <span class="badge bg-secondary">En attente de retour matériel</span>
+                                        {% elseif commande.statut == 'terminee' %}
+                                            <span class="badge bg-dark">Terminée</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                        {% endif %}
                                     </p>
                                     {% if editable and edit_form is not null %}
                                     <button type="submit" class="btn btn-success">
@@ -258,7 +274,7 @@
                                 <i class="bi bi-star-fill text-dark"></i>
                                 Donner mon avis
                             </button>
-                        {% elseif commande.statut == 'livree' and commande.avis is not null %}
+                        {% elseif commande.statut == 'terminee' and commande.avis is not null %}
                             <div class="alert alert-success d-inline-block px-4 py-2 mb-0">
                                 <i class="bi bi-check-circle-fill"></i> Avis enregistré
                             </div>

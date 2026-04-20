@@ -19,6 +19,9 @@ class AdminCommandeFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $nombrePersonneMin = $options['nombre_personne_min'] ?? 1;
+        $pretMateriel = $options['pret_materiel'] ?? false;
+        $restitutionMateriel = $options['restitution_materiel'] ?? false;
+        $statutActuel = $options['statut_actuel'] ?? Commande::STATUT_EN_ATTENTE;
 
         $builder
             ->add('datePrestation', DateType::class, [
@@ -89,8 +92,11 @@ class AdminCommandeFormType extends AbstractType
                     'En préparation' => Commande::STATUT_EN_PREPARATION,
                     'Livrée' => Commande::STATUT_LIVREE,
                     'Annulée' => Commande::STATUT_ANNULEE,
+                    $this->getLabelAttenteRetour($pretMateriel) => Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL,
+                    $this->getLabelTerminee($statutActuel, $pretMateriel, $restitutionMateriel) => Commande::STATUT_TERMINEE,
                 ],
-                'attr' => ['class' => 'form-select'],
+                'choice_attr' => $this->buildStatutChoiceAttr($statutActuel, $pretMateriel, $restitutionMateriel),
+                'attr' => ['class' => 'form-select', 'id' => 'commande-statut-select'],
             ]);
     }
 
@@ -99,6 +105,65 @@ class AdminCommandeFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Commande::class,
             'nombre_personne_min' => 1,
+            'pret_materiel' => false,
+            'restitution_materiel' => false,
+            'statut_actuel' => Commande::STATUT_EN_ATTENTE,
         ]);
+    }
+
+    private function buildStatutChoiceAttr(string $statutActuel, bool $pretMateriel, bool $restitutionMateriel): \Closure
+    {
+        return function (string $value) use ($statutActuel, $pretMateriel, $restitutionMateriel): array {
+            // Le statut actuel ne doit jamais être désactivé :
+            // un <option disabled selected> n'est pas soumis par le navigateur → setStatut(null) → TypeError
+            if ($value === $statutActuel) {
+                return [];
+            }
+
+            // "En attente de retour matériel" : uniquement depuis "livrée" avec prêt et sans restitution
+            if ($value === Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL) {
+                $peutAttenteRetour = $statutActuel === Commande::STATUT_LIVREE
+                    && $pretMateriel
+                    && !$restitutionMateriel;
+
+                return $peutAttenteRetour ? [] : ['disabled' => 'disabled'];
+            }
+
+            // "Terminée" : depuis "livrée" sans prêt, depuis "livrée" avec prêt+restitution,
+            //              ou depuis "en attente retour" avec restitution
+            if ($value === Commande::STATUT_TERMINEE) {
+                $peutTerminer = $statutActuel === Commande::STATUT_LIVREE && !$pretMateriel
+                    || $statutActuel === Commande::STATUT_LIVREE && $pretMateriel && $restitutionMateriel
+                    || $statutActuel === Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL && $restitutionMateriel;
+
+                return $peutTerminer ? [] : ['disabled' => 'disabled'];
+            }
+
+            return [];
+        };
+    }
+
+    private function getLabelAttenteRetour(bool $pretMateriel): string
+    {
+        if (!$pretMateriel) {
+            return 'En attente de retour matériel (prêt : non)';
+        }
+
+        return 'En attente de retour matériel';
+    }
+
+    private function getLabelTerminee(string $statutActuel, bool $pretMateriel, bool $restitutionMateriel): string
+    {
+        // Statut non éligible
+        if ($statutActuel !== Commande::STATUT_LIVREE && $statutActuel !== Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL) {
+            return 'Terminée (requiert : livrée)';
+        }
+
+        // Livrée ou en attente retour, prêt matériel mais restitution non cochée
+        if ($pretMateriel && !$restitutionMateriel) {
+            return 'Terminée (restitution : non)';
+        }
+
+        return 'Terminée';
     }
 }

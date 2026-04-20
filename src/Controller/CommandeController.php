@@ -235,8 +235,8 @@ class CommandeController extends AbstractController
 
         $avisForm = null;
 
-        // Si la commande est livrée et qu'aucun avis n'a été déposé
-        if ($commande->getStatut() === Commande::STATUT_LIVREE && !$commande->getAvis()) {
+        // Si la commande est terminée et qu'aucun avis n'a été déposé
+        if ($commande->getStatut() === Commande::STATUT_TERMINEE && !$commande->getAvis()) {
             $avis = new \App\Entity\Avis();
             $avis->setCommande($commande);
             $avis->setUtilisateur($this->getUser());

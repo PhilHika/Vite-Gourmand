@@ -175,11 +175,11 @@ Afin de garantir des performances optimales et une mise en cache efficace, les i
 
 > **📍 Justification architecturale (Écart par rapport au schéma initial ECF)**
 > Le schéma de base de données (UML) fourni prévoyait un attribut `photo` de type `BLOB` sur l'entité `Plat`.
-> Dans un contexte professionnel, stocker des fichiers binaires (images) directement dans une base de données relationnelle est considéré comme une anti-pattern pour plusieurs raisons structurelles :
+> Pour plusieurs raisons structurelles je me suis ecarté de ce choix :
 > 1. **Performances et volume BDD** : Les BLOBs alourdissent considérablement le poids de la base de données, ce qui ralentit drastiquement les requêtes SQL, la consommation de RAM, ainsi que les opérations de sauvegarde (dump) et de restauration.
 > 2. **Mise en cache serveur et CDN** : Servir une image depuis un BLOB nécessite systématiquement d'invoquer le processeur PHP (via un Contrôleur) pour extraire et retourner les flux binaires. En stockant le fichier sur le disque (`/public/`), on délègue cette tâche au serveur web (Nginx) qui sert ces fichiers statiques instantanément tout en tirant parti du cache navigateur client et d'un éventuel CDN. 
 > 3. **Scalabilité** : Conserver uniquement les chemins (URL) en base de données permet d'isoler le stockage des fichiers. Si l'application évolue, il sera aisé de déporter le dossier d'upload vers un stockage objet externe de type Amazon S3 sans aucune modification du schéma de données.
-> **Ce changement vers un `VARCHAR(255)` est donc une décision d'optimisation technique majeure pour répondre aux standards de l'industrie.**
+> **Ce changement vers un `VARCHAR(255)` est donc une décision d'optimisation.**
 
 ### 🛒 Système de Commande
 
@@ -391,6 +391,8 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 | Voir les logs Docker | `docker compose logs -f` |
 
 > En mode Docker complet, préfixez les commandes par `docker compose exec php`.
+
+> **📍 Note de déploiement prod (Opcache)** : passer `validate_timestamps=0` dans `docker/php/opcache.ini` pour désactiver la vérification des fichiers à chaque requête (gain de performance significatif). En contrepartie, vider obligatoirement l'opcache à chaque déploiement via `php bin/console cache:clear`.
 
 ---
 

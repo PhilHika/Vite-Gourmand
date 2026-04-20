@@ -3,7 +3,9 @@
 {% block title %}Gérer commande {{ commande.numeroCommande }}{% endblock %}
 
 {% block body %}
-    <section class="py-5">
+    <section class="py-5"
+        data-controller="admin-commande-status-dropdown"
+        data-admin-commande-status-dropdown-statut-actuel-value="{{ commande.statut }}">
         <div class="container px-4 px-lg-5">
             <h2 class="fw-bolder mb-4">
                 <i class="bi bi-pencil-square"></i>
@@ -242,3 +244,4 @@
         </div>
     </section>
 {% endblock %}
+

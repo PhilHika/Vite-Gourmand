@@ -81,11 +81,13 @@ class AdminCommandeController extends AbstractController
 
         $form = $this->createForm(AdminCommandeFormType::class, $commande, [
             'nombre_personne_min' => $menu->getNombrePersonneMinimum(),
+            'pret_materiel' => $commande->getPretMateriel() ?? false,
+            'restitution_materiel' => $commande->getRestitutionMateriel() ?? false,
+            'statut_actuel' => $ancienStatut,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si le bouton "recalculer" a été cliqué
             if ($request->request->has('_recalculer')) {
                 $commande->calculerPrixMenu();
                 $this->addFlash('info', sprintf(
@@ -93,23 +95,63 @@ class AdminCommandeController extends AbstractController
                     number_format($commande->getPrixMenu(), 2, ',', ' ')
                 ));
             } else {
-                $em->flush();
+                $nouveauStatut = $commande->getStatut();
+                $commande->setStatut($ancienStatut);
 
-                // Envoi email si le statut a changé
+                $erreur = $this->validerDonnees($commande, $ancienStatut, $nouveauStatut);
+                if ($erreur !== null) {
+                    $this->addFlash('danger', $erreur);
+                    return $this->renderEdit($commande, $form);
+                }
+
+                $commande->setStatut($nouveauStatut);
+                $em->flush();
                 $commandeMailer->envoyerChangementStatut($commande, $ancienStatut);
 
                 $this->addFlash('success', 'Commande mise à jour avec succès.');
-                return $this->redirectToRoute('app_admin_commande_index');
+                return $this->redirectToRoute('app_admin_commande_edit', [
+                    'numeroCommande' => $commande->getNumeroCommande(),
+                ]);
             }
         }
 
-        // Calcul du total pour l'affichage
-        $total = ($commande->getPrixMenu() ?? 0) + ($commande->getPrixLivraison() ?? 0);
+        return $this->renderEdit($commande, $form);
+    }
 
+    private function validerDonnees(Commande $commande, string $ancienStatut, string $nouveauStatut): ?string
+    {
+        if ($commande->getRestitutionMateriel() && !$commande->getPretMateriel()) {
+            return 'Une restitution de matériel ne peut être validée sans prêt de matériel.';
+        }
+
+        return $this->validerTransitionStatut($commande, $ancienStatut, $nouveauStatut);
+    }
+
+    private function validerTransitionStatut(Commande $commande, string $ancienStatut, string $nouveauStatut): ?string
+    {
+        $erreur = null;
+
+        if ($nouveauStatut !== $ancienStatut && $nouveauStatut === Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL && !$commande->peutEtreEnAttenteRetourMateriel()) {
+            $erreur = $commande->getRestitutionMateriel()
+                ? 'Impossible : le matériel est déjà indiqué comme restitué.'
+                : 'Impossible de passer au statut "En attente de retour matériel" : la commande doit être au statut "Livrée" avec un prêt de matériel.';
+        }
+
+        if ($nouveauStatut !== $ancienStatut && $nouveauStatut === Commande::STATUT_TERMINEE && !$commande->peutEtreTerminee()) {
+            $erreur = $commande->getPretMateriel()
+                ? 'Une commande ne peut être terminée sans retour matériel.'
+                : 'Impossible de passer au statut "Terminée" : la commande doit être au statut "Livrée".';
+        }
+
+        return $erreur;
+    }
+
+    private function renderEdit(Commande $commande, mixed $form): Response
+    {
         return $this->render('admin/commande/edit.html.twig', [
             'commande' => $commande,
             'form' => $form,
-            'total' => $total,
+            'total' => ($commande->getPrixMenu() ?? 0) + ($commande->getPrixLivraison() ?? 0),
         ]);
     }
 }

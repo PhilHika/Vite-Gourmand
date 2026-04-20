@@ -62,6 +62,10 @@
                                                     <span class="badge bg-primary">Livrée</span>
                                                 {% elseif commande.statut == 'annulee' %}
                                                     <span class="badge bg-danger">Annulée</span>
+                                                {% elseif commande.statut == 'en_attente_retour_materiel' %}
+                                                    <span class="badge bg-secondary">En attente de retour matériel</span>
+                                                {% elseif commande.statut == 'terminee' %}
+                                                    <span class="badge bg-dark">Terminée</span>
                                                 {% else %}
                                                     <span class="badge bg-secondary">{{ commande.statut }}</span>
                                                 {% endif %}
