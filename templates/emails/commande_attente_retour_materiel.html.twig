@@ -1,0 +1,40 @@
+{# Variables attendues :
+    - commande     : App\Entity\Commande
+    - labelStatut  : string "En attente de retour matériel"
+    - isStaff      : bool (true = email interne staff, false = email client)
+#}
+{% extends 'emails/_layout.html.twig' %}
+
+{% block content %}
+    {% if isStaff %}
+        <h2>Retour matériel en attente</h2>
+        <p>
+            <strong>Client :</strong> {{ commande.utilisateur.prenom }} {{ commande.utilisateur.nom }}<br>
+            <strong>Email :</strong> {{ commande.utilisateur.email }}<br>
+            <strong>Téléphone :</strong> {{ commande.utilisateur.telephone }}<br>
+            <strong>N° de commande :</strong> {{ commande.numeroCommande }}
+        </p>
+    {% else %}
+        <h2>Retour du matériel prêté</h2>
+        <p>Bonjour <strong>{{ commande.utilisateur.prenom }}</strong>,</p>
+        <p>
+            Votre commande <strong>{{ commande.numeroCommande }}</strong> a bien été livrée.<br>
+            Nous attendons maintenant le retour du matériel prêté.
+        </p>
+        <p style="border: 3px solid #c33434; padding: 10px; color: #c33434; background-color: #fdecec; border-radius: 10px;">
+            <strong>Attention : si sous 10 jours ouvré, le matériel n’est pas restitué</strong>  
+            vous devrez vous acquitter de 600 euros de frais (mentionné dans les conditions générales de vente).
+        </p>
+        <p>Merci de nous contacter pour convenir des modalités de restitution.</p>
+    {% endif %}
+
+    <p>Statut : <span class="badge">{{ labelStatut }}</span></p>
+
+    <hr class="divider">
+
+    <ul>
+        <li><strong>Menu :</strong> {{ commande.menu.titre }}</li>
+        <li><strong>Date de prestation :</strong> {{ commande.datePrestation|date('d/m/Y') }}</li>
+        <li><strong>Heure :</strong> {{ commande.heureLivraison }}</li>
+    </ul>
+{% endblock %}
