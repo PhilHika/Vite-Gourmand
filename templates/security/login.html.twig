@@ -35,7 +35,7 @@
                                 <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required placeholder="Votre mot de passe">
                             </div>
 
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
                             {% if app.request.query.get('_target_path') %}
                                 <input type="hidden" name="_target_path" value="{{ app.request.query.get('_target_path') }}">
