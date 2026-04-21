@@ -214,6 +214,10 @@ Afin d'offrir une expérience utilisateur (UX) moderne et fluide, le tunnel de v
 | `/admin/commande/` | Listing de toutes les commandes (tous clients) |
 | `/admin/commande/{id}/edit` | Édition complète (statut, prix, dates, matériel) |
 
+#### Annulation par le client (`ROLE_USER`)
+
+Le client peut annuler sa commande depuis `/commande/{numeroCommande}` **uniquement si le statut est `en_attente`**. La route POST `/commande/{numeroCommande}/annuler` vérifie ownership + statut + CSRF, puis restitue le stock du menu.
+
 ### ⭐ Système d'Avis et Modération
 
 #### Côté Client
