@@ -20,6 +20,8 @@ class Commande
     public const STATUT_EN_PREPARATION = 'en_preparation';
     public const STATUT_LIVREE = 'livree';
     public const STATUT_ANNULEE = 'annulee';
+    public const STATUT_EN_ATTENTE_RETOUR_MATERIEL = 'en_attente_retour_materiel';
+    public const STATUT_TERMINEE = 'terminee';
 
     #[ORM\Id]
     #[ORM\Column(length: 50, unique: true)]
@@ -217,6 +219,41 @@ class Commande
         $this->restitutionMateriel = $restitutionMateriel;
 
         return $this;
+    }
+
+    /**
+     * Vérifie si la commande peut passer au statut "en attente de retour matériel".
+     * Conditions : statut actuel = livrée ET prêt de matériel activé ET restitution non encore validée.
+     */
+    public function peutEtreEnAttenteRetourMateriel(): bool
+    {
+        return $this->statut === self::STATUT_LIVREE && $this->pretMateriel && !$this->restitutionMateriel;
+    }
+
+    /**
+     * Vérifie si la commande peut passer au statut "terminée".
+     * Chemin 1 : statut livrée + pas de prêt matériel.
+     * Chemin 2 : statut livrée + prêt matériel + restitution déjà validée (raccourci).
+     * Chemin 3 : statut en attente retour matériel + matériel restitué.
+     */
+    public function peutEtreTerminee(): bool
+    {
+        // Sans prêt matériel : directement après livraison
+        if ($this->statut === self::STATUT_LIVREE && !$this->pretMateriel) {
+            return true;
+        }
+
+        // Avec prêt matériel ET restitution déjà cochée : raccourci direct depuis livrée
+        if ($this->statut === self::STATUT_LIVREE && $this->pretMateriel && $this->restitutionMateriel) {
+            return true;
+        }
+
+        // Avec prêt matériel : après passage par attente retour + restitution validée
+        if ($this->statut === self::STATUT_EN_ATTENTE_RETOUR_MATERIEL && $this->restitutionMateriel) {
+            return true;
+        }
+
+        return false;
     }
 
     public function calculerPrixMenu(): void

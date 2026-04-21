@@ -5,23 +5,33 @@ namespace App\Service;
 use App\Entity\Commande;
 use App\Repository\UtilisateurRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 
 class CommandeMailerService
 {
-    private const EXPEDITEUR = 'noreply@vite-et-gourmand.fr';
+    private const string EXPEDITEUR = 'noreply@vite-et-gourmand.fr';
 
-    private const STATUT_LABELS = [
-        Commande::STATUT_EN_ATTENTE     => 'En attente',
-        Commande::STATUT_CONFIRMEE      => 'Confirmée',
-        Commande::STATUT_EN_PREPARATION => 'En préparation',
-        Commande::STATUT_LIVREE         => 'Livrée',
-        Commande::STATUT_ANNULEE        => 'Annulée',
+    private const string TPL_STATUT        = 'emails/commande_statut.html.twig';
+    private const string TPL_TERMINEE      = 'emails/commande_terminee.html.twig';
+    private const string TPL_CONFIRMATION  = 'emails/commande_confirmation.html.twig';
+    private const string TPL_ATTENTE_RETOUR = 'emails/commande_attente_retour_materiel.html.twig';
+
+    private const array STATUT_LABELS = [
+        Commande::STATUT_EN_ATTENTE                  => 'En attente',
+        Commande::STATUT_CONFIRMEE                   => 'Confirmée',
+        Commande::STATUT_EN_PREPARATION              => 'En préparation',
+        Commande::STATUT_LIVREE                      => 'Livrée',
+        Commande::STATUT_ANNULEE                     => 'Annulée',
+        Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL  => 'En attente de retour matériel',
+        Commande::STATUT_TERMINEE                    => 'Terminée',
     ];
 
     public function __construct(
         private MailerInterface $mailer,
         private UtilisateurRepository $utilisateurRepository,
+        #[Autowire('%kernel.project_dir%')]
+        private string $projectDir,
     ) {}
 
     /**
@@ -30,19 +40,22 @@ class CommandeMailerService
     public function envoyerConfirmation(Commande $commande): void
     {
         $user = $commande->getUtilisateur();
+        $sujet = $this->sujetCommande($commande, 'Confirmation de votre commande');
 
         $this->mailer->send(
-            new TemplatedEmail()
-                ->from(self::EXPEDITEUR)
-                ->to($user->getEmail())
-                ->subject('Confirmation de votre commande ' . $commande->getNumeroCommande())
-                ->htmlTemplate('emails/commande_confirmation.html.twig')
-                ->context(['commande' => $commande, 'isStaff' => false])
+            $this->ajouterLogo(
+                new TemplatedEmail()
+                    ->from(self::EXPEDITEUR)
+                    ->to($user->getEmail())
+                    ->subject($sujet)
+                    ->htmlTemplate(self::TPL_CONFIRMATION)
+                    ->context(['commande' => $commande, 'isStaff' => false])
+            )
         );
 
         $this->notifierGestionnaires(
-            'Nouvelle commande ' . $commande->getNumeroCommande(),
-            'emails/commande_confirmation.html.twig',
+            $this->sujetCommande($commande, 'Nouvelle commande'),
+            self::TPL_CONFIRMATION,
             ['commande' => $commande, 'isStaff' => true]
         );
     }
@@ -59,40 +72,85 @@ class CommandeMailerService
         $user = $commande->getUtilisateur();
         $labelStatut = self::STATUT_LABELS[$commande->getStatut()] ?? $commande->getStatut();
 
-        // Commande.status === "Livrée"
-        // Envoi email au client pour inciter aux retours/avis
-        if ($commande->getStatut() === Commande::STATUT_LIVREE) {
+        if ($commande->getStatut() === Commande::STATUT_EN_ATTENTE_RETOUR_MATERIEL) {
+            $sujet = $this->sujetCommande($commande, 'Retour matériel en attente');
+            $contexteClient = ['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => false];
+            $contexteStaff  = ['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => true];
+
             $this->mailer->send(
-                new TemplatedEmail()
-                    ->from(self::EXPEDITEUR)
-                    ->to($user->getEmail())
-                    ->subject('Commande ' . $commande->getNumeroCommande() . ' — Livrée')
-                    ->htmlTemplate('emails/commande_livree.html.twig')
-                    ->context(['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => false])
+                $this->ajouterLogo(
+                    new TemplatedEmail()
+                        ->from(self::EXPEDITEUR)
+                        ->to($user->getEmail())
+                        ->subject($sujet)
+                        ->htmlTemplate(self::TPL_ATTENTE_RETOUR)
+                        ->context($contexteClient)
+                )
             );
-            // notify gestionnaire avec l'email classique de changement de status
+            $this->notifierGestionnaires($sujet, self::TPL_ATTENTE_RETOUR, $contexteStaff);
+
+            return;
+        }
+
+        // Statut "Terminée" : email dédié au client pour inciter aux avis
+        if ($commande->getStatut() === Commande::STATUT_TERMINEE) {
+            $sujet = $this->sujetCommande($commande, 'Terminée');
+
+            $this->mailer->send(
+                $this->ajouterLogo(
+                    new TemplatedEmail()
+                        ->from(self::EXPEDITEUR)
+                        ->to($user->getEmail())
+                        ->subject($sujet)
+                        ->htmlTemplate(self::TPL_TERMINEE)
+                        ->context(['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => false])
+                )
+            );
             $this->notifierGestionnaires(
-                'Commande ' . $commande->getNumeroCommande() . ' — Statut : ' . $labelStatut,
-                'emails/commande_statut.html.twig',
+                $this->sujetCommande($commande, "Statut : $labelStatut"),
+                self::TPL_STATUT,
                 ['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => true]
             );
 
             return;
         }
 
+        $contexte = ['commande' => $commande, 'labelStatut' => $labelStatut];
+        $sujet = $this->sujetCommande($commande, 'Statut mis à jour');
+
         $this->mailer->send(
-            new TemplatedEmail()
-                ->from(self::EXPEDITEUR)
-                ->to($user->getEmail())
-                ->subject('Commande ' . $commande->getNumeroCommande() . ' — Statut mis à jour')
-                ->htmlTemplate('emails/commande_statut.html.twig')
-                ->context(['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => false])
+            $this->ajouterLogo(
+                new TemplatedEmail()
+                    ->from(self::EXPEDITEUR)
+                    ->to($user->getEmail())
+                    ->subject($sujet)
+                    ->htmlTemplate(self::TPL_STATUT)
+                    ->context($contexte + ['isStaff' => false])
+            )
         );
 
         $this->notifierGestionnaires(
-            'Commande ' . $commande->getNumeroCommande() . ' — Statut : ' . $labelStatut,
-            'emails/commande_statut.html.twig',
-            ['commande' => $commande, 'labelStatut' => $labelStatut, 'isStaff' => true]
+            $this->sujetCommande($commande, "Statut : $labelStatut"),
+            self::TPL_STATUT,
+            $contexte + ['isStaff' => true]
+        );
+    }
+
+    private function sujetCommande(Commande $commande, string $suffixe): string
+    {
+        $numero = $commande->getNumeroCommande();
+
+        return "Commande $numero — $suffixe";
+    }
+
+    /**
+     * Ajoute le logo aux emails.
+     */
+    private function ajouterLogo(TemplatedEmail $email): TemplatedEmail
+    {
+        return $email->embedFromPath(
+            "{$this->projectDir}/public/images/VetG-logo.jpg",
+            'logo'
         );
     }
 
@@ -111,12 +169,14 @@ class CommandeMailerService
     {
         foreach ($this->utilisateurRepository->findGestionnaires() as $gestionnaire) {
             $this->mailer->send(
-                new TemplatedEmail()
-                    ->from(self::EXPEDITEUR)
-                    ->to($gestionnaire->getEmail())
-                    ->subject('[STAFF] ' . $sujet)
-                    ->htmlTemplate($template)
-                    ->context($context)
+                $this->ajouterLogo(
+                    new TemplatedEmail()
+                        ->from(self::EXPEDITEUR)
+                        ->to($gestionnaire->getEmail())
+                        ->subject("[STAFF] $sujet")
+                        ->htmlTemplate($template)
+                        ->context($context)
+                )
             );
         }
     }
