@@ -56,6 +56,11 @@
                                     </button>
                                 </div>
                             {% endif %}
+                            {% if avis_form is defined and avis_form is not null %}
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#avisModal">
+                                    <i class="bi bi-star-fill text-dark"></i> Donner mon avis
+                                </button>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -294,12 +299,7 @@
 
                     {# Boutons #}
                     <div class="d-flex gap-2 justify-content-center mt-4">
-                        {% if avis_form is defined and avis_form is not null %}
-                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#avisModal">
-                                <i class="bi bi-star-fill text-dark"></i>
-                                Donner mon avis
-                            </button>
-                        {% elseif commande.statut == 'terminee' and commande.avis is not null %}
+                        {% if commande.statut == 'terminee' and commande.avis is not null %}
                             <div class="alert alert-success d-inline-block px-4 py-2 mb-0">
                                 <i class="bi bi-check-circle-fill"></i> Avis enregistré
                             </div>
