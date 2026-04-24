@@ -7,8 +7,9 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Contract\PasswordResetMailerServiceInterface;
 
-class PasswordResetMailerService
+class PasswordResetMailerService implements PasswordResetMailerServiceInterface
 {
     private const EXPEDITEUR = 'noreply@vite-et-gourmand.fr';
 

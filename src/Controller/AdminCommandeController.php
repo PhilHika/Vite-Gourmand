@@ -6,7 +6,7 @@ use App\Entity\Commande;
 use App\Form\AdminCommandeFormType;
 use App\Form\CommandesFilterType;
 use App\Repository\CommandeRepository;
-use App\Service\CommandeMailerService;
+use App\Contract\CommandeMailerServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,7 +43,7 @@ class AdminCommandeController extends AbstractController
         Commande $commande,
         Request $request,
         EntityManagerInterface $em,
-        CommandeMailerService $commandeMailer
+        CommandeMailerServiceInterface $commandeMailer
     ): Response {
         $statutsAnnulables = [
             Commande::STATUT_EN_ATTENTE,
@@ -83,7 +83,7 @@ class AdminCommandeController extends AbstractController
         Commande $commande,
         Request $request,
         EntityManagerInterface $em,
-        CommandeMailerService $commandeMailer
+        CommandeMailerServiceInterface $commandeMailer
     ): Response {
         $menu = $commande->getMenu();
         $ancienStatut = $commande->getStatut();

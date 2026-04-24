@@ -7,8 +7,9 @@ use App\Repository\UtilisateurRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Contract\CommandeMailerServiceInterface;
 
-class CommandeMailerService
+class CommandeMailerService implements CommandeMailerServiceInterface
 {
     private const string EXPEDITEUR = 'noreply@vite-et-gourmand.fr';
 

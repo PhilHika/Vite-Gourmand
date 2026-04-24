@@ -6,7 +6,7 @@ use App\Entity\Commande;
 use App\Form\CommandeFormType;
 use App\Form\EditCommandeFormType;
 use App\Repository\MenuRepository;
-use App\Service\CommandeMailerService;
+use App\Contract\CommandeMailerServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +20,7 @@ class CommandeController extends AbstractController
 {
     #[Route('/new', name: 'app_commande_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request, MenuRepository $menuRepository, EntityManagerInterface $em, CommandeMailerService $commandeMailer): Response
+    public function new(Request $request, MenuRepository $menuRepository, EntityManagerInterface $em, CommandeMailerServiceInterface $commandeMailer): Response
     {
         $menuId = $request->query->get('menu');
         $menu = null;

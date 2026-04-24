@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\DTO\ContactData;
 use App\Form\ContactFormType;
-use App\Service\ContactMailerService;
+use App\Contract\ContactMailerServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ContactController extends AbstractController
 {
     #[Route('/contact', name: 'app_contact')]
-    public function contactUs(Request $request, ContactMailerService $contactMailer): Response
+    public function contactUs(Request $request, ContactMailerServiceInterface $contactMailer): Response
     {
         $contactData = new ContactData();
         $form = $this->createForm(ContactFormType::class, $contactData);

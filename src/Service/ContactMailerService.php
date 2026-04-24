@@ -6,8 +6,9 @@ use App\DTO\ContactData;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Contract\ContactMailerServiceInterface;
 
-class ContactMailerService
+class ContactMailerService implements ContactMailerServiceInterface
 {
     private const EXPEDITEUR = 'noreply@vite-et-gourmand.fr';
     private const DESTINATAIRE_ADMIN = 'admin@vite-et-gourmand.fr';

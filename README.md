@@ -117,6 +117,7 @@ classDiagram
 ### 🔑 Gestion des mots de passe
 - `UserPasswordHasherInterface` avec l'algorithme `auto` (bcrypt/argon2id selon la config).
 - Stockage sur `VARCHAR(255)` en base.
+- `UtilisateurRepository` implémente `PasswordUpgraderInterface` : re-hachage automatique silencieux à chaque login si l'algorithme configuré a évolué.
 
 ### 🆔 Identifiants de commande
 - Format `XXXXXXXX-YYYYMMDD` (UUID v4 tronqué + date), généré automatiquement via `#[ORM\PrePersist]`.
@@ -138,13 +139,18 @@ Implémentation manuelle (sans bundle externe) avec une table dédiée `reset_pa
 
 #### Architecture Service
 
-Les emails sont gérés par des **services dédiés** dans `src/Service/` :
+Les emails sont gérés par des **services dédiés** dans `src/Service/`, chacun **derrière un contrat** dans `src/Contract/` (principe SOLID — Dependency Inversion) :
 
 ```
+src/Contract/
+├── CommandeMailerServiceInterface.php   ← Contrat : envoyerConfirmation(), envoyerChangementStatut()
+├── ContactMailerServiceInterface.php    ← Contrat : envoyerMessageContact()
+└── PasswordResetMailerServiceInterface.php ← Contrat : envoyerLienReset()
+
 src/Service/
-├── CommandeMailerService.php          ← Emails liés aux commandes
-├── ContactMailerService.php           ← Emails liés au formulaire de contact
-└── PasswordResetMailerService.php     ← Emails liés au reset de mot de passe
+├── CommandeMailerService.php          ← Implémentation (commandes)
+├── ContactMailerService.php           ← Implémentation (formulaire de contact)
+└── PasswordResetMailerService.php     ← Implémentation (reset de mot de passe)
 ```
 
 Les vues des emails sont dans `templates/emails/` (layout + un template par type). Les services se chargent uniquement de l'envoi.

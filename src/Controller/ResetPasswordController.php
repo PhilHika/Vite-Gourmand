@@ -6,7 +6,7 @@ use App\Entity\ResetPasswordRequest;
 use App\Form\ResetPasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
 use App\Repository\ResetPasswordRequestRepository;
-use App\Service\PasswordResetMailerService;
+use App\Contract\PasswordResetMailerServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +25,7 @@ class ResetPasswordController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ResetPasswordRequestRepository $resetRepo,
-        PasswordResetMailerService $mailerService,
+        PasswordResetMailerServiceInterface $mailerService,
     ): Response {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
