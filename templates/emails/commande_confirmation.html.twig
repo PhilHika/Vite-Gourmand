@@ -29,7 +29,10 @@
         <li><strong>Prix menu :</strong> {{ commande.prixMenu|number_format(2, ',', ' ') }} €</li>
     </ul>
 
-    {% if not isStaff %}
+    {% if isStaff %}
+        <p><a href="{{ url('app_admin_commande_edit', {numeroCommande: commande.numeroCommande}) }}">Gérer cette commande</a></p>
+    {% else %}
         <p>Notre équipe vous contactera pour confirmer les détails de livraison.</p>
+        <p><a href="{{ url('app_commande_show', {numeroCommande: commande.numeroCommande}) }}">Voir ma commande</a></p>
     {% endif %}
 {% endblock %}
