@@ -211,8 +211,12 @@ Afin d'offrir une expérience utilisateur (UX) moderne et fluide, le tunnel de v
 
 | Route | Description |
 | :--- | :--- |
-| `/admin/commande/` | Listing de toutes les commandes (tous clients) |
+| `/admin/commande/` | Listing de toutes les commandes avec filtres (statut, client) |
 | `/admin/commande/{id}/edit` | Édition complète (statut, prix, dates, matériel) |
+
+**Filtres disponibles sur le listing :**
+- **Statut** : dropdown sur tous les statuts possibles
+- **Client** : champ de recherche autocomplété — liste uniquement les clients ayant au moins une commande, filtre par nom/prénom/email à la saisie
 
 #### Annulation par le client (`ROLE_USER`)
 

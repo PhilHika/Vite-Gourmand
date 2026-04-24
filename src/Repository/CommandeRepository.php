@@ -16,28 +16,24 @@ class CommandeRepository extends ServiceEntityRepository
         parent::__construct($registry, Commande::class);
     }
 
-    //    /**
-    //     * @return Commande[] Returns an array of Commande objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Commande[]
+     */
+    public function findByFilters(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->orderBy('c.dateCommande', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Commande
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!empty($filters['statut'])) {
+            $qb->andWhere('c.statut = :statut')
+               ->setParameter('statut', $filters['statut']);
+        }
+
+        if (!empty($filters['utilisateur'])) {
+            $qb->andWhere('c.utilisateur = :utilisateur')
+               ->setParameter('utilisateur', $filters['utilisateur']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

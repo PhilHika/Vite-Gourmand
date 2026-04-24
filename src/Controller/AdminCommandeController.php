@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commande;
 use App\Form\AdminCommandeFormType;
+use App\Form\CommandesFilterType;
 use App\Repository\CommandeRepository;
 use App\Service\CommandeMailerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,12 +20,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminCommandeController extends AbstractController
 {
     #[Route('/', name: 'app_admin_commande_index', methods: ['GET'])]
-    public function index(CommandeRepository $commandeRepository): Response
+    public function index(CommandeRepository $commandeRepository, Request $request): Response
     {
-        $commandes = $commandeRepository->findBy([], ['dateCommande' => 'DESC']);
+        $filterForm = $this->createForm(CommandesFilterType::class);
+        $filterForm->handleRequest($request);
+
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+            $commandes = $commandeRepository->findByFilters($filterForm->getData());
+        } else {
+            $commandes = $commandeRepository->findBy([], ['dateCommande' => 'DESC']);
+        }
 
         return $this->render('admin/commande/index.html.twig', [
             'commandes' => $commandes,
+            'filterForm' => $filterForm,
         ]);
     }
 

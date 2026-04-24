@@ -2,6 +2,11 @@
 
 {% block title %}Gestion des commandes{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <section class="py-5">
         <div class="container px-4 px-lg-5">
@@ -11,6 +16,31 @@
                     Gestion des commandes
                 </h2>
                 <span class="badge bg-primary fs-6">{{ commandes|length }} commande{{ commandes|length > 1 ? 's' : '' }}</span>
+            </div>
+
+            {# Filtres #}
+            <div class="card mb-4">
+                <div class="card-body">
+                    {{ form_start(filterForm, {attr: {class: 'row g-3 align-items-end'}}) }}
+                    <div class="col-md-4">
+                        {{ form_label(filterForm.statut) }}
+                        {{ form_widget(filterForm.statut, {attr: {class: 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_label(filterForm.utilisateur) }}
+                        {{ form_widget(filterForm.utilisateur, {attr: {class: 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-4 d-flex gap-2 align-items-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel"></i>
+                            Filtrer
+                        </button>
+                        <a href="{{ path('app_admin_commande_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                    {{ form_end(filterForm) }}
+                </div>
             </div>
 
             {% if commandes|length > 0 %}
@@ -107,4 +137,12 @@
             </div>
         </div>
     </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        new TomSelect('#commandes_filter_utilisateur', {
+            placeholder: 'Tous les clients',
+            allowEmptyOption: true,
+        });
+    </script>
 {% endblock %}
