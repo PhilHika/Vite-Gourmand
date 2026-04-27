@@ -238,22 +238,24 @@ class Commande
      */
     public function peutEtreTerminee(): bool
     {
+        $termineeFlag = false;
+
         // Sans prêt matériel : directement après livraison
         if ($this->statut === self::STATUT_LIVREE && !$this->pretMateriel) {
-            return true;
+            $termineeFlag = true;
         }
 
         // Avec prêt matériel ET restitution déjà cochée : raccourci direct depuis livrée
         if ($this->statut === self::STATUT_LIVREE && $this->pretMateriel && $this->restitutionMateriel) {
-            return true;
+            $termineeFlag = true;
         }
 
         // Avec prêt matériel : après passage par attente retour + restitution validée
         if ($this->statut === self::STATUT_EN_ATTENTE_RETOUR_MATERIEL && $this->restitutionMateriel) {
-            return true;
+            $termineeFlag = true;
         }
 
-        return false;
+        return $termineeFlag;
     }
 
     public function calculerPrixMenu(): void
