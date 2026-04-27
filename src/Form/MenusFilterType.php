@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** Formulaire de filtrage de la liste des menus (méthode GET, sans protection CSRF). */
 class MenusFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

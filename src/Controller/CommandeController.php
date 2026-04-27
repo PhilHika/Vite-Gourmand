@@ -247,7 +247,7 @@ class CommandeController extends AbstractController
             $avis->setUtilisateur($this->getUser());
             $avis->setStatut(\App\Entity\Avis::STATUT_EN_ATTENTE);
 
-            // Create form directly using fully-qualified name to avoid missing imports in use statements
+            // Création du formulaire en nom complet pour éviter un import manquant dans les use
             $form = $this->createForm(\App\Form\AvisFormType::class, $avis);
             $form->handleRequest($request);
 

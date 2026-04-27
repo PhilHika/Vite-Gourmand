@@ -6,6 +6,11 @@ use App\Repository\ContenuSiteRepository;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Document MongoDB pour les contenus éditables du site.
+ * Clés utilisées : 'description' (page d'accueil), 'conditions_vente' (CGV).
+ * Accessible en Twig via get_description_site() et get_conditions_vente().
+ */
 #[MongoDB\Document(collection: 'contenu_site', repositoryClass: ContenuSiteRepository::class)]
 class ContenuSite
 {

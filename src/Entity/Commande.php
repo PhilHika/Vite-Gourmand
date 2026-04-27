@@ -280,7 +280,7 @@ class Commande
 
     public function setAvis(Avis $avis): static
     {
-        // set the owning side of the relation if necessary
+        // Définir le côté propriétaire de la relation si nécessaire
         if ($avis->getCommande() !== $this) {
             $avis->setCommande($this);
         }

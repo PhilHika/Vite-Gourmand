@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** Entité référentiel des régimes alimentaires (ex: végétarien, sans gluten). Liée aux Menus. */
 #[ORM\Entity(repositoryClass: RegimeRepository::class)]
 class Regime
 {

@@ -16,6 +16,7 @@ class ContenuSiteRepository extends ServiceDocumentRepository
         parent::__construct($registry, ContenuSite::class);
     }
 
+    /** Retourne le document ContenuSite pour la clé donnée ('description', 'conditions_vente'). */
     public function findByCle(string $cle): ?ContenuSite
     {
         return $this->findOneBy(['cle' => $cle]);

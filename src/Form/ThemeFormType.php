@@ -23,7 +23,7 @@ class ThemeFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Theme::class,
-            'csrf_protection' => false, // Simplifies AJAX handling for this specific internal tool
+            'csrf_protection' => false, // Simplifie la gestion AJAX pour cet outil interne
         ]);
     }
 }
