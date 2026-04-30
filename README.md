@@ -398,13 +398,66 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 | Créer un admin (+ init rôles) | `php bin/console app:create-admin --email=... --password=...` |
 | Reset mot de passe admin | `php bin/console app:reset-admin` |
 | **Tests** | |
-| Lancer les tests PHPUnit | `php bin/phpunit` |
+| Lancer tous les tests | `php bin/phpunit --no-coverage` |
+| Lancer uniquement les tests unitaires | `php bin/phpunit tests/Unit --no-coverage` |
+| Lancer un fichier précis | `php bin/phpunit tests/Unit/Entity/CommandeTest.php --no-coverage` |
+| Lancer un test précis | `php bin/phpunit --filter testCalculerPrixMenuAvecRemise --no-coverage` |
 | **Qualité & Debug** | |
 | Vider le cache | `php bin/console cache:clear` |
 | Voir les routes | `php bin/console debug:router` |
 | Voir les logs Docker | `docker compose logs -f` |
 
 > En mode Docker complet, préfixez les commandes par `docker compose exec php`.
+
+---
+
+## 🧪 Tests PHPUnit
+
+### Structure des tests
+
+```
+tests/
+├── bootstrap.php                              ← Chargement Symfony (APP_ENV=test)
+└── Unit/                                      ← Tests sans BDD ni kernel
+    ├── Entity/
+    │   ├── AvisTest.php
+    │   ├── AllergeneTest.php
+    │   ├── CommandeTest.php
+    │   ├── PlatTest.php
+    │   ├── RegimeTest.php
+    │   ├── ResetPasswordRequestTest.php
+    │   ├── RoleTest.php
+    │   ├── ThemeTest.php
+    │   └── UtilisateurTest.php
+    ├── Document/
+    │   └── HoraireTest.php
+    ├── Service/
+    │   └── CommandeMailerServiceTest.php
+    └── Twig/
+        ├── HoraireExtensionTest.php
+        └── ContenuSiteExtensionTest.php
+```
+
+### Fichiers à lire pour apprendre PHPUnit (commentaires tutoriels)
+
+Ces fichiers contiennent des commentaires pédagogiques détaillés. À lire dans cet ordre :
+
+1. `tests/Unit/Entity/AvisTest.php`
+2. `tests/Unit/Entity/CommandeTest.php`
+3. `tests/Unit/Entity/PlatTest.php`
+4. `tests/Unit/Document/HoraireTest.php`
+5. `tests/Unit/Entity/UtilisateurTest.php`
+6. `tests/Unit/Entity/ResetPasswordRequestTest.php`
+7. `tests/Unit/Service/CommandeMailerServiceTest.php`
+8. `tests/Unit/Twig/HoraireExtensionTest.php`
+9. `tests/Unit/Twig/ContenuSiteExtensionTest.php`
+
+### Fichiers en style production (sans commentaires tutoriels)
+
+- `tests/Unit/Entity/RoleTest.php`
+- `tests/Unit/Entity/AllergeneTest.php`
+- `tests/Unit/Entity/RegimeTest.php`
+- `tests/Unit/Entity/ThemeTest.php`
 
 > **📍 Note de déploiement prod (Opcache)** : passer `validate_timestamps=0` dans `docker/php/opcache.ini` pour désactiver la vérification des fichiers à chaque requête (gain de performance significatif). En contrepartie, vider obligatoirement l'opcache à chaque déploiement via `php bin/console cache:clear`.
 

@@ -18,8 +18,29 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+        <!--
+            3 suites indépendantes — chacune s'exécute sans l'autre.
+
+            Unit        → pas de BDD, pas de kernel Symfony. Rapide. Toujours vert.
+            Functional  → kernel Symfony complet. Docker requis pour les pages
+                          qui rendent du Twig avec MongoDB/PostgreSQL.
+                          Les tests d'accès (redirections) fonctionnent SANS Docker.
+            Integration → BDD réelle (PostgreSQL + MongoDB). Requiert Docker.
+
+            Commandes utiles :
+              php vendor/bin/phpunit −−testsuite Unit
+              php vendor/bin/phpunit −−testsuite Functional
+              php vendor/bin/phpunit −−testsuite Integration
+              php vendor/bin/phpunit                         (toutes les suites)
+        -->
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
 
@@ -31,6 +52,14 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory>src/DataFixtures</directory>
+            <directory>src/Migrations</directory>
+            <directory>src/Command</directory>
+            <directory>src/Form</directory>
+            <directory>src/Controller</directory>
+            <file>src/Kernel.php</file>
+        </exclude>
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>
@@ -39,6 +68,21 @@
         </deprecationTrigger>
     </source>
 
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false"
+    >
+        <report>
+            <html outputDirectory="var/coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            <text outputFile="var/coverage/coverage.txt" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
     <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="App" />
+            <parameter name="dns-mock-namespaces" value="App" />
+        </bootstrap>
     </extensions>
 </phpunit>
