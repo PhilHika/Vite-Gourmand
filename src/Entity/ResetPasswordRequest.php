@@ -5,6 +5,12 @@ namespace App\Entity;
 use App\Repository\ResetPasswordRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Entité représentant une demande de réinitialisation de mot de passe.
+ * Le token UUID v4 est valide 1h (expiresAt).
+ * Toute demande précédente pour le même utilisateur est supprimée
+ * avant création d'une nouvelle (voir ResetPasswordRequestRepository).
+ */
 #[ORM\Entity(repositoryClass: ResetPasswordRequestRepository::class)]
 #[ORM\Table(name: 'reset_password_request')]
 class ResetPasswordRequest
@@ -60,6 +66,7 @@ class ResetPasswordRequest
         return $this->requestedAt;
     }
 
+    /** Retourne true si le délai de validité du token (1h) est dépassé. */
     public function isExpired(): bool
     {
         return $this->expiresAt < new \DateTimeImmutable();

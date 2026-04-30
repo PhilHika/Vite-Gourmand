@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 
+/**
+ * Formulaire d'inscription.
+ * Le mot de passe est non mappé ('mapped' => false) et hashé dans RegistrationController.
+ */
 class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -30,6 +34,7 @@ class RegistrationFormType extends AbstractType
                 'first_options' => [
                     'label' => 'Mot de passe',
                     'attr' => ['placeholder' => 'Minimum 10 caractères'],
+                    // Règles : min 10 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
                     'constraints' => [
                         new NotBlank(['message' => 'Veuillez saisir un mot de passe']),
                         new Length([

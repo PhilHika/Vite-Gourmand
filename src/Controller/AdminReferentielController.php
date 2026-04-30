@@ -44,7 +44,7 @@ class AdminReferentielController extends AbstractController
         $allergene = new Allergene();
         $form = $this->createForm(AllergeneFormType::class, $allergene);
 
-        // Handle JSON or Form data (simplest is form submit via ajax)
+        // Traiter les données JSON ou formulaire (soumission via AJAX)
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -56,7 +56,7 @@ class AdminReferentielController extends AbstractController
             ]);
         }
 
-        // If errors
+        // En cas d'erreurs de validation
         return new JsonResponse(['success' => false, 'message' => 'Erreur de validation'], 400);
     }
 

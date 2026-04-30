@@ -24,7 +24,7 @@ class MenuFormType extends AbstractType
                 'label' => 'Titre',
                 'attr' => ['class' => 'form-control', 'maxlength' => 50]
             ])
-            ->add('description', TextType::class, [ // Using TextType because length is 50 in Entity
+            ->add('description', TextType::class, [ // TextType car la longueur est limitée à 50 dans l'entité
                 'label' => 'Description courte',
                 'attr' => ['class' => 'form-control', 'maxlength' => 50]
             ])
@@ -61,9 +61,9 @@ class MenuFormType extends AbstractType
                 'choice_label' => 'titrePlat',
                 'label' => 'Plats inclus',
                 'multiple' => true,
-                'expanded' => false, // Set to true for checkboxes if preferred
-                'attr' => ['class' => 'form-select', 'size' => 10], // size to show multiple items
-                'by_reference' => false, // Important for ManyToMany to call add/remove methods
+                'expanded' => false, // Mettre à true pour afficher des cases à cocher
+                'attr' => ['class' => 'form-select', 'size' => 10], // size pour afficher plusieurs items
+                'by_reference' => false, // Obligatoire pour ManyToMany : appelle les méthodes add/remove
             ])
             ->add('conditions', CollectionType::class, [
                 'entry_type' => TextType::class,

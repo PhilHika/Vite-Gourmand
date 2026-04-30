@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/** Entité référentiel des allergènes. Liée aux Plats via une relation ManyToMany. */
 #[ORM\Entity(repositoryClass: AllergeneRepository::class)]
 class Allergene
 {

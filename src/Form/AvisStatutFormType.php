@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** Formulaire de modération d'un avis : permet de le publier, refuser ou remettre en attente. */
 class AvisStatutFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

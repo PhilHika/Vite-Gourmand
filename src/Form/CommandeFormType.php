@@ -12,11 +12,16 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Formulaire de création d'une commande.
+ * Accepte l'option 'nombre_personne_min' (défaut : 1) pour contraindre
+ * le champ nombrePersonne au minimum du menu sélectionné.
+ */
 class CommandeFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $nombrePersonneMin = $options['nombre_personne_min'] ?? 1;
+        $nombrePersonneMin = $options['nombre_personne_min'] ?? 1; // Minimum issu du menu sélectionné
 
         $builder
             ->add('datePrestation', DateType::class, [

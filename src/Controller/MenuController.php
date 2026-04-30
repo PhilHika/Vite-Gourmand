@@ -19,6 +19,7 @@ class MenuController extends AbstractController
         $filterForm = $this->createForm(MenusFilterType::class);
         $filterForm->handleRequest($request);
 
+        // Appliquer les filtres soumis via GET si le formulaire est valide
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $menus = $menuRepository->findByFilters($filterForm->getData());
         } else {

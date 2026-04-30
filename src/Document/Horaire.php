@@ -73,7 +73,7 @@ class Horaire
 
     public function setHeureFermeture(string $heureFermeture): static
     {
-        // [0-2][0-9]:[0-5][0-9]
+        // Format attendu : HH:mm (ex: 09:30 — regex [0-2][0-9]:[0-5][0-9])
         if (!preg_match('/^[0-2][\d]:[0-5][\d]$/', $heureFermeture)) {
             throw new \InvalidArgumentException('Le format de l\'heure de fermeture doit être HH:mm.');
         }

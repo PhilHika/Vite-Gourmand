@@ -8,6 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entité de gestion des rôles (ROLE_USER, ROLE_SALARIE, ROLE_ADMIN).
+ * Pattern non-standard Symfony : le rôle est une entité ORM plutôt qu'un
+ * tableau dans Utilisateur. La hiérarchie est définie dans security.yaml.
+ */
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
 class Role
 {

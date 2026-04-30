@@ -105,7 +105,7 @@ class CommandeController extends AbstractController
             if ($request->request->get('_confirmed') === '1') {
                 // Décrémenter le stock
                 $menu->setQuantiteRestante($menu->getQuantiteRestante() - 1);
-                
+
                 // Mémoriser les conditions du menu (snapshot)
                 $commande->setConditionsMenu($menu->getConditions());
 
@@ -236,13 +236,18 @@ class CommandeController extends AbstractController
         $avisForm = null;
 
         // Si la commande est terminée et qu'aucun avis n'a été déposé
-        if ($commande->getStatut() === Commande::STATUT_TERMINEE && !$commande->getAvis()) {
+        // seulement pour le proprietaire de la commande (MEME les role_admin & role_salarie ne peuvent pas laisser d'avis)
+        if (
+            $commande->getStatut() === Commande::STATUT_TERMINEE
+            && !$commande->getAvis()
+            && $commande->getUtilisateur() === $this->getUser()
+        ) {
             $avis = new \App\Entity\Avis();
             $avis->setCommande($commande);
             $avis->setUtilisateur($this->getUser());
             $avis->setStatut(\App\Entity\Avis::STATUT_EN_ATTENTE);
 
-            // Create form directly using fully-qualified name to avoid missing imports in use statements
+            // Création du formulaire en nom complet pour éviter un import manquant dans les use
             $form = $this->createForm(\App\Form\AvisFormType::class, $avis);
             $form->handleRequest($request);
 

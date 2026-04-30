@@ -67,16 +67,16 @@ class AdminPlatController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle Deletion
+            // Traitement de la suppression de photo
             if ($form->get('deletePhoto')->getData()) {
                 $this->removePhotoFile($plat->getPhoto());
                 $plat->setPhoto(null);
             }
 
-            // Handle Upload (Overwrites deletion if both selected)
+            // Traitement de l'upload (remplace la suppression si les deux sont sélectionnés)
             $photoFile = $form->get('photoFile')->getData();
             if ($photoFile) {
-                // Remove old file first
+                // Supprimer l'ancien fichier en premier
                 $this->removePhotoFile($plat->getPhoto());
 
                 $newFilename = $this->handleUpload($photoFile);
@@ -99,7 +99,7 @@ class AdminPlatController extends AbstractController
     #[Route('/{id}/delete-photo', name: 'app_admin_plat_delete_photo', methods: ['POST'])]
     public function deletePhoto(Request $request, Plat $plat, PlatRepository $platRepository): Response
     {
-        // Validate CSRF token
+        // Vérifier le jeton CSRF
         if (!$this->isCsrfTokenValid('delete-photo-' . $plat->getId(), $request->request->get('_token'))) {
             $this->addFlash('danger', 'Token CSRF invalide.');
             return $this->redirectToRoute('app_admin_plat_edit', ['id' => $plat->getId()]);
@@ -124,7 +124,7 @@ class AdminPlatController extends AbstractController
 
         $titre = $plat->getTitrePlat();
 
-        // Remove photo file before deleting the entity
+        // Supprimer le fichier photo avant de supprimer l'entité
         $this->removePhotoFile($plat->getPhoto());
 
         $platRepository->remove($plat, true);
@@ -135,7 +135,7 @@ class AdminPlatController extends AbstractController
     }
 
     /**
-     * Upload a photo file and return the generated filename.
+     * Téléverse un fichier photo et retourne le nom de fichier généré.
      */
     private function handleUpload(\Symfony\Component\HttpFoundation\File\UploadedFile $file): string
     {
@@ -149,7 +149,7 @@ class AdminPlatController extends AbstractController
     }
 
     /**
-     * Remove a photo file from disk if it exists.
+     * Supprime un fichier photo du disque s'il existe.
      */
     private function removePhotoFile(?string $filename): void
     {

@@ -12,6 +12,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Formulaire de modification d'une commande existante.
+ * Utilisable uniquement si statut = EN_ATTENTE.
+ * Sous-ensemble de CommandeFormType : exclut dateCommande et adresse initiale.
+ */
 class EditCommandeFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

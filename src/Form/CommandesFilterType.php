@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** Formulaire de filtrage des commandes pour l'espace admin (méthode GET, sans CSRF). */
 class CommandesFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,6 +36,7 @@ class CommandesFilterType extends AbstractType
                 'label' => 'Client',
                 'placeholder' => 'Tous les clients',
                 'choice_label' => fn(Utilisateur $u) => sprintf('%s %s (%s)', $u->getPrenom(), $u->getNom(), $u->getEmail()),
+                // Limité aux utilisateurs ayant au moins une commande
                 'query_builder' => fn($repo) => $repo->createQueryBuilder('u')
                     ->join('u.commandes', 'c')
                     ->groupBy('u.id')
