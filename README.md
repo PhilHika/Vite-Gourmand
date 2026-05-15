@@ -10,7 +10,8 @@ Application de gestion de commandes de menus traiteur, développée avec Symfony
 - **Serveur Web** : Nginx (Alpine)
 - **Base de données relationnelle** : PostgreSQL 16 (Doctrine ORM)
 - **Base de données NoSQL** : MongoDB 7 (Doctrine ODM)
-- **Outils** : Mailpit (Capture d'emails), Mongo Express (Admin MongoDB), Composer 2.8
+- **Frontend dynamique** : Vue.js 3 (Vue CLI 5) — utilisé pour les pages à interactivité riche (filtres sans rechargement, etc.)
+- **Outils** : Mailpit (Capture d'emails), Mongo Express (Admin MongoDB), Composer 2.8, npm 10+
 
 ---
 
@@ -299,24 +300,32 @@ docker compose up -d --build
 docker compose exec php composer install
 ```
 
-**Mode dev hybride (recommandé pour le développement) :**
+**Mode dev hybride (recommandé pour le développement sur Windows) :**
 
-Ce mode utilise Docker uniquement pour les bases de données et le serveur PHP natif de Symfony pour l'application. Il offre de meilleures performances et un rechargement plus rapide.
+Ce mode utilise Docker uniquement pour les bases de données et le **serveur PHP natif de Symfony CLI** pour l'application. Sous Windows, ce mode est nettement plus rapide (le bind-mount Docker du dossier projet ralentit considérablement PHP-FPM).
 
 ```bash
 # Lancer les bases de données + Mongo Express
 docker compose up -d db mongodb mongo-express
 
-# Lancer le serveur Symfony
+# Lancer le serveur Symfony (lit automatiquement .symfony.local.yaml)
 symfony serve -d
 ```
 
-| Service | URL |
-| :--- | :--- |
-| Application (mode hybride) | http://localhost:8000 |
-| Application (mode Docker) | http://localhost:8080 |
-| Mongo Express (admin MongoDB) | http://localhost:8081 |
-| Mailpit (capture d'emails) | http://localhost:8025 |
+Le fichier `.symfony.local.yaml` à la racine du projet fixe automatiquement deux paramètres importants :
+- `port: 8080` — même port qu'en mode Docker complet, **un seul URL à retenir** quel que soit le mode
+- `no_tls: true` — désactive l'auto-redirect HTTPS du serveur Go de Symfony CLI
+
+> ⚠️ Sans `no_tls: true`, Symfony CLI répond 307 sur HTTP et redirige vers `https://localhost:8080`. Le proxy Vue (`localhost:8082` → `localhost:8080`) reçoit ce redirect et le passe au navigateur, qui voit alors un cross-origin → **erreur CORS**. C'est pour ça qu'on désactive TLS en dev.
+
+| Service | URL | Mode |
+| :--- | :--- | :--- |
+| Application (Symfony) | http://localhost:8080 | Hybride OU Docker (exclusifs) |
+| Mongo Express (admin MongoDB) | http://localhost:8081 | Docker |
+| Mailpit (capture d'emails) | http://localhost:8025 | Docker |
+| Vue.js dev server (HMR) | http://localhost:8082 | `npm run serve` |
+
+> 🔁 **Hybride et Docker complet utilisent tous deux le port :8080** — ils sont donc **mutuellement exclusifs**. Si tu lances `symfony serve -d` puis `docker compose up nginx`, le second échouera à bind sur :8080.
 
 ### 4. Initialiser les bases de données
 
@@ -331,7 +340,50 @@ php bin/console doctrine:mongodb:schema:create
 
 > Les fixtures créent les **3 rôles** (`ROLE_USER`, `ROLE_SALARIE`, `ROLE_ADMIN`) en base. Les comptes utilisateurs sont à créer via l'interface `/register`.
 
-### 5. Créer un administrateur (post-déploiement)
+### 5. Installer et builder le frontend Vue.js
+
+Le projet utilise Vue.js 3 (Vue CLI 5) pour les pages à interactivité riche. Le code source Vue vit dans `vue-app/` et est compilé vers `public/build/` pour être servi par Symfony.
+
+```bash
+cd vue-app
+npm ci                  # installe les dépendances (équivalent npm install mais plus rapide et déterministe)
+npm run build           # compile les .vue vers public/build/
+cd ..
+```
+
+Vérifie que `public/build/manifest.json` a été généré : c'est ce fichier que Symfony lit pour résoudre les noms de fichiers hashés via `{{ asset('menu-index.js', 'vue_build') }}` en Twig.
+
+> **Pourquoi `npm ci` plutôt que `npm install`** : `npm ci` installe **exactement** les versions du `package-lock.json` (plus rapide, déterministe, idéal pour CI/CD et premier clone). `npm install` peut mettre à jour les versions selon les caret/tilde.
+
+#### Workflow de dev frontend (Hot Module Reload)
+
+Pour développer sur les composants Vue avec rechargement instantané :
+
+```bash
+cd vue-app
+npm run serve           # → http://localhost:8082
+```
+
+Les appels `/api/*` faits depuis `localhost:8082` sont automatiquement proxifiés vers Symfony sur `localhost:8080` (peu importe que tu sois en mode hybride ou Docker) — configuré dans `vue-app/vue.config.js`.
+
+> **Limite du dev server Vue (`:8082`)** : la SPA y tourne en isolation, sans le layout Twig (navbar, footer). Pour tester l'intégration finale, valide toujours sur `http://localhost:8080/menu` après un `npm run build`.
+
+#### Note importante : CORS uniquement en dev
+
+Le proxy Vue + `.symfony.local.yaml` (no_tls) est nécessaire **seulement** en mode dev avec `npm run serve`. En production :
+
+- Vue est **pré-buildé** une seule fois au déploiement (`npm run build` → `public/build/`)
+- Symfony Nginx sert à la fois le HTML Twig ET les assets `/build/*`
+- Toutes les requêtes (page + API) sont donc en **même origine** → **CORS impossible**
+- Le HTTPS est géré par le reverse proxy en amont (Cloudflare, Traefik, etc.), pas par l'app
+
+#### Détail technique : intégration Vue ↔ Symfony
+
+- `vue-app/vue.config.js` : redirige `outputDir` vers `../public/build/` et configure le plugin `webpack-manifest-plugin` (manifest.json non généré nativement par Vue CLI 5)
+- `config/packages/framework.yaml` : déclare un asset package `vue_build` qui lit ce manifest
+- Templates Twig : `{{ asset('chunk-vendors.js', 'vue_build') }}` et `{{ asset('menu-index.js', 'vue_build') }}` injectent les bons fichiers hashés
+
+### 6. Créer un administrateur (post-déploiement)
 
 Après un déploiement en production (ou sur un environnement vierge sans fixtures), la commande `app:create-admin` permet de créer un compte administrateur en une seule étape :
 
@@ -364,7 +416,7 @@ heroku run php bin/console app:create-admin --email=admin@viteetgourmand.fr --pa
 
 > **Sécurité** : ces commandes ne sont accessibles que via le terminal serveur (CLI). Elles ne peuvent pas être exécutées depuis le navigateur. Seul un utilisateur authentifié sur la plateforme d'hébergement (Heroku, Upsun, SSH, etc.) peut les exécuter.
 
-### 6. Réinitialiser les mots de passe admin
+### 7. Réinitialiser les mots de passe admin
 
 La commande `app:reset-admin` permet de réinitialiser le mot de passe des comptes admin sans les supprimer (préserve les commandes et avis liés).
 
@@ -383,7 +435,7 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 
 > En mode interactif, le mot de passe est saisi de manière **cachée** (non affiché à l'écran). Si vous appuyez sur Entrée sans rien taper, l'admin est ignoré.
 
-### 7. Commandes utiles
+### 8. Commandes utiles
 
 | Action | Commande |
 | :--- | :--- |
@@ -402,9 +454,15 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 | Lancer uniquement les tests unitaires | `php bin/phpunit tests/Unit --no-coverage` |
 | Lancer un fichier précis | `php bin/phpunit tests/Unit/Entity/CommandeTest.php --no-coverage` |
 | Lancer un test précis | `php bin/phpunit --filter testCalculerPrixMenuAvecRemise --no-coverage` |
+| **Frontend (Vue CLI)** — depuis `vue-app/` | |
+| Installer les dépendances | `cd vue-app && npm ci` |
+| Lancer le dev server (HMR sur :8082) | `cd vue-app && npm run serve` |
+| Builder pour la prod (→ `public/build/`) | `cd vue-app && npm run build` |
+| Vérifier le manifest généré | `cat public/build/manifest.json` |
 | **Qualité & Debug** | |
 | Vider le cache | `php bin/console cache:clear` |
 | Voir les routes | `php bin/console debug:router` |
+| Voir la config asset packages | `php bin/console debug:config framework assets` |
 | Voir les logs Docker | `docker compose logs -f` |
 
 > En mode Docker complet, préfixez les commandes par `docker compose exec php`.

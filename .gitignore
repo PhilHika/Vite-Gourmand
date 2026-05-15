@@ -38,6 +38,16 @@ docker/db_data/
 /docker/mongodb/data
 ###< Docker ###
 
+###> vue-app ###
+PLAN-VUE-MENU-FILTER.md
+/vue-app/node_modules/
+/vue-app/dist/
+/public/build/
+
+# template file .old
+# This file is a backup of the original template file
+templates/menu/index.html.twig.old
+
 ###> vincentlanglet/twig-cs-fixer ###
 /.twig-cs-fixer.cache
 ###< vincentlanglet/twig-cs-fixer ###

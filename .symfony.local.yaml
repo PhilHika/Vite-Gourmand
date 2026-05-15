@@ -1,0 +1,13 @@
+# Config du serveur local Symfony CLI pour ce projet (mode dev hybride).
+# Lu automatiquement par `symfony serve` depuis ce répertoire.
+#
+# - port: 8080 pour cohabiter avec le mode Docker complet sans confusion
+#         (en mode Docker, c'est aussi :8080 via nginx, on a un seul URL en tête).
+# - no_tls: true → désactive l'auto-redirect HTTP→HTTPS du serveur Go.
+#         Sans ça, les fetch JS depuis le proxy Vue (localhost:8082)
+#         se font casser par un 307 redirect vers https://localhost:8080
+#         qui devient cross-origin → CORS blocked.
+
+http:
+    port: 8080
+    no_tls: true

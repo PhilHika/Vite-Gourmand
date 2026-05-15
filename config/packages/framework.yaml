@@ -2,6 +2,13 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    # Package d'assets dédié au build Vue : permet à asset('foo.js', 'vue_build')
+    # de résoudre les noms de fichiers hashés via public/build/manifest.json.
+    assets:
+        packages:
+            vue_build:
+                json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
+
     session:
         handler_id: null
         cookie_secure: auto

@@ -45,7 +45,7 @@ class MenusFilterType extends AbstractType
             ])
             ->add('nombrePersonne', IntegerType::class, [
                 'required' => false,
-                'label' => 'Minimum de personnes',
+                'label' => 'Nombre de personnes',
                 'attr' => ['placeholder' => 'Nb personnes', 'min' => 1],
             ])
         ;

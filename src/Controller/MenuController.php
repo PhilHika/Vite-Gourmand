@@ -3,33 +3,23 @@
 namespace App\Controller;
 
 use App\Entity\Menu;
-use App\Form\MenusFilterType;
-use App\Repository\MenuRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/menu')]
 class MenuController extends AbstractController
 {
+    /**
+     * Point d'entrée HTML de la liste des menus.
+     * Le filtrage, le chargement des données et le rendu des cartes sont entièrement
+     * délégués à la SPA Vue (montée sur #app dans menu/index.html.twig).
+     * La logique métier reste dans MenuApiController qui sert les données en JSON.
+     */
     #[Route('/', name: 'app_menu_index', methods: ['GET'])]
-    public function index(Request $request, MenuRepository $menuRepository): Response
+    public function index(): Response
     {
-        $filterForm = $this->createForm(MenusFilterType::class);
-        $filterForm->handleRequest($request);
-
-        // Appliquer les filtres soumis via GET si le formulaire est valide
-        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-            $menus = $menuRepository->findByFilters($filterForm->getData());
-        } else {
-            $menus = $menuRepository->findAll();
-        }
-
-        return $this->render('menu/index.html.twig', [
-            'menus' => $menus,
-            'filterForm' => $filterForm,
-        ]);
+        return $this->render('menu/index.html.twig');
     }
 
     #[Route('/{id}', name: 'app_menu_show', methods: ['GET'])]
