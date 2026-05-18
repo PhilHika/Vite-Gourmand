@@ -16,7 +16,9 @@ class MenuApiController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(Request $request, MenuRepository $menuRepository): JsonResponse
     {
-        // Réutilise EXACTEMENT le même formulaire que la version Twig
+        // MenusFilterType n'est plus rendu en HTML (Vue gère son propre formulaire dans
+        // MenuFilters.vue) : on l'utilise ici uniquement comme parseur/validateur des
+        // query params GET envoyés par la SPA, préfixés `menus_filter[clé]=valeur`.
         $filterForm = $this->createForm(MenusFilterType::class);
         $filterForm->handleRequest($request);
 
