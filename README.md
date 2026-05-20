@@ -248,6 +248,22 @@ Le client peut annuler sa commande depuis `/commande/{numeroCommande}` **uniquem
 > 2. **Typage de la `note` en `SMALLINT`** (1 à 5) : Garantit l'intégrité de la note directement au niveau de la base de données PostgreSQL, empêchant d'éventuelles failles de saisie.
 > 3. **Ajout d'un système d'état (`statut` en `VARCHAR(255)`)** : Gérer un site sans modération expose le propriétaire à des avis indésirables ou diffamatoires. L'ajout natif des statuts constants (`STATUT_EN_ATTENTE`, `STATUT_PUBLIE`, `STATUT_REFUSE`) était indispensable pour simuler un véritable outil de gestion e-commerce professionnel.
 
+### 🔎 Filtrage dynamique du catalogue (Vue CLI + API Symfony)
+
+Listing `/menu` rendu par une **SPA Vue 3** — filtres appliqués **sans rechargement**.
+
+**Côté Vue** — [vue-app/src/views/MenuIndex.vue](vue-app/src/views/MenuIndex.vue) :
+- Fetch `/api/referentiels` une seule fois (thèmes/régimes)
+- `watch` deep sur `filtresMenu` + **debounce 500 ms** → fetch `/api/menus`
+- Event `@apply-now` (touche Enter) → bypass du debounce
+- `window.history.replaceState` → URL partageable, back/forward OK
+
+**Côté Symfony** — [src/Form/MenusFilterType.php](src/Form/MenusFilterType.php) :
+- Format query : `menus_filter[clé]=valeur`
+- `method: GET`, `csrf_protection: false`
+- Sert de **parseur/validateur** des query params (pas de rendu HTML)
+- Validation Symfony conservée (`EntityType` pour `theme`/`regime`), UX déléguée à `MenuFilters.vue`
+
 ---
 
 ## 🛠️ Installation & Workflow
