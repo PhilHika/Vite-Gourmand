@@ -169,14 +169,14 @@ export default {
       }
     },
 
-    // Construit la query string compatible avec MenusFilterType de Symfony
-    // (préfixe "menus_filter[clé]=valeur" attendu par le form Symfony)
+    // Construit la query string à plat : ?prixMin=10&theme=2
+    // Le préfixe "menus_filter[]" a été retiré côté Symfony via getBlockPrefix() = ''.
     construireParamsUrl() {
       const params = new URLSearchParams();
       for (const cleFiltre of Object.keys(this.filtresMenu)) {
         const valeur = this.filtresMenu[cleFiltre];
         if (valeur !== null && valeur !== '') {
-          params.append(`menus_filter[${cleFiltre}]`, valeur);
+          params.append(cleFiltre, valeur);
         }
       }
       return params.toString();
@@ -193,7 +193,7 @@ export default {
     lireFiltresDepuisUrl() {
       const params = new URLSearchParams(window.location.search);
       for (const cleFiltre of Object.keys(FILTRES_VIDES)) {
-        const valeurUrl = params.get(`menus_filter[${cleFiltre}]`);
+        const valeurUrl = params.get(cleFiltre);
         if (valeurUrl !== null && valeurUrl !== '') {
           this.filtresMenu[cleFiltre] = valeurUrl;
         }
