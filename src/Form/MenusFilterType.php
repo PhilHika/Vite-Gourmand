@@ -11,7 +11,15 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/** Formulaire de filtrage de la liste des menus (méthode GET, sans protection CSRF). */
+/**
+ * Filtres de la liste des menus (méthode GET, sans protection CSRF).
+ *
+ * Utilisé par MenuApiController comme parseur/validateur des query params GET
+ * envoyés par la SPA Vue (préfixe `menus_filter[clé]=valeur`). Ce formulaire
+ * n'est plus rendu en HTML : Vue construit son propre formulaire dans
+ * vue-app/src/components/MenuFilters.vue. Les options de rendu (label, attr,
+ * placeholder, html5, choice_label) sont donc volontairement omises.
+ */
 class MenusFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -19,34 +27,20 @@ class MenusFilterType extends AbstractType
         $builder
             ->add('prixMin', NumberType::class, [
                 'required' => false,
-                'label' => 'Prix min (€/pers)',
-                'attr' => ['placeholder' => 'Min', 'min' => 0, 'step' => '0.50'],
-                'html5' => true,
             ])
             ->add('prixMax', NumberType::class, [
                 'required' => false,
-                'label' => 'Prix max (€/pers)',
-                'attr' => ['placeholder' => 'Max', 'min' => 0, 'step' => '0.50'],
-                'html5' => true,
             ])
             ->add('theme', EntityType::class, [
                 'class' => Theme::class,
-                'choice_label' => 'libelle',
                 'required' => false,
-                'label' => 'Thème',
-                'placeholder' => 'Tous les thèmes',
             ])
             ->add('regime', EntityType::class, [
                 'class' => Regime::class,
-                'choice_label' => 'libelle',
                 'required' => false,
-                'label' => 'Régime',
-                'placeholder' => 'Tous les régimes',
             ])
             ->add('nombrePersonne', IntegerType::class, [
                 'required' => false,
-                'label' => 'Minimum de personnes',
-                'attr' => ['placeholder' => 'Nb personnes', 'min' => 1],
             ])
         ;
     }
