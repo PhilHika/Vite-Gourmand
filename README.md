@@ -451,7 +451,21 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 
 > En mode interactif, le mot de passe est saisi de manière **cachée** (non affiché à l'écran). Si vous appuyez sur Entrée sans rien taper, l'admin est ignoré.
 
-### 8. Commandes utiles
+### 8. Lister les utilisateurs
+
+La commande `app:list-users` affiche tous les comptes présents.
+
+```bash
+php bin/console app:list-users
+```
+
+**Colonnes affichées :**
+
+| `ID` |  `Email` |  `Username` | `Role` | 
+> trié par rôle (`ROLE_ADMIN`, `ROLE_SALARIE`, `ROLE_USER`) (puis tri alphabétique / email) 
+> La commande est en lecture seule : aucune modification n'est faite en base.
+
+### 9. Commandes utiles
 
 | Action | Commande |
 | :--- | :--- |
@@ -465,6 +479,7 @@ php bin/console app:reset-admin --email=admin@viteetgourmand.fr --password=Nouve
 | **Déploiement** | |
 | Créer un admin (+ init rôles) | `php bin/console app:create-admin --email=... --password=...` |
 | Reset mot de passe admin | `php bin/console app:reset-admin` |
+| Lister tous les utilisateurs | `php bin/console app:list-users` |
 | **Tests** | |
 | Lancer tous les tests | `php bin/phpunit --no-coverage` |
 | Lancer uniquement les tests unitaires | `php bin/phpunit tests/Unit --no-coverage` |
