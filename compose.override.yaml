@@ -5,14 +5,8 @@ services:
       - "5433:5432"
   ###< doctrine/doctrine-bundle ###
 
-  ###> symfony/mailer ###
-  mailer:
-    image: axllent/mailpit
-    ports:
-      - "1025"
-      - "8025"
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
-
-###< symfony/mailer ###
+  # NOTE : le service `mailer` (Mailpit) a été retiré volontairement.
+  # En dev hybride, le mailer utilisé est MailHog.exe standalone (host Windows,
+  # ports 1025/8025). Garder un service `mailer` ici fait écraser MAILER_DSN par
+  # `symfony serve` (auto-détection des services Docker) et casse l'envoi.
+  # La migration vers Mailpit est planifiée — voir doc/mémoire dédiée.

@@ -52,4 +52,15 @@ class MenusFilterType extends AbstractType
             'csrf_protection' => false,
         ]);
     }
+
+    /**
+     * Préfixe vidé : les champs apparaissent à plat dans la query string
+     * (?prixMin=10&theme=2) au lieu de ?menus_filter[prixMin]=10&menus_filter[theme]=2.
+     * URLs plus lisibles et partageables. Pas de risque de collision tant que la
+     * page /menu n'a qu'un seul form (pas de pagination ni autres params concurrents).
+     */
+    public function getBlockPrefix(): string
+    {
+        return '';
+    }
 }
